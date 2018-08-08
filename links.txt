@@ -14,6 +14,20 @@ asyncio:
 https://www.youtube.com/watch?v=GLN_xo4Awcc
 https://www.youtube.com/watch?v=8-PxeTgTx6s
 
+
+
+https://www.youtube.com/watch?v=wilsMcO-vkY
+https://www.youtube.com/watch?v=Zx0RjdwOyKQ
+https://www.youtube.com/watch?v=F6sa6G0lJCk
+
+https://www.youtube.com/watch?v=8-PxeTgTx6s
+https://www.youtube.com/watch?v=OjDAu2DCzt0
+
+https://www.youtube.com/watch?v=oa9Tjs80n5E
+
+https://www.youtube.com/watch?v=6KTjxQd1zjM
+
+
 Введение в aiohttp:
 https://www.youtube.com/watch?v=F6sa6G0lJCk
 
@@ -31,6 +45,9 @@ https://www.youtube.com/watch?v=yMTkk36HTvM
 
 DevOps
 https://www.youtube.com/watch?v=vPFGi9nDHmA
+
+
+
 
 
 
