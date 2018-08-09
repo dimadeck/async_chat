@@ -53,5 +53,5 @@ class ChatProtocolFactory(ServerFactory):
 if __name__ == "__main__":
     print("Starting Server")
     factory = ChatProtocolFactory()
-    reactor.listenTCP(12345, factory)
+    reactor.listenTCP(1234, factory)
     reactor.run()
