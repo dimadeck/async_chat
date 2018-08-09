@@ -2,10 +2,8 @@ from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
 from clint.textui import colored
-import datetime
 
 port = 8000
-chatLog = []
 
 
 class ChatProtocol(LineReceiver):
@@ -14,26 +12,16 @@ class ChatProtocol(LineReceiver):
         self.name = None
         self.state = "REGISTER"
 
-    def getTime(self):
-        return '({:%Y/%m/%d %H:%M:%S})'.format(datetime.datetime.now())
-
     def connectionMade(self):
-        banner = ("""
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        #### Successfully Connected to the Chat Server ####
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        """)
-        self.sendLine(banner)
-        self.sendLine(self.getTime())
-        self.sendLine("Choose a username:")
+        print("New connection")
+        self.sendLine(bytes("You're connected", 'utf-8'))
+        self.sendLine(bytes("Choose a username:", 'utf-8'))
 
     def connectionLost(self, reason):
-        leftMsg = colored.red('%s has left the channel.' % (self.name,))
+        leftMsg = f'{self.name} has left the channel.'
         if self.name in self.factory.users:
             del self.factory.users[self.name]
             self.broadcastMessage(leftMsg)
-        chatLog.append(self.name + " exits.")
-        self.updateSessionInfo()
 
     def lineReceived(self, line):
         if self.state == "REGISTER":
@@ -43,45 +31,25 @@ class ChatProtocol(LineReceiver):
 
     def handle_REGISTER(self, name):
         if name in self.factory.users:
-            self.sendLine("Sorry, %r is taken. Try something else." % name)
+            self.sendLine(bytes(f'Sorry, {name} is taken. Try something else.', 'utf-8'))
             return
 
-        welcomeMsg = ('Welcome to the chat, %s.' % (name,))
-
         joinedMsg = colored.green('%s has joined the chanel.' % (name,))
-        self.sendLine(welcomeMsg)
         self.broadcastMessage(joinedMsg)
         self.name = name
         self.factory.users[name] = self
         self.state = "CHAT"
-        self.updateSessionInfo()
-
-        if len(self.factory.users) > 1:
-            self.sendLine('Participants in chat: %s ' % (", ".join(self.factory.users)))
-        else:
-            self.sendLine("You're the only one here, %r" % name)
 
     def handle_CHAT(self, message):
         message = self.getTime() + "<%s> %s" % (self.name, message)
         self.broadcastMessage(colored.magenta(message))
-        chatLog.append(message)
-        self.updateSessionInfo()
 
     def broadcastMessage(self, message):
-        for name, protocol in self.factory.users.iteritems():
+        for name, protocol in self.factory.users.items():
+            print(f'name = {name}')
+            print(f'protocol = {protocol}')
             if protocol != self:
-                protocol.sendLine(colored.white(message))
-                self.updateSessionInfo()
-
-    def updateSessionInfo(self):
-        print(chr(27) + "[2J")
-        molding = "============================================"
-        print(molding)
-        print('Users in chat: %s ' % (", ".join(self.factory.users)))
-        print(molding)
-        global chatLog
-        chatLog = chatLog[-20:]
-        print("\n".join(chatLog))
+                protocol.sendLine(bytes(colored.white(message), 'utf-8'))
 
 
 class ChatFactory(Factory):
