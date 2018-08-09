@@ -1,5 +1,6 @@
 Часть 10. Сетевое программирование
 https://www.ibm.com/developerworks/ru/library/l-python_part_10/
+http://twisted.readthedocs.io/en/twisted-18.4.0/core/howto/servers.html
 
 AsyncIO
 https://habr.com/post/337420/

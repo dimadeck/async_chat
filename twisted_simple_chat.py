@@ -10,6 +10,7 @@ class Chat(LineReceiver):
 
     def connectionMade(self):
         print("[DEBUG] - New connection")
+
         self.send_current("What's your name?")
 
     def connectionLost(self, reason):
