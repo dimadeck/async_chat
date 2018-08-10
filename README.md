@@ -13,16 +13,30 @@
 
 Note [10.09.18]:
 
-Реализация асинхронного сервера инструментами Asyncio и Twisted.
+Реализация асинхронного сервера с помощью инструментов Asyncio, Tornado и Twisted.
 
+Tornado и AsyncIO являются наследниками одного класса - ChatKernel.
 
 Подключение клиентов через telnet:
-
-
 
 Twisted: port = 1234
 
 Asyncio: port = 10000
+
+Tornado: port = 8000
+
+## Tornado Simple Chat ##
+
+Запуск сервера:
+
+python run.py tor_chat
+
+Клиенты: telnet 127.0.0.1 8000
+
+Демонстрация работы чата:
+
+![alt text](git03.png)
+
 
 ## Asyncio Simple Chat ##
 
