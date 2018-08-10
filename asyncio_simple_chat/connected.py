@@ -6,6 +6,9 @@ class Connected:
     def add_connection(self, connection):
         self.connections.append(connection)
 
+    def is_exist_connection(self, connection):
+        return connection in self.connections
+
     def is_valid_name(self, username):
         if username in self.users.values():
             return -1
@@ -13,7 +16,10 @@ class Connected:
             return 0
 
     def register_user(self, connection, username):
-        self.users[connection] = username
+        if self.is_valid_name(username) == 0:
+            self.users[connection] = username
+            return 0
+        return -1
 
     def is_register(self, connection):
         return connection in self.users

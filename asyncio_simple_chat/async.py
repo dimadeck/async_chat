@@ -2,6 +2,9 @@ import asyncio
 from asyncio_simple_chat.data_parser import DataParser
 from asyncio_simple_chat.connected import Connected
 
+SERVER_INFO = True
+DEBUG_MODE = False
+
 
 class AsyncioChat:
     def __init__(self):
@@ -13,10 +16,13 @@ class AsyncioChat:
             if len(request) > 1:
                 parse_list = DataParser(request)
 
-                print(f'Request: {parse_list.data_list}')  # DEBUG LINE
+                if DEBUG_MODE:
+                    print(f'Request: {parse_list.data_list}')  # DEBUG LINE
 
-                if self.connected.get_name(writer) == 0:
+                if not self.connected.is_exist_connection(writer):
                     self.connected.add_connection(writer)
+                    if SERVER_INFO:
+                        print(f"[SERVER INFO] - New connection: {writer.get_extra_info('peername')}")
 
                 if parse_list.status == 0:
                     if self.run_command(parse_list, writer) == -1:
@@ -31,7 +37,9 @@ class AsyncioChat:
         cmd = req_dict.cmd
         param = req_dict.parameter
         body = req_dict.body
-        print(f'Command: {cmd}\nParameter: {param}\nBody: {body}')  # DEBUG LINE
+
+        if DEBUG_MODE:
+            print(f'Command: {cmd}\nParameter: {param}\nBody: {body}')  # DEBUG LINE
 
         if self.connected.is_register(connection):
             if cmd == 'msg' or cmd == 'msgall':
@@ -47,12 +55,12 @@ class AsyncioChat:
             elif cmd == 'userlist':
                 self.send_message(connection, self.connected.get_user_list())
             elif cmd == 'login':
-                self.send_message(connection, 'Already login!')
+                self.send_message(connection, '[Error]: Already login!')
         else:
             if cmd == 'login':
                 self.login(connection, param)
             else:
-                self.send_message(connection, 'First login!')
+                self.send_message(connection, '[Error]: First login!')
         return 0
 
     def send_engine(self, connection, cmd, param, body):
@@ -64,7 +72,7 @@ class AsyncioChat:
                 self.send_message(user, f'[{sender}*]: {message}')
                 self.send_message(connection, f'[{sender}*]: {message}')
             else:
-                self.send_message(connection, f'[{user}]: not found!')
+                self.send_message(connection, f'[Error]: [{user}]: not found!')
         elif cmd == 'msgall':
             self.send_all(f'[{sender}]: {message}')
 
@@ -77,14 +85,18 @@ class AsyncioChat:
             self.send_message(user, message)
 
     def login(self, connection, username):
-        self.connected.register_user(connection, username)
-        self.send_all(f'[System Message]: [{username}] login to chat.')
+        if self.connected.register_user(connection, username) == 0:
+            self.send_all(f'[System Message]: [{username}] login to chat.')
+            if SERVER_INFO:
+                print(f'[SERVER INFO] - [{username}] login to chat.')
 
     def logout(self, connection):
         username = self.connected.get_name(connection)
         connection.close()
         self.connected.drop_connection(connection)
         self.send_all(f'[System Message]: [{username}] logout from chat.')
+        if SERVER_INFO:
+            print(f'[SERVER INFO] - [{username}] logout from chat.')
 
 
 def main():
@@ -92,7 +104,8 @@ def main():
     port = 10000
     loop = asyncio.get_event_loop()
     loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
-    print(f'Server started on {port} port.')
+    if SERVER_INFO:
+        print(f'[SERVER INFO] - Server started on {port} port.')
     try:
         loop.run_forever()
     except KeyboardInterrupt:
