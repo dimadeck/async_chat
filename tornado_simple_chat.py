@@ -2,23 +2,22 @@ from tornado.ioloop import IOLoop
 from tornado import gen
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
+from base_server.base_server import ChatKernel
 
-from asyncio_simple_chat.connected import Connected
 
-
-class EchoServer(TCPServer):
+class EchoServer(TCPServer, ChatKernel):
     def __init__(self):
-        super().__init__()
-        self.connected = Connected()
+        super(EchoServer, self).__init__()
+        super(ChatKernel, self).__init__()
 
     @gen.coroutine
     def handle_stream(self, stream, address):
         while True:
             try:
                 data = yield stream.read_until(b"\n")
-                data = data.decode("utf-8").strip("\r\n")
-                print(f'Recieved: {data}')
-                yield stream.write(bytes(data, 'utf-8'))
+                if self.engine(data, stream) == -1:
+                    break
+                # yield stream.write(bytes(data, 'utf-8'))
             except StreamClosedError:
                 print(f"Log out: {address}")
                 break

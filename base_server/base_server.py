@@ -9,6 +9,7 @@ class ChatKernel:
     def __init__(self):
         self.connected = Connected()
 
+    # Asyncio chat
     # async def handle_client(self, reader, writer):
     #     while True:
     #         request = (await reader.read(1024))

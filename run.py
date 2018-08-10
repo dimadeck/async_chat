@@ -1,5 +1,6 @@
 import twisted_simple_chat as tw_chat
-import asyncio_simple_chat.server as as_chat
+import tornado_simple_chat as tor_chat
+import asyncio_simple_chat as as_chat
 import sys
 
 if __name__ == '__main__':
@@ -9,7 +10,9 @@ if __name__ == '__main__':
             tw_chat.main()
         elif prog == 'as_chat' or prog == '2':
             as_chat.main()
+        elif prog == 'tor_chat' or prog == '3':
+            tor_chat.main()
         else:
             print('Unknown program!')
     else:
-        print("Type program name: 'tw_chat' or 'as_chat'")
+        print("Type program name: 'tw_chat' or 'as_chat' or 'tor_chat'")
