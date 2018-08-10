@@ -89,6 +89,8 @@ class AsyncioChat:
             self.send_all(f'[System Message]: [{username}] login to chat.')
             if SERVER_INFO:
                 print(f'[SERVER INFO] - [{username}] login to chat.')
+        else:
+            self.send_message(connection, f'[Error]: [{username}]: already exist!')
 
     def logout(self, connection):
         username = self.connected.get_name(connection)
@@ -97,6 +99,7 @@ class AsyncioChat:
         self.send_all(f'[System Message]: [{username}] logout from chat.')
         if SERVER_INFO:
             print(f'[SERVER INFO] - [{username}] logout from chat.')
+            print(f"[SERVER INFO] - [{connection.get_extra_info('peername')}] is closed.")
 
 
 def main():

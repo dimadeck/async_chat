@@ -1,5 +1,5 @@
 import twisted_simple_chat as tw_chat
-import asyncio_simple_chat.async as as_chat
+import asyncio_simple_chat.server as as_chat
 import sys
 
 if __name__ == '__main__':

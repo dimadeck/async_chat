@@ -1,4 +1,4 @@
-#Asyncio, twisted, tornado#
+# Asyncio, twisted, tornado #
 
 Подготовка:
 
@@ -11,17 +11,41 @@
 4) source env/bin/activate
 
 
-##Twisted Simple Chat##
+Note [10.09.18]:
 
-Запуск сервера:
-
-python run.py
+Реализация асинхронного сервера инструментами Asyncio и Twisted.
 
 
 Подключение клиентов через telnet:
 
-telnet 127.0.0.1 1234
+
+
+Twisted: port = 1234
+
+Asyncio: port = 10000
+
+## Asyncio Simple Chat ##
+
+Запуск сервера:
+
+python run.py as_chat
+
+Клиенты: telnet 127.0.0.1 10000
+
+Демонстрация работы чата:
+
+![alt text](git02.png)
+
+
+## Twisted Simple Chat ##
+
+Запуск сервера:
+
+python run.py tw_chat
+
+Клиенты: telnet 127.0.0.1 1234
 
 Демонстрация работы чата:
 
 ![alt text](git01.png)
+
