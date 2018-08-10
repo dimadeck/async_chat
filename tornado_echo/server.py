@@ -21,10 +21,14 @@ class EchoServer(TCPServer):
                 print(e)
 
 
-if __name__ == "__main__":
+def main():
     server = EchoServer()
     server.listen(8000)
     try:
         IOLoop.current().start()
     except KeyboardInterrupt:
         IOLoop.current().close()
+
+
+if __name__ == "__main__":
+    main()
