@@ -27,45 +27,46 @@ class AsyncioChat:
                 self.logout(writer)
                 break
 
-    def run_command(self, dictionary, connection):
-        cmd = dictionary.cmd
-        param = dictionary.parameter
-        body = dictionary.body
+    def run_command(self, req_dict, connection):
+        cmd = req_dict.cmd
+        param = req_dict.parameter
+        body = req_dict.body
         print(f'Command: {cmd}\nParameter: {param}\nBody: {body}')  # DEBUG LINE
-        if cmd == 'login':
-            if self.connected.is_register(connection):
-                self.send_message(connection, 'Already log in.')
-            else:
-                self.login(connection, param)
+
+        if self.connected.is_register(connection):
+            if cmd == 'msg' or cmd == 'msgall':
+                self.send_engine(connection, cmd, param, body)
+            elif cmd == 'logout':
+                self.logout(connection)
+                return -1
+            elif cmd == 'debug':
+                print(self.connected.connections)
+                print(self.connected.users)
+            elif cmd == 'whoami':
+                self.send_message(connection, self.connected.get_name(connection))
+            elif cmd == 'userlist':
+                self.send_message(connection, self.connected.get_user_list())
+            elif cmd == 'login':
+                self.send_message(connection, 'Already login!')
         else:
-            if self.connected.is_register(connection):
-                if cmd == 'msg' or cmd == 'msgall':
-                    sender = self.connected.get_name(connection)
-                    message = ' '.join(body)
-
-                    if cmd == 'msg':
-                        user = self.connected.get_connection(param)
-                        if user is not None:
-                            self.send_message(user, f'[{sender}*]: {message}')
-                            self.send_message(connection, f'[{sender}*]: {message}')
-                        else:
-                            self.send_message(connection, f'[{user}]: not found!')
-                    elif cmd == 'msgall':
-                        self.send_all(f'[{sender}]: {message}')
-
-                elif cmd == 'logout':
-                    self.logout(connection)
-                    return -1
-                elif cmd == 'debug':
-                    print(self.connected.connections)
-                    print(self.connected.users)
-                elif cmd == 'whoami':
-                    self.send_message(connection, self.connected.get_name(connection))
-                elif cmd == 'userlist':
-                    self.send_message(connection, self.connected.get_user_list())
+            if cmd == 'login':
+                self.login(connection, param)
             else:
                 self.send_message(connection, 'First login!')
         return 0
+
+    def send_engine(self, connection, cmd, param, body):
+        sender = self.connected.get_name(connection)
+        message = ' '.join(body)
+        if cmd == 'msg':
+            user = self.connected.get_connection(param)
+            if user is not None:
+                self.send_message(user, f'[{sender}*]: {message}')
+                self.send_message(connection, f'[{sender}*]: {message}')
+            else:
+                self.send_message(connection, f'[{user}]: not found!')
+        elif cmd == 'msgall':
+            self.send_all(f'[{sender}]: {message}')
 
     @staticmethod
     def send_message(connection, message):
