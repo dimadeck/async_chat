@@ -12,7 +12,7 @@ class AsyncioChat:
             request = (await reader.read(1024))
             parse_list = DataParser(request)
 
-            print(parse_list.data_list)  # DEBUG CODE
+            print(f'Request: {parse_list.data_list}')  # DEBUG LINE
 
             self.connected.add_connection(writer)
             if parse_list.status == 0:
@@ -22,33 +22,41 @@ class AsyncioChat:
 
     def run_command(self, dictionary, connection):
         cmd = dictionary.cmd
-        params = dictionary.parameter
+        param = dictionary.parameter
         body = dictionary.body
-
-        # DEBUG CODE START
-        print(cmd)
-        print(params)
-        print(body)
-        # DEBUG CODE END
+        print(f'Command: {cmd}\nParameter: {param}\nBody: {body}')  # DEBUG LINE
 
         if cmd == 'login':
-            self.connected.register_user(connection, params)
-        elif cmd == 'msg':
-            pass
-        elif cmd == 'msgall':
-            pass
-            # for user in self.users.keys():
-            #     user.write(bytes('Вам новое сообщение','utf-8'))
+            self.connected.register_user(connection, param)
+        elif cmd == 'msg' or cmd == 'msgall':
+            sender = self.connected.get_name(connection)
+            message = ' '.join(body)
+
+            if cmd =='msg':
+                user = self.connected.get_connection(param)
+                if user is not None:
+                    self.send_message(user, f'[{sender}*]: {message}')
+                    self.send_message(connection, f'[{sender}*]: {message}')
+                else:
+                    self.send_message(connection, f'[{user}]: not found!')
+
+            elif cmd =='msgall':
+                for user in self.connected.users.keys():
+                    self.send_message(user, f'[{sender}]: {message}')
+
         elif cmd == 'logout':
             pass
         elif cmd == 'debug':
-            pass
+            print(self.connected.connections)
+            print(self.connected.users)
         elif cmd == 'whoami':
-            pass
-        elif cmd == 'userlist':
-            pass
+            self.send_message(connection, self.connected.get_name(connection))
 
-    def send_message(self, connection, message):
+        elif cmd == 'userlist':
+            self.send_message(connection, self.connected.get_user_list())
+
+    @staticmethod
+    def send_message(connection, message):
         connection.write(bytes(f'{message}\n', 'utf-8'))
 
 

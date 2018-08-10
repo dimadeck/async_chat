@@ -22,6 +22,7 @@ class Connected:
         for connection in self.connections:
             if username == self.users[connection]:
                 return connection
+        return None
 
     def get_name(self, connection):
         try:
