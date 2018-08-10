@@ -20,7 +20,10 @@ class EchoServer(TCPServer, ChatKernel):
 
 def main():
     server = EchoServer()
-    server.listen(8000)
+    port = 8000
+    server.listen(port)
+    print(f'[SERVER INFO] - Tornado server started on {port} port.')
+
     try:
         IOLoop.current().start()
     except KeyboardInterrupt:

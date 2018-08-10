@@ -11,7 +11,7 @@
 4) source env/bin/activate
 
 
-Note [10.09.18]:
+## Note [10.09.18]: ##
 
 Реализация асинхронного сервера с помощью инструментов Asyncio, Tornado и Twisted.
 
