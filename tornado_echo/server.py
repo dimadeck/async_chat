@@ -15,7 +15,7 @@ class EchoServer(TCPServer):
                     data = data + b"\n"
                 yield stream.write(data)
             except StreamClosedError:
-                print(f"Log out: {address[0]}")
+                print(f"Log out: {address}")
                 break
             except Exception as e:
                 print(e)
@@ -24,4 +24,7 @@ class EchoServer(TCPServer):
 if __name__ == "__main__":
     server = EchoServer()
     server.listen(8000)
-    IOLoop.current().start()
+    try:
+        IOLoop.current().start()
+    except KeyboardInterrupt:
+        IOLoop.current().close()
