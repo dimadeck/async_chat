@@ -19,7 +19,8 @@ class AsyncioChat:
                     self.connected.add_connection(writer)
 
                 if parse_list.status == 0:
-                    self.run_command(parse_list, writer)
+                    if self.run_command(parse_list, writer) == -1:
+                        break
                 else:
                     self.send_message(writer, parse_list.STATUS_DICT[parse_list.status])
             if not request:
@@ -49,6 +50,7 @@ class AsyncioChat:
 
         elif cmd == 'logout':
             self.logout(connection)
+            return -1
         elif cmd == 'debug':
             print(self.connected.connections)
             print(self.connected.users)
@@ -56,6 +58,7 @@ class AsyncioChat:
             self.send_message(connection, self.connected.get_name(connection))
         elif cmd == 'userlist':
             self.send_message(connection, self.connected.get_user_list())
+        return 0
 
     @staticmethod
     def send_message(connection, message):
