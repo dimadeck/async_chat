@@ -3,11 +3,10 @@ from base_server.base_server import ChatKernel
 
 
 class AsyncioChat(ChatKernel):
-
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))
-            if self.engine(request, writer) == -1:
+            if self.engine(request, writer, writer.get_extra_info('peername')) == -1:
                 break
 
 

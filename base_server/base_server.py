@@ -9,17 +9,7 @@ class ChatKernel:
     def __init__(self):
         self.connected = Connected()
 
-    # Asyncio chat
-    # async def handle_client(self, reader, writer):
-    #     while True:
-    #         request = (await reader.read(1024))
-    #         if self.engine(request, writer) == -1:
-    #             break
-
-    def handle_client(self, reader, writer):
-        raise NotImplementedError
-
-    def engine(self, request, writer):
+    def engine(self, request, writer, addr):
         if len(request) > 1:
             parse_list = DataParser(request)
 
@@ -29,7 +19,7 @@ class ChatKernel:
             if not self.connected.is_exist_connection(writer):
                 self.connected.add_connection(writer)
                 if SERVER_INFO:
-                    print(f"[SERVER INFO] - New connection: {writer.get_extra_info('peername')}")
+                    print(f"[SERVER INFO] - New connection: {addr}")
 
             if parse_list.status == 0:
                 if self.run_command(parse_list, writer) == -1:
@@ -107,4 +97,3 @@ class ChatKernel:
         self.send_all(f'[System Message]: [{username}] logout from chat.')
         if SERVER_INFO:
             print(f'[SERVER INFO] - [{username}] logout from chat.')
-            print(f"[SERVER INFO] - [{connection.get_extra_info('peername')}] is closed.")
