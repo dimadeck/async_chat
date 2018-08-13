@@ -19,7 +19,7 @@
 подключенные пользователи, парсинг данных и т.д.
 
 Демонстрация работы трех чатов:
-![alt text](git04.png)
+![alt text](additional_materials/img_readme/all.png)
 
 
 Подключение клиентов через telnet:
@@ -40,7 +40,7 @@ python run.py tor_chat
 
 Демонстрация работы чата:
 
-![alt text](git03.png)
+![alt text](additional_materials/img_readme/tor.png)
 
 
 ## Asyncio Simple Chat ##
@@ -53,7 +53,7 @@ python run.py as_chat
 
 Демонстрация работы чата:
 
-![alt text](git02.png)
+![alt text](additional_materials/img_readme/as.png)
 
 
 ## Twisted Simple Chat ##
@@ -66,5 +66,5 @@ python run.py tw_chat
 
 Демонстрация работы чата:
 
-![alt text](git01.png)
+![alt text](additional_materials/img_readme/tw.png)
 
