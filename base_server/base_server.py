@@ -9,9 +9,8 @@ class ChatKernel:
     def __init__(self):
         self.connected = Connected()
 
-    def engine(self, request, writer, addr):
+    def engine(self, request, writer, addr, parse_list):
         if len(request) > 1:
-            parse_list = DataParser(request)
 
             if DEBUG_MODE:
                 print(f'Request: {parse_list.data_list}')  # DEBUG LINE
@@ -76,7 +75,7 @@ class ChatKernel:
 
     @staticmethod
     def send_message(connection, message):
-        connection.write(bytes(f'{message}\n', 'utf-8'))
+        raise NotImplementedError
 
     def send_all(self, message):
         for user in self.connected.users.keys():

@@ -3,6 +3,7 @@ from tornado import gen
 from tornado.tcpserver import TCPServer
 from base_server.base_server import ChatKernel
 from base_server.connected import Connected
+from base_server.data_parser import DataParser
 
 
 class EchoServer(TCPServer, ChatKernel):
@@ -14,8 +15,13 @@ class EchoServer(TCPServer, ChatKernel):
     def handle_stream(self, stream, address):
         while True:
             data = yield stream.read_until(b"\n")
-            if self.engine(data, stream, address) == -1:
+            parse_list = DataParser(data)
+            if self.engine(data, stream, address, parse_list) == -1:
                 break
+
+    @staticmethod
+    def send_message(connection, message):
+        connection.write(bytes(f'{message}\n', 'utf-8'))
 
 
 def main():
