@@ -22,6 +22,10 @@ class EchoServer(TCPServer, ChatKernel):
     def send_message(connection, message):
         connection.write(bytes(f'{message}\n', 'utf-8'))
 
+    @staticmethod
+    def close_connection(connection):
+        connection.close()
+
 
 def main():
     server = EchoServer()

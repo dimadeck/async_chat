@@ -78,6 +78,10 @@ class ChatKernel:
     def send_message(connection, message):
         raise NotImplementedError
 
+    @staticmethod
+    def close_connection(connection):
+        raise NotImplementedError
+
     def send_all(self, message):
         for user in self.connections.users.keys():
             self.send_message(user, message)
@@ -92,7 +96,7 @@ class ChatKernel:
 
     def logout(self, connection):
         username = self.connections.get_name(connection)
-        connection.close()
+        self.close_connection(connection)
         self.connections.drop_connection(connection)
         self.send_all(f'[System Message]: [{username}] logout from chat.')
         if SERVER_INFO:

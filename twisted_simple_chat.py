@@ -16,6 +16,10 @@ class Chat(LineReceiver, ChatKernel):
     def send_message(connection, message):
         connection.sendLine(bytes(f'{message}', 'utf-8'))
 
+    @staticmethod
+    def close_connection(connection):
+        connection.stopProducing()
+
 
 class Factory(protocol.ServerFactory):
     def startFactory(self):
