@@ -31,7 +31,7 @@ class Factory(protocol.ServerFactory):
 
 
 def main(port=1234):
-    print(f'[DEBUG] - Twisted Server start on {port}')
+    print(f'[SERVER INFO] - Twisted server started on {port} port.')
     reactor.listenTCP(port, Factory())
     reactor.run()
 
