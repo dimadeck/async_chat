@@ -70,9 +70,8 @@ class ChatKernel:
         if cmd == 'msg':
             user = self.connections.get_connection(param)
             if user is not None:
-                connection_message = f'[{colored.blue(sender)}*]: {message}'
                 self.send_message(user, f'[{sender}*]: {message}')
-                self.send_message(connection, connection_message)
+                self.send_message(connection, f'[{sender}*]: {message}')
             else:
                 mess = self.color_message('error', f'[{colored.yellow(user)}]: not found!')
                 self.send_message(connection, mess)

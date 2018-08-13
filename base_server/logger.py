@@ -41,7 +41,7 @@ class Log:
             message = f'[{self.kw["username"]}] login to chat.'
             color = 'green'
         elif mode == 'logout':
-            message = f'[{self.kw["username"]} logout from chat.'
+            message = f'[{self.kw["username"]}] logout from chat.'
             color = 'red'
         elif mode == 'new':
             message = f'New connection: {self.kw["addr"]}'
