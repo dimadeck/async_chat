@@ -1,7 +1,8 @@
-import twisted_simple_chat as tw_chat
-import tornado_simple_chat as tor_chat
-import asyncio_simple_chat as as_chat
 import sys
+
+import asyncio_simple_chat as as_chat
+import tornado_simple_chat as tor_chat
+import twisted_simple_chat as tw_chat
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

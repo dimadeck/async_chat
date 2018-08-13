@@ -1,4 +1,5 @@
 import asyncio
+
 from base_server.base_server import ChatKernel
 
 
@@ -17,6 +18,7 @@ class AsyncioChat(ChatKernel):
     @staticmethod
     def close_connection(connection):
         connection.close()
+
 
 def main():
     server = AsyncioChat()

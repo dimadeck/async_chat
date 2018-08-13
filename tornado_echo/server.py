@@ -1,5 +1,5 @@
-from tornado.ioloop import IOLoop
 from tornado import gen
+from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 

@@ -1,5 +1,5 @@
-from base_server.data_parser import DataParser
 from base_server.connected import Connected
+from base_server.data_parser import DataParser
 
 SERVER_INFO = True
 DEBUG_MODE = False
