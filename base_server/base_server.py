@@ -9,22 +9,22 @@ class ChatKernel:
     def __init__(self):
         self.connected = Connected()
 
-    def engine(self, request, writer, addr, parse_list):
+    def engine(self, request, writer, addr, req_dict):
         if len(request) > 1:
 
             if DEBUG_MODE:
-                print(f'Request: {parse_list.data_list}')  # DEBUG LINE
+                print(f'Request: {req_dict.data_list}')  # DEBUG LINE
 
             if not self.connected.is_exist_connection(writer):
                 self.connected.add_connection(writer)
                 if SERVER_INFO:
                     print(f"[SERVER INFO] - New connection: {addr}")
 
-            if parse_list.status == 0:
-                if self.run_command(parse_list, writer) == -1:
+            if req_dict.status == 0:
+                if self.run_command(req_dict, writer) == -1:
                     return -1
             else:
-                self.send_message(writer, parse_list.STATUS_DICT[parse_list.status])
+                self.send_message(writer, req_dict.STATUS_DICT[req_dict.status])
         if not request:
             self.logout(writer)
             return -1

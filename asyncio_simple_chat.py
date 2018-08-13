@@ -7,9 +7,9 @@ class AsyncioChat(ChatKernel):
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))
-            parse_list = DataParser(request)
+            req_dict = DataParser(request, strip='\r\n')
             addr = writer.get_extra_info('peername')
-            if self.engine(request, writer, addr, parse_list) == -1:
+            if self.engine(request, writer, addr, req_dict) == -1:
                 break
 
     @staticmethod

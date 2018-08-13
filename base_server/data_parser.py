@@ -5,13 +5,14 @@ class DataParser:
                    -20: 'empty message', }
     CMD_LIST = ['login', 'msg', 'msgall', 'logout', 'debug', 'whoami', 'userlist']
 
-    def __init__(self, request: bytes):
+    def __init__(self, request: bytes, strip):
         self.data_list = []
         self.request = request
         self.cmd = None
         self.parameter = None
         self.body = None
         self.status = 0
+        self.strip = strip
         self.parse_engine()
 
     def parse_engine(self):
@@ -26,7 +27,7 @@ class DataParser:
 
     def fill_list(self, encoding='utf-8', separator=' '):
         try:
-            self.data_list = self.request.decode(encoding).strip('\r\n').split(separator)
+            self.data_list = self.request.decode(encoding).strip(self.strip).split(separator)
             return 0
         except:
             return -1

@@ -15,8 +15,8 @@ class EchoServer(TCPServer, ChatKernel):
     def handle_stream(self, stream, address):
         while True:
             data = yield stream.read_until(b"\n")
-            parse_list = DataParser(data)
-            if self.engine(data, stream, address, parse_list) == -1:
+            req_dict = DataParser(data, strip='\r\n')
+            if self.engine(data, stream, address, req_dict) == -1:
                 break
 
     @staticmethod
