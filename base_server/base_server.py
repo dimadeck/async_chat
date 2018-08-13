@@ -6,15 +6,13 @@ DEBUG_MODE = False
 
 
 class ChatKernel:
-    def __init__(self, connections=None):
-        if connections is None:
-            self.connections = Connected()
-        else:
-            self.connections = connections
+    def __init__(self, connections=None, parse_strip='\r\n'):
+        self.connections = connections if connections is not None else Connected()
+        self.parse_strip = parse_strip
 
-    def engine(self, request, writer, addr, req_dict):
+    def engine(self, request, writer, addr):
         if len(request) > 1:
-
+            req_dict = DataParser(request, strip=self.parse_strip)
             if DEBUG_MODE:
                 print(f'Request: {req_dict.data_list}')  # DEBUG LINE
 
@@ -81,7 +79,6 @@ class ChatKernel:
         raise NotImplementedError
 
     def send_all(self, message):
-        print(self.connections.users)
         for user in self.connections.users.keys():
             self.send_message(user, message)
 

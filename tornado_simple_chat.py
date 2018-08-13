@@ -3,20 +3,19 @@ from tornado import gen
 from tornado.tcpserver import TCPServer
 from base_server.base_server import ChatKernel
 from base_server.connected import Connected
-from base_server.data_parser import DataParser
 
 
 class EchoServer(TCPServer, ChatKernel):
     def __init__(self):
         super(EchoServer, self).__init__()
-        self.connected = Connected()
+        self.connections = Connected()
+        self.parse_strip = '\r\n'
 
     @gen.coroutine
     def handle_stream(self, stream, address):
         while True:
             data = yield stream.read_until(b"\n")
-            req_dict = DataParser(data, strip='\r\n')
-            if self.engine(data, stream, address, req_dict) == -1:
+            if self.engine(data, stream, address) == -1:
                 break
 
     @staticmethod

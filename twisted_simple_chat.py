@@ -2,12 +2,11 @@ from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 from base_server.base_server import ChatKernel
 from base_server.connected import Connected
-from base_server.data_parser import DataParser
 
 
 class Chat(LineReceiver, ChatKernel):
     def __init__(self, users):
-        super(Chat, self).__init__(connections=users)
+        super(Chat, self).__init__(connections=users, parse_strip='')
 
     def connectionMade(self):
         print("[DEBUG] - New connection")
@@ -17,9 +16,8 @@ class Chat(LineReceiver, ChatKernel):
 
     def lineReceived(self, line):
         print(f'[DEBUG] - {line}')
-        req_dict = DataParser(line, strip='')
         writer = self
-        self.engine(line, writer, 'fake address', req_dict)
+        self.engine(line, writer, 'fake address')
 
     @staticmethod
     def send_message(connection, message):
