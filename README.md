@@ -11,11 +11,16 @@
 4) source env/bin/activate
 
 
-## Note [10.09.18]: ##
+## Note [13.08.18]: ##
 
 Реализация асинхронного сервера с помощью инструментов Asyncio, Tornado и Twisted.
 
-Tornado и AsyncIO являются наследниками одного класса - ChatKernel.
+{asyncio, tornado, twisted}*_simple_chat.py - Наследники класса ChatKernel. В нем основная логика чата и его механизмы:
+подключенные пользователи, парсинг данных и т.д.
+
+Демонстрация работы трех чатов:
+![alt text](git04.png)
+
 
 Подключение клиентов через telnet:
 
