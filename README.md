@@ -13,6 +13,10 @@
 
 ## Note [13.08.18]: ##
 
+### Update ###
+Добавлен цвет сообщений для более комфортного просмотра сообщений.
+![alt text](additional_materials/img_readme/color.png)
+
 Реализация асинхронного сервера с помощью инструментов Asyncio, Tornado и Twisted.
 
 {asyncio, tornado, twisted}*_simple_chat.py - Наследники класса ChatKernel. В нем основная логика чата и его механизмы:
@@ -20,6 +24,7 @@
 
 Демонстрация работы трех чатов:
 ![alt text](additional_materials/img_readme/all.png)
+
 
 
 Подключение клиентов через telnet:
