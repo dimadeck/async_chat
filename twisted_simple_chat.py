@@ -5,19 +5,12 @@ from base_server.connected import Connected
 
 
 class Chat(LineReceiver, ChatKernel):
-    def __init__(self, users):
-        super(Chat, self).__init__(connections=users, parse_strip='')
-
-    def connectionMade(self):
-        print("[DEBUG] - New connection")
-
-    def connectionLost(self, reason):
-        print("[DEBUG] - Lost connection")
+    def __init__(self, connections, addr):
+        super(Chat, self).__init__(connections=connections, parse_strip='')
+        self.addr = addr
 
     def lineReceived(self, line):
-        print(f'[DEBUG] - {line}')
-        writer = self
-        self.engine(line, writer, 'fake address')
+        self.engine(line, self, self.addr)
 
     @staticmethod
     def send_message(connection, message):
@@ -26,10 +19,10 @@ class Chat(LineReceiver, ChatKernel):
 
 class Factory(protocol.ServerFactory):
     def startFactory(self):
-        self.users = Connected()
+        self.connections = Connected()
 
     def buildProtocol(self, addr):
-        return Chat(self.users)
+        return Chat(self.connections, addr)
 
 
 def main(port=1234):
