@@ -7,8 +7,10 @@ DEBUG_MODE = False
 class Log:
     def __init__(self):
         self.color_set = {'blue': colored.blue, 'yellow': colored.yellow, 'red': colored.red, 'green': colored.green}
+        self.kw = None
 
     def log_engine(self, mode=None, mess=None, **kwargs):
+        self.kw = kwargs
         message = None
         color = None
         suffix = None
@@ -18,11 +20,11 @@ class Log:
         if mode is not None:
             if SERVER_INFO:
                 suffix = '[SERVER INFO] - '
-                message, color = self.server_info(mode, kwargs=kwargs)
+                message, color = self.server_info(mode)
             if DEBUG_MODE:
                 suffix = '[DEBUG] - '
                 color = 'blue'
-                message = self.debug_mode(mode, kwargs=kwargs)
+                message = self.debug_mode(mode)
 
             if message is not None:
                 if suffix is not None:
@@ -32,26 +34,24 @@ class Log:
 
                 print(message)
 
-    @staticmethod
-    def server_info(mode, **kwargs):
+    def server_info(self, mode):
         message = None
         color = None
         if mode == 'login':
-            message = f'[{kwargs["username"]}] login to chat.'
+            message = f'[{self.kw["username"]}] login to chat.'
             color = 'green'
         elif mode == 'logout':
-            message = f'[{kwargs["username"]} logout from chat.'
+            message = f'[{self.kw["username"]} logout from chat.'
             color = 'red'
         elif mode == 'new':
-            message = f'New connection: {kwargs["addr"]}'
+            message = f'New connection: {self.kw["addr"]}'
             color = 'yellow'
         return message, color
 
-    @staticmethod
-    def debug_mode(mode, **kwargs):
+    def debug_mode(self, mode):
         message = None
         if mode == 'request':
-            message = f'Request: {kwargs["data_list"]}'
+            message = f'Request: {self.kw["data_list"]}'
         elif mode == 'parse':
-            message = f'Command: {kwargs["cmd"]}\nParameter: {kwargs["param"]}\nBody: {kwargs["body"]}'
+            message = f'Command: {self.kw["cmd"]}\nParameter: {self.kw["param"]}\nBody: {self.kw["body"]}'
         return message
