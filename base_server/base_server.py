@@ -1,3 +1,5 @@
+from clint.textui import colored
+
 from base_server.connected import Connected
 from base_server.data_parser import DataParser
 
@@ -13,13 +15,11 @@ class ChatKernel:
     def engine(self, request, writer, addr):
         if len(request) > 1:
             req_dict = DataParser(request, strip=self.parse_strip)
-            if DEBUG_MODE:
-                print(f'Request: {req_dict.data_list}')  # DEBUG LINE
+            self.logging(mode='request', data_list=req_dict.data_list)
 
             if not self.connections.is_exist_connection(writer):
                 self.connections.add_connection(writer)
-                if SERVER_INFO:
-                    print(f"[SERVER INFO] - New connection: {addr}")
+                self.logging(mode='new', addr=addr)
 
             if req_dict.status == 0:
                 if self.run_command(req_dict, writer) == -1:
@@ -35,9 +35,7 @@ class ChatKernel:
         cmd = req_dict.cmd
         param = req_dict.parameter
         body = req_dict.body
-
-        if DEBUG_MODE:
-            print(f'Command: {cmd}\nParameter: {param}\nBody: {body}')  # DEBUG LINE
+        self.logging(mode='parse', cmd=cmd, param=param, body=body)
 
         if self.connections.is_register(connection):
             if cmd == 'msg' or cmd == 'msgall':
@@ -46,8 +44,8 @@ class ChatKernel:
                 self.logout(connection)
                 return -1
             elif cmd == 'debug':
-                print(self.connections.connections)
-                print(self.connections.users)
+                self.logging(mess=self.connections.connections)
+                self.logging(mess=self.connections.users)
             elif cmd == 'whoami':
                 self.send_message(connection, self.connections.get_name(connection))
             elif cmd == 'userlist':
@@ -89,8 +87,7 @@ class ChatKernel:
     def login(self, connection, username):
         if self.connections.register_user(connection, username) == 0:
             self.send_all(f'[System Message]: [{username}] login to chat.')
-            if SERVER_INFO:
-                print(f'[SERVER INFO] - [{username}] login to chat.')
+            self.logging(mode='login', username=username)
         else:
             self.send_message(connection, f'[Error]: [{username}]: already exist!')
 
@@ -99,5 +96,45 @@ class ChatKernel:
         self.close_connection(connection)
         self.connections.drop_connection(connection)
         self.send_all(f'[System Message]: [{username}] logout from chat.')
-        if SERVER_INFO:
-            print(f'[SERVER INFO] - [{username}] logout from chat.')
+        self.logging(mode='logout', username=username)
+
+    @staticmethod
+    def logging(mode=None, mess=None, **kwargs):
+        if mess is not None:
+            print(colored.white(mess))
+        if mode is not None:
+            message = None
+            suffix = None
+            color = None
+            if SERVER_INFO:
+                suffix = '[SERVER INFO] - '
+                if mode == 'login':
+                    message = f'[{kwargs["username"]}] login to chat.'
+                    color = 'green'
+                elif mode == 'logout':
+                    message = f'[{kwargs["username"]} logout from chat.'
+                    color = 'red'
+                elif mode == 'new':
+                    message = f'New connection: {kwargs["addr"]}'
+                    color = 'yellow'
+            if DEBUG_MODE:
+                suffix = '[DEBUG] - '
+                color = 'blue'
+                if mode == 'request':
+                    message = f'Request: {kwargs["data_list"]}'
+                elif mode == 'parse':
+                    message = f'Command: {kwargs["cmd"]}\nParameter: {kwargs["param"]}\nBody: {kwargs["body"]}'
+
+            if message is not None:
+                if suffix is not None:
+                    message = f'{suffix}{message}'
+                if color is not None:
+                    if color == 'blue':
+                        message = colored.blue(message)
+                    elif color == 'green':
+                        message = colored.green(message)
+                    elif color == 'red':
+                        message = colored.red(message)
+                    elif color == 'yellow':
+                        message = colored.yellow(message)
+                print(message)
