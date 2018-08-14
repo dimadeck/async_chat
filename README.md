@@ -23,7 +23,7 @@
 подключенные пользователи, парсинг данных и т.д.
 
 Демонстрация работы трех чатов:
-![alt text](additional_materials/img_readme/all.png)
+![alt text](additional_materials/img_readme/all_1408.png)
 
 
 
