@@ -41,9 +41,6 @@ class ColorChat:
 class ColorServer:
     @staticmethod
     def log_engine(mode=None, mess=None, **kw):
-        message = None
-        color = None
-        suffix = None
         if mess is not None:
             print(Color.change_color('white', mess))
 
@@ -51,18 +48,21 @@ class ColorServer:
             if SERVER_INFO:
                 suffix = '[SERVER INFO] - '
                 message, color = ColorServer.server_info(mode, **kw)
+                ColorServer.print_info(suffix, message, color)
             if DEBUG_MODE:
                 suffix = '[DEBUG] - '
                 color = 'blue'
                 message = ColorServer.debug_mode(mode, **kw)
+                ColorServer.print_info(suffix, message, color)
 
-            if message is not None:
-                if suffix is not None:
-                    message = f'{suffix}{message}'
-                if color is not None:
-                    message = Color.change_color(color, message)
-
-                print(message)
+    @staticmethod
+    def print_info(suffix, message, color):
+        if message is not None:
+            if suffix is not None:
+                message = f'{suffix}{message}'
+            if color is not None:
+                message = Color.change_color(color, message)
+            print(message)
 
     @staticmethod
     def server_info(mode, **kw):
