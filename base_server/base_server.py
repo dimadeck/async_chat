@@ -1,5 +1,4 @@
-from clint.textui import colored
-
+from base_server.color_module import ColorModule
 from base_server.connected import Connected
 from base_server.data_parser import DataParser
 from base_server.logger import Log
@@ -24,7 +23,8 @@ class ChatKernel:
                 if self.run_command(req_dict, writer) == -1:
                     return -1
             else:
-                message = self.color_message('error', req_dict.STATUS_DICT[req_dict.status])
+                message = req_dict.STATUS_DICT[req_dict.status]
+                message = ColorModule.add_suffix('error', message)
                 self.send_message(writer, message)
         if not request:
             self.logout(writer)
@@ -49,34 +49,47 @@ class ChatKernel:
             else:
                 message = None
                 if cmd == 'whoami':
-                    message = self.color_message('info', self.connections.get_name(connection))
+                    message = self.connections.get_name(connection)
+                    message = ColorModule.add_suffix('info', message)
                 elif cmd == 'userlist':
-                    message = self.color_message('info', self.connections.get_user_list())
+                    message = self.connections.get_user_list()
+                    message = ColorModule.add_suffix('info', message)
                 elif cmd == 'login':
-                    message = self.color_message('error', 'Already login!')
+                    message = 'Already login!'
+                    message = ColorModule.add_suffix('error', message)
                 if message is not None:
                     self.send_message(connection, message)
         else:
             if cmd == 'login':
                 self.login(connection, param)
             else:
-                message = self.color_message('error', 'First login!')
+                message = 'First login!'
+                message = ColorModule.add_suffix('error', message)
                 self.send_message(connection, message)
         return 0
 
     def send_engine(self, connection, cmd, param, body):
-        sender = colored.yellow(self.connections.get_name(connection))
-        message = colored.white(' '.join(body))
+        sender = self.connections.get_name(connection)
+        message = ' '.join(body)
+
+        sender = ColorModule.color_user(sender)
+        message = ColorModule.color_message(message)
+
         if cmd == 'msg':
-            user = self.connections.get_connection(param)
+            username = param
+            user = self.connections.get_connection(username)
             if user is not None:
-                self.send_message(user, f'[{sender}*]: {message}')
-                self.send_message(connection, f'[{sender}*]: {message}')
+                message = f'[{sender}*]: {message}'
+                self.send_message(user, message)
+                self.send_message(connection, message)
             else:
-                mess = self.color_message('error', f'[{colored.yellow(user)}]: not found!')
-                self.send_message(connection, mess)
+                message = 'not found!'
+                username = ColorModule.color_user(username)
+                message = ColorModule.add_suffix('error', f'[{username}]: {message}')
+                self.send_message(connection, message)
         elif cmd == 'msgall':
-            self.send_all(f'[{sender}]: {message}')
+            message = f'[{sender}]: {message}'
+            self.send_all(message)
 
     @staticmethod
     def send_message(connection, message):
@@ -91,29 +104,36 @@ class ChatKernel:
             self.send_message(user, message)
 
     def login(self, connection, username):
+
         if self.connections.register_user(connection, username) == 0:
-            message = self.color_message('sys', f'[{colored.yellow(username)}] '
-                                                f'{colored.green("login to chat.")}')
+            username = ColorModule.color_user(username)
+
+            message = "login to chat."
+            message = ColorModule.change_color('green', message)
+
+            message = f'[{username}] {message}'
+            message = ColorModule.add_suffix('sys', message)
+
             self.send_all(message)
             self.logger.log_engine(mode='login', username=username)
         else:
-            message = self.color_message('error', f'[{username}]: already exist!')
+            username = ColorModule.color_user(username)
+            message = 'already exist!'
+            message = f'[{username}]: {message}'
+            message = ColorModule.add_suffix('error', message)
+
             self.send_message(connection, message)
 
     def logout(self, connection):
         username = self.connections.get_name(connection)
+
+        message = "logout from chat."
+        message = ColorModule.change_color('red', message)
+        username = ColorModule.color_user(username)
+
         self.close_connection(connection)
         self.connections.drop_connection(connection)
-        message = self.color_message('sys', f'[{colored.yellow(username)}] '
-                                            f'{colored.red("logout from chat.")}')
+        message = f'[{username}] {message}'
+        message = ColorModule.add_suffix('sys', message)
         self.send_all(message)
         self.logger.log_engine(mode='logout', username=username)
-
-    def color_message(self, mode, message):
-        if mode == 'error':
-            message = f'{colored.red("[Error]: ")}{message}'
-        elif mode == 'sys':
-            message = f'{colored.green("[System Message]: ")}{message}'
-        elif mode == 'info':
-            message = f'{colored.blue("[INFO]: ")}{message}'
-        return message
