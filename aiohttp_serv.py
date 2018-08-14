@@ -14,6 +14,7 @@ async def testhandle(request):
 async def websocket_handler(request):
     print('Websocket connection starting')
     ws = aiohttp.web.WebSocketResponse()
+    print(ws)
     await ws.prepare(request)
     print('Websocket connection ready')
     async for msg in ws:
