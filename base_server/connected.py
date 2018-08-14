@@ -4,7 +4,11 @@ class Connected:
         self.users = {}
 
     def add_connection(self, connection):
-        self.connections.append(connection)
+        if not self.is_exist_connection(connection):
+            self.connections.append(connection)
+            return 0
+        else:
+            return -1
 
     def is_exist_connection(self, connection):
         return connection in self.connections

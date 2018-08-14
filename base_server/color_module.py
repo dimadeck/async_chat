@@ -56,7 +56,7 @@ class ColorServer:
                 ColorServer.print_info(suffix, message, color)
 
     @staticmethod
-    def print_info(suffix, message, color):
+    def print_info(suffix=None, message=None, color=None):
         if message is not None:
             if suffix is not None:
                 message = f'{suffix}{message}'
