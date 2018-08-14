@@ -12,22 +12,26 @@ class ChatKernel:
         if len(request) > 1:
             req_dict = DataParser(request, strip=self.parse_strip)
             ColorServer.log_engine(mode='request', data_list=req_dict.data_list)
-
-            if not self.connections.is_exist_connection(writer):
-                self.connections.add_connection(writer)
-                ColorServer.log_engine(mode='new', addr=addr)
+            self.add_connection(writer, addr)
 
             if req_dict.status == 0:
-                if self.run_command(req_dict, writer) == -1:
-                    return -1
+                return self.run_command(req_dict, writer)
             else:
-                message = req_dict.STATUS_DICT[req_dict.status]
-                message = ColorChat.add_suffix('error', message)
-                self.send_message(writer, message)
+                self.response_for_bad_request(req_dict, writer)
         if not request:
             self.logout(writer)
             return -1
         return 0
+
+    def add_connection(self, connection, addr):
+        if not self.connections.is_exist_connection(connection):
+            self.connections.add_connection(connection)
+            ColorServer.log_engine(mode='new', addr=addr)
+
+    def response_for_bad_request(self, req_dict, connection):
+        message = req_dict.STATUS_DICT[req_dict.status]
+        message = ColorChat.add_suffix('error', message)
+        self.send_message(connection, message)
 
     def run_command(self, req_dict, connection):
         cmd = req_dict.cmd

@@ -16,7 +16,7 @@ class MyServerProtocol(WebSocketServerProtocol):
             print("Binary message received: {0} bytes".format(len(payload)))
         else:
             print("Text message received: {0}".format(payload.decode('utf8')))
-
+        print(payload)
         # echo back message verbatim
         self.sendMessage(payload, isBinary)
 
