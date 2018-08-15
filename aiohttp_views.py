@@ -1,10 +1,6 @@
-import logging
-
 import aiohttp
 import aiohttp_jinja2
 from aiohttp import web
-
-log = logging.getLogger(__name__)
 
 names = ['dima', 'alex', 'bruce', 'mark']
 
@@ -23,7 +19,7 @@ async def index(request):
     await ws_current.prepare(request)
 
     name = get_random_name()
-    log.info(f'{name} joined.')
+    print(f'{name} joined.')
 
     await ws_current.send_json({'action': 'connect', 'name': name})
 
@@ -43,7 +39,7 @@ async def index(request):
             break
 
     del request.app['websockets'][name]
-    log.info('%s disconnected.', name)
+    print(f'{name} disconnected.')
     for ws in request.app['websockets'].values():
         await ws.send_json({'action': 'disconnect', 'name': name})
 
