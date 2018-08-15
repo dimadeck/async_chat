@@ -2,6 +2,8 @@ import aiohttp
 import aiohttp_jinja2
 from aiohttp import web
 
+VERSION = 'aioChat'
+
 
 async def index(request):
     ws_current = web.WebSocketResponse()
@@ -17,7 +19,7 @@ async def index(request):
     print(f'{name} joined.')
 
     await ws_current.send_json({'action': 'connect', 'name': name})
-
+    await ws_current.send_json({'action': 'get_version', 'version': VERSION})
     for ws in request.app['websockets'].values():
         await ws.send_json({'action': 'join', 'name': name})
     request.app['websockets'][name] = ws_current
