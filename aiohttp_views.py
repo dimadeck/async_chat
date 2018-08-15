@@ -11,14 +11,21 @@ async def index(request):
     if not ws_ready.ok:
         return aiohttp_jinja2.render_template('index.html', request, {})
     await ws_current.prepare(request)
+
     name = await get_name(ws_current)
     print(f'{name} joined.')
+
     await send_to(ws_current, action='connect', name=name)
-    await send_all(request, action='join', name=name)
+    await send_to(ws_current, action='get_version', version=VERSION)
+
     add_connection(request, ws_current, name)
+    await send_all(request, action='join', name=name)
+
     await chat_engine(request, ws_current, name)
+
     await close_connection(request, name)
     print(f'{name} disconnected.')
+
     return ws_current
 
 
