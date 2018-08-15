@@ -1,6 +1,7 @@
 import asyncio
 
 from base_server.base_server import ChatKernel
+from base_server.connected import Connected
 
 
 class AsyncioChat(ChatKernel):
@@ -20,8 +21,10 @@ class AsyncioChat(ChatKernel):
         connection.close()
 
 
-def main():
-    server = AsyncioChat()
+def main(connections=None):
+    if connections is None:
+        connections = Connected()
+    server = AsyncioChat(connections=connections)
     port = 10000
     loop = asyncio.get_event_loop()
     loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
