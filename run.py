@@ -1,22 +1,19 @@
 import sys
 
+import aiohttp_web as aio_chat
 import chat_asyncio as as_chat
 import chat_tornado as tor_chat
 import chat_twisted as tw_chat
-import aiohttp_web as aio_chat
+
+LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main, 'aio_chat': aio_chat.main}
+LAUNCH_KEYS = list(LAUNCH.keys())
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         prog = sys.argv[1]
-        if prog == 'tw_chat' or prog == '1':
-            tw_chat.main()
-        elif prog == 'as_chat' or prog == '2':
-            as_chat.main()
-        elif prog == 'tor_chat' or prog == '3':
-            tor_chat.main()
-        elif prog == 'aio_chat' or prog == '4':
-            aio_chat.main()
+        if prog in LAUNCH:
+            LAUNCH[prog]()
         else:
             print('Unknown program!')
     else:
-        print("Type program name: 'tw_chat' or 'as_chat' or 'tor_chat' or 'aio_chat")
+        print(f'Type program name: {LAUNCH_KEYS}')
