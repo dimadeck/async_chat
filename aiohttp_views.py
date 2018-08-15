@@ -22,15 +22,19 @@ async def index(request):
 
     await chat_engine(request, ws_current, name)
 
-    await close_connection(request, name)
+    await close_connection(ws_current, request, name)
     print(f'{name} disconnected.')
 
     return ws_current
 
 
 async def send_all(request, **kwargs):
-    for connection in request.app['websockets'].values():
-        await connection.send_json(kwargs)
+    for user in request.app['websockets'].users.keys():
+        await send_message(user, **kwargs)
+
+
+async def send_message(user, **kwargs):
+    await user.send_json(kwargs)
 
 
 async def send_to(connection, **kwargs):
@@ -42,8 +46,9 @@ async def get_name(connection):
     return name.data
 
 
-def add_connection(request, connection, name):
-    request.app['websockets'][name] = connection
+def add_connection(request, connection, username):
+    request.app['websockets'].add_connection(connection)
+    request.app['websockets'].register_user(connection, username)
 
 
 async def chat_engine(request, connection, name):
@@ -61,6 +66,7 @@ def run_command(request, cmd):
         print(request.writer)
 
 
-async def close_connection(request, name):
-    del request.app['websockets'][name]
+async def close_connection(connection, request, name):
+    # del request.app['websockets'][name]
+    request.app['websockets'].drop_connection(connection)
     await send_all(request, action='disconnect', name=name)
