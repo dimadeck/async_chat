@@ -12,7 +12,6 @@ def get_random_name():
 async def index(request):
     ws_current = web.WebSocketResponse()
     ws_ready = ws_current.can_prepare(request)
-    print(f'ws_current: {ws_current}\nws_ready: {ws_ready}')
     if not ws_ready.ok:
         return aiohttp_jinja2.render_template('index.html', request, {})
 
