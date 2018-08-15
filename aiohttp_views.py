@@ -17,7 +17,6 @@ async def index(request):
 
     await send_to(ws_current, action='connect', name=name)
     await send_to(ws_current, action='get_version', version=VERSION)
-
     add_connection(request, ws_current, name)
     await send_all(request, action='join', name=name)
 
@@ -52,8 +51,14 @@ async def chat_engine(request, connection, name):
         msg = await connection.receive()
         if msg.type == aiohttp.WSMsgType.text:
             await send_all(request, action='sent', name=name, text=msg.data)
+            run_command(request, msg.data)
         else:
             break
+
+
+def run_command(request, cmd):
+    if cmd == 'debug':
+        print(request.writer)
 
 
 async def close_connection(request, name):

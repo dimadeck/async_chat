@@ -70,13 +70,13 @@
        function update_ui() {
          if (conn == null) {
            $('#status').text('disconnected');
-           $('#connect').html('Connect');
+           $('#connect').prop("value", 'Login');
            $('#send').prop("disabled", true);
            $('#name').prop("hidden", true);
            $('#field_name').prop("hidden", false);
          } else {
            $('#status').text('Connected');
-           $('#connect').html('Disconnect');
+           $('#connect').prop("value", 'Logout');
            $('#send').prop("disabled", false);
            $('#name').prop("hidden", false);
            $('#field_name').prop("hidden", true);
@@ -116,9 +116,17 @@
 <body>
 <h3><span id="chat_version">Chat</span></h3>
 <div>
-    <button id="connect">Connect</button>
+
     <div>Status: <span id="status">disconnected</span></div>
-    <div>Name:<input id="field_name" type="text"/><span hidden=true id="name">None</span></div>
+    <!--<div>Name:<input style="width:10em; id="field_name" type="text"/><span hidden=true id="name">None</span><button id="connect">Connect</button></div>
+    -->
+    <div>Name:<span hidden=true id="name"></span>
+
+    <form id="loginform" onsubmit="return false;">
+        <input style="width:15em" id="field_name" type="text"/>
+        <input id="connect" type="button" value="Login">
+    </form>
+    </div>
 </div>
 <div id="log"
      style="width:20em;height:15em;overflow:auto;border:1px solid black">
