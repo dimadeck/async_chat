@@ -8,6 +8,7 @@
      $(function() {
        var conn = null;
        var name = "None";
+       $('#field_name').val('').focus();
        function log(msg) {
          var control = $('#log');
          var date = new Date();
@@ -74,12 +75,14 @@
            $('#send').prop("disabled", true);
            $('#name').prop("hidden", true);
            $('#field_name').prop("hidden", false);
+           $('#field_name').val('').focus();
          } else {
            $('#status').text('Connected');
            $('#connect').prop("value", 'Logout');
            $('#send').prop("disabled", false);
            $('#name').prop("hidden", false);
            $('#field_name').prop("hidden", true);
+           $('#text').val('').focus();
          }
          $('#name').text(name);
        }
@@ -118,10 +121,7 @@
 <div>
 
     <div>Status: <span id="status">disconnected</span></div>
-    <!--<div>Name:<input style="width:10em; id="field_name" type="text"/><span hidden=true id="name">None</span><button id="connect">Connect</button></div>
-    -->
     <div>Name:<span hidden=true id="name"></span>
-
     <form id="loginform" onsubmit="return false;">
         <input style="width:15em" id="field_name" type="text"/>
         <input id="connect" type="button" value="Login">
