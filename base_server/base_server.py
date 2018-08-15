@@ -22,7 +22,7 @@ class ChatKernel:
                 message = PackMessage.send_response_for_bad_request(req_dict)
                 self.send_message(writer, message)
         if not request:
-            self.logout(writer)
+            self.logout_engine(writer)
             return -1
         return 0
 
@@ -36,10 +36,7 @@ class ChatKernel:
             if cmd == 'msg' or cmd == 'msgall':
                 self.send_engine(connection, cmd, param, body)
             elif cmd == 'logout':
-                self.logout(connection)
-                username = self.connections.get_name(connection)
-                message = PackMessage.send_logout(username)
-                self.send_all(message)
+                self.logout_engine(connection)
                 return -1
             elif cmd == 'debug':
                 ColorServer.log_engine(mess=self.connections.connections)
@@ -97,6 +94,12 @@ class ChatKernel:
 
     def login(self, connection, username):
         return self.connections.register_user(connection, username)
+
+    def logout_engine(self, connection):
+        username = self.connections.get_name(connection)
+        self.logout(connection)
+        message = PackMessage.send_logout(username)
+        self.send_all(message)
 
     def logout(self, connection):
         self.close_connection(connection)

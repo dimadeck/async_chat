@@ -44,7 +44,6 @@ class PackMessage:
     @staticmethod
     def send_logout(username):
         ColorServer.log_engine(mode='logout', username=username)
-
         message = "logout from chat."
         message = Color.change_color('red', message)
         username = ColorChat.color_user(username)
