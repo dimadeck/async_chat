@@ -8,6 +8,7 @@ PORT = int(os.getenv('PORT', 8080))
 
 
 async def testhandle(request):
+    print(request)
     return aiohttp.web.Response(text='Test handle')
 
 
