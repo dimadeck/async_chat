@@ -10,6 +10,13 @@
 
 4) source env/bin/activate
 
+5) pip install -r requirements.txt
+
+## Note [15.08.18]: ##
+
+Реализован простой websocket чат на основе aiohttp:
+![alt text](additional_materials/img_readme/aio_chat.png)
+
 
 ## Note [13.08.18]: ##
 
