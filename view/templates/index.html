@@ -25,7 +25,9 @@
          disconnect();
          var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host;
          conn = new WebSocket(wsUri);
+         name = $('#field_name').val()
          conn.onopen = function() {
+           conn.send(name)
            update_ui();
          };
          conn.onmessage = function(e) {
@@ -68,10 +70,14 @@
            $('#status').text('disconnected');
            $('#connect').html('Connect');
            $('#send').prop("disabled", true);
+           $('#name').prop("hidden", true);
+           $('#field_name').prop("hidden", false);
          } else {
-           $('#status').text('connected (' + conn.protocol + ')');
+           $('#status').text('Connected');
            $('#connect').html('Disconnect');
            $('#send').prop("disabled", false);
+           $('#name').prop("hidden", false);
+           $('#field_name').prop("hidden", true);
          }
          $('#name').text(name);
        }
@@ -96,6 +102,12 @@
            return false;
          }
        });
+       $('#field_name').on('keyup', function(e) {
+         if (e.keyCode === 13) {
+           $('#connect').click();
+           return false;
+         }
+       });
      });
     </script>
 </head>
@@ -104,7 +116,7 @@
 <div>
     <button id="connect">Connect</button>
     <div>Status: <span id="status">disconnected</span></div>
-    <div>Name:<span id="name">None</span></div>
+    <div>Name:<input id="field_name" type="text"/><span hidden=true id="name">None</span></div>
 </div>
 <div id="log"
      style="width:20em;height:15em;overflow:auto;border:1px solid black">

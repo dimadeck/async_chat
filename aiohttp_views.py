@@ -2,12 +2,6 @@ import aiohttp
 import aiohttp_jinja2
 from aiohttp import web
 
-names = ['dima', 'alex', 'bruce', 'mark']
-
-
-def get_random_name():
-    return names.pop()
-
 
 async def index(request):
     ws_current = web.WebSocketResponse()
@@ -16,8 +10,10 @@ async def index(request):
         return aiohttp_jinja2.render_template('index.html', request, {})
 
     await ws_current.prepare(request)
-    print(ws_current.headers)
-    name = get_random_name()
+
+    name = await ws_current.receive()
+    name = name.data
+
     print(f'{name} joined.')
 
     await ws_current.send_json({'action': 'connect', 'name': name})
@@ -28,7 +24,6 @@ async def index(request):
 
     while True:
         msg = await ws_current.receive()
-        print(f'FULL REQUEST:\n{msg}')
         if msg.type == aiohttp.WSMsgType.text:
             for ws in request.app['websockets'].values():
                 await ws.send_json(
