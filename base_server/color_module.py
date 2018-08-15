@@ -50,13 +50,15 @@ class ColorServer:
                 suffix = '[SERVER INFO] - '
                 message, color = ColorServer.server_info(mode, **kw)
                 message = ColorServer.print_info(suffix, message, color)
-                print(message)
+                if message is not None:
+                    print(message)
             if DEBUG_MODE:
                 suffix = '[DEBUG] - '
                 color = 'blue'
                 message = ColorServer.debug_mode(mode, **kw)
                 message = ColorServer.print_info(suffix, message, color)
-                print(message)
+                if message is not None:
+                    print(message)
 
     @staticmethod
     def print_info(suffix=None, message=None, color=None):
