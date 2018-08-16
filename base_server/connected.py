@@ -46,7 +46,7 @@ class Connected:
         if connection in self.connections:
             self.connections.remove(connection)
 
-    def get_user_list(self):
+    def get_username_list(self):
         user_list = []
         for username in self.users.values():
             user_list.append(username)
