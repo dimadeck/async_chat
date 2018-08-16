@@ -42,7 +42,10 @@ class ColorServer:
     @staticmethod
     def log_engine(mode=None, mess=None, **kw):
         if mess is not None:
-            mess = Color.change_color('white', mess)
+            try:
+                mess = Color.change_color('white', mess)
+            except:
+                pass
             print(mess)
 
         if mode is not None:
