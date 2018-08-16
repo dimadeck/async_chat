@@ -2,14 +2,13 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 
-from base_server.base_server import TCPKernel
-from base_server.connected import Connected
+from base_server.tcp_server.tcp_kernel import TCPKernel
 
 
 class EchoServer(TCPServer, TCPKernel):
-    def __init__(self):
+    def __init__(self, connections):
         super(EchoServer, self).__init__()
-        self.connections = Connected()
+        self.connections = self.init_connection_list(connections)
         self.parse_strip = '\r\n'
 
     @gen.coroutine
@@ -28,8 +27,8 @@ class EchoServer(TCPServer, TCPKernel):
         connection.close()
 
 
-def main():
-    server = EchoServer()
+def main(connections=None):
+    server = EchoServer(connections=connections)
     port = 8000
     server.listen(port)
     print(f'[SERVER INFO] - Tornado server started on {port} port.')

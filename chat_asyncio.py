@@ -1,7 +1,6 @@
 import asyncio
 
-from base_server.base_server import TCPKernel
-from base_server.connected import Connected
+from base_server.tcp_server.tcp_kernel import TCPKernel
 
 
 class AsyncioChat(TCPKernel):
@@ -22,8 +21,6 @@ class AsyncioChat(TCPKernel):
 
 
 def main(connections=None):
-    if connections is None:
-        connections = Connected()
     server = AsyncioChat(connections=connections)
     port = 10000
     loop = asyncio.get_event_loop()

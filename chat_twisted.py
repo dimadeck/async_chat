@@ -1,8 +1,7 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
-from base_server.base_server import TCPKernel
-from base_server.connected import Connected
+from base_server.tcp_server.tcp_kernel import TCPKernel
 
 
 class Chat(LineReceiver, TCPKernel):
@@ -23,16 +22,17 @@ class Chat(LineReceiver, TCPKernel):
 
 
 class Factory(protocol.ServerFactory):
-    def startFactory(self):
-        self.connections = Connected()
+    def __init__(self, connections):
+        super(Factory, self).__init__()
+        self.connections = TCPKernel.init_connection_list(connections)
 
     def buildProtocol(self, addr):
         return Chat(self.connections, addr)
 
 
-def main(port=1234):
+def main(port=1234, connections=None):
     print(f'[SERVER INFO] - Twisted server started on {port} port.')
-    reactor.listenTCP(port, Factory())
+    reactor.listenTCP(port, Factory(connections=connections))
     reactor.run()
 
 
