@@ -53,6 +53,8 @@ def add_connection(request, connection, username):
 
 async def chat_engine(request, connection, name):
     while True:
+        print(f'A: {request.app["websockets"]}')
+        print(f'A: {request.app["websockets"].users}')
         msg = await connection.receive()
         if msg.type == aiohttp.WSMsgType.text:
             await send_all(request, action='sent', name=name, text=msg.data)
