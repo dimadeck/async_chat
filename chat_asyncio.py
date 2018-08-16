@@ -8,11 +8,11 @@ class AsyncioChat(TCPKernel):
         while True:
             request = (await reader.read(1024))
             addr = writer.get_extra_info('peername')
-            if await self.engine(request, writer, addr) == -1:
+            if self.engine(request, writer, addr) == -1:
                 break
 
     @staticmethod
-    async def send_message(connection, message):
+    def send_message(connection, message):
         connection.write(bytes(f'{message}\n', 'utf-8'))
 
     @staticmethod

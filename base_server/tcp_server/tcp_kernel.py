@@ -9,7 +9,7 @@ class TCPKernel(ChatKernel):
         super(TCPKernel, self).__init__(connections=connections)
         self.parse_strip = parse_strip
 
-    async def engine(self, request, writer, addr):
+    def engine(self, request, writer, addr):
         if len(request) > 1:
             req_dict = DataParser(request, strip=self.parse_strip)
             ColorServer.log_engine(mode='request', data_list=req_dict.data_list)
@@ -17,16 +17,16 @@ class TCPKernel(ChatKernel):
                 ColorServer.log_engine(mode='new', addr=addr)
 
             if req_dict.status == 0:
-                return await self.run_command(req_dict, writer)
+                return self.run_command(req_dict, writer)
             else:
                 message = PackMessage.send_response_for_bad_request(req_dict)
-                await self.send_message(writer, message)
+                self.send_message(writer, message)
         if not request:
-            await self.logout_engine(writer)
+            self.logout_engine(writer)
             return -1
         return 0
 
-    async def run_command(self, req_dict, connection):
+    def run_command(self, req_dict, connection):
         cmd = req_dict.cmd
         param = req_dict.parameter
         body = req_dict.body
@@ -34,9 +34,9 @@ class TCPKernel(ChatKernel):
 
         if self.is_register(connection):
             if cmd == 'msg' or cmd == 'msgall':
-                await self.send_engine(connection, cmd, param, body)
+                self.send_engine(connection, cmd, param, body)
             elif cmd == 'logout':
-                await self.logout_engine(connection)
+                self.logout_engine(connection)
                 return -1
             elif cmd == 'debug':
                 ColorServer.log_engine(mess=self.get_connections())
@@ -51,37 +51,37 @@ class TCPKernel(ChatKernel):
                     message = PackMessage.get_info(cmd='userlist', message=userlist)
                 elif cmd == 'login':
                     message = PackMessage.get_info(cmd='login')
-                await self.send_message(connection, message)
+                self.send_message(connection, message)
         else:
             if cmd == 'login':
                 if self.login(connection, param) == 0:
                     message = PackMessage.send_success_login(param)
-                    await self.send_all(message)
+                    self.send_all(message)
                 else:
                     message = PackMessage.send_already_login(param)
-                    await self.send_message(connection, message)
+                    self.send_message(connection, message)
             else:
                 message = PackMessage.send_first_login()
-                await self.send_message(connection, message)
+                self.send_message(connection, message)
         return 0
 
-    async def send_engine(self, connection, cmd, username, body):
+    def send_engine(self, connection, cmd, username, body):
         sender = self.get_name_by_connection(connection)
         if cmd == 'msg':
             user = self.get_connection_by_name(username)
             if user is not None:
                 message = PackMessage.text_message(is_exist=True, sender=sender, body=body)
-                await self.send_message(user, message)
-                await self.send_message(connection, message)
+                self.send_message(user, message)
+                self.send_message(connection, message)
             else:
                 message = PackMessage.text_message(is_exist=False, username=username)
-                await self.send_message(connection, message)
+                self.send_message(connection, message)
         elif cmd == 'msgall':
             message = PackMessage.text_message(is_exist=True, private=False, sender=sender, body=body)
-            await self.send_all(message)
+            self.send_all(message)
 
-    async def logout_engine(self, connection):
+    def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         self.logout(connection)
         message = PackMessage.send_logout(username)
-        await self.send_all(message)
+        self.send_all(message)

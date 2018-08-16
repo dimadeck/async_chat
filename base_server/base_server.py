@@ -10,16 +10,16 @@ class ChatKernel:
         return connections if connections is not None else Connected()
 
     @staticmethod
-    async def send_message(connection, message):
+    def send_message(connection, message):
         raise NotImplementedError
 
     @staticmethod
     def close_connection(connection):
         raise NotImplementedError
 
-    async def send_all(self, message):
+    def send_all(self, message):
         for user in self.get_users():
-            await self.send_message(user, message)
+            self.send_message(user, message)
 
     def login(self, connection, username):
         return self.connections.register_user(connection, username)
