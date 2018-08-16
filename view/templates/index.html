@@ -43,9 +43,6 @@
                log('Disconnected ' + data.name);
                update_ui();
                break;
-             case 'get_version':
-                $('#chat_version').text(data.version);
-                break;
              case 'join':
                log('Joined ' + data.name);
                break;
@@ -117,7 +114,7 @@
     </script>
 </head>
 <body>
-<h3><span id="chat_version">Chat</span></h3>
+<h3><span id="chat_version">{{version}}</span></h3>
 <div>
 
     <div>Status: <span id="status">disconnected</span></div>
