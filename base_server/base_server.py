@@ -18,7 +18,7 @@ class ChatKernel:
         raise NotImplementedError
 
     def send_all(self, message):
-        for user in self.connections.users.keys():
+        for user in self.get_connections():
             self.send_message(user, message)
 
     def login(self, connection, username):
@@ -36,6 +36,9 @@ class ChatKernel:
 
     def get_connections(self):
         return self.connections.connections
+
+    def clear_connections(self):
+        self.connections.clear_all()
 
     def get_users(self):
         return self.connections.users
