@@ -2,11 +2,11 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 
-from base_server.base_server import ChatKernel
+from base_server.base_server import TCPKernel
 from base_server.connected import Connected
 
 
-class EchoServer(TCPServer, ChatKernel):
+class EchoServer(TCPServer, TCPKernel):
     def __init__(self):
         super(EchoServer, self).__init__()
         self.connections = Connected()

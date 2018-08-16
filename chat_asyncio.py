@@ -1,10 +1,10 @@
 import asyncio
 
-from base_server.base_server import ChatKernel
+from base_server.base_server import TCPKernel
 from base_server.connected import Connected
 
 
-class AsyncioChat(ChatKernel):
+class AsyncioChat(TCPKernel):
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))

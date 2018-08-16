@@ -9,6 +9,27 @@ class ChatKernel:
         self.connections = connections if connections is not None else Connected()
         self.parse_strip = parse_strip
 
+    @staticmethod
+    def send_message(connection, message):
+        raise NotImplementedError
+
+    @staticmethod
+    def close_connection(connection):
+        raise NotImplementedError
+
+    def send_all(self, message):
+        for user in self.connections.users.keys():
+            self.send_message(user, message)
+
+    def login(self, connection, username):
+        return self.connections.register_user(connection, username)
+
+    def logout(self, connection):
+        self.close_connection(connection)
+        self.connections.drop_connection(connection)
+
+
+class TCPKernel(ChatKernel):
     def engine(self, request, writer, addr):
         if len(request) > 1:
             req_dict = DataParser(request, strip=self.parse_strip)
@@ -80,27 +101,8 @@ class ChatKernel:
             message = PackMessage.text_message(is_exist=True, private=False, sender=sender, body=body)
             self.send_all(message)
 
-    @staticmethod
-    def send_message(connection, message):
-        raise NotImplementedError
-
-    @staticmethod
-    def close_connection(connection):
-        raise NotImplementedError
-
-    def send_all(self, message):
-        for user in self.connections.users.keys():
-            self.send_message(user, message)
-
-    def login(self, connection, username):
-        return self.connections.register_user(connection, username)
-
     def logout_engine(self, connection):
         username = self.connections.get_name(connection)
         self.logout(connection)
         message = PackMessage.send_logout(username)
         self.send_all(message)
-
-    def logout(self, connection):
-        self.close_connection(connection)
-        self.connections.drop_connection(connection)

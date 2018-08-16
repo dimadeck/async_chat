@@ -1,11 +1,11 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
-from base_server.base_server import ChatKernel
+from base_server.base_server import TCPKernel
 from base_server.connected import Connected
 
 
-class Chat(LineReceiver, ChatKernel):
+class Chat(LineReceiver, TCPKernel):
     def __init__(self, connections, addr):
         super(Chat, self).__init__(connections=connections, parse_strip='')
         self.addr = addr
