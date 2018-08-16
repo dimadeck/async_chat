@@ -4,6 +4,9 @@ from base_server.tcp_server.tcp_kernel import TCPKernel
 
 
 class AsyncioChat(TCPKernel):
+    def __init__(self, connections):
+        super(AsyncioChat, self).__init__(connections=connections)
+        self.init_connection_list(connections)
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))
