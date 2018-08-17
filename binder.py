@@ -1,6 +1,7 @@
 from multiprocessing import Process, Manager
 from time import sleep
 
+from aiohttp_web import main as aio_main
 from base_server.connected import Connected
 from chat_asyncio import main as as_main
 from chat_tornado import main as tor_main
@@ -48,19 +49,27 @@ class LaunchProcesses:
             process.join()
 
 
-def main():
+def setup(mode):
+    settings = None
     connections = Connected()
+    if mode == 'tcp_all':
+        settings = {'servers': [as_main, tor_main, tw_main],
+                    'connections': connections,
+                    'ports': [8000, 8080, 8888]}
+    elif mode == 'as_aio':
+        settings = {'servers': [as_main, aio_main],
+                    'connections': connections,
+                    'ports': [8080, 8000]}
+    return settings
 
+
+def main(mode):
     # manager = Manager()
     # ns = manager.Namespace()
-    # ns.conn = connections
+    # ns.mess = 0
 
-    setup = {'servers': [as_main, tor_main, tw_main],
-             'connections': connections,
-             'ports': [8000, 8080, 8888]}
-
-    launch = LaunchProcesses(**setup)
+    settings = setup(mode)
     try:
-        launch.engine()
+        LaunchProcesses(**settings).engine()
     except KeyboardInterrupt:
         pass
