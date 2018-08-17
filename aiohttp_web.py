@@ -28,27 +28,24 @@ class AioChat(ChatKernel):
             pass
         self.clear_connections()
 
-    ##
-
     async def index(self, request):
         ws_current = web.WebSocketResponse()
         ws_ready = ws_current.can_prepare(request)
         if not ws_ready.ok:
             return aiohttp_jinja2.render_template('index.html', request, {'version': VERSION})
         await ws_current.prepare(request)
-        name = await self.get_name(ws_current)
+        self.add_connection(ws_current)
 
+        name = await self.get_name(ws_current)
         mes = {'action': 'connect', 'name': name}
         await self.send_message(ws_current, mes)
 
-        self.add_connection(ws_current)
         self.login(ws_current, name)
 
         mes = {'action': 'join', 'name': name}
         await self.send_all(mes)
         await self.chat_engine(ws_current, name)
-        # await self.close_connect(ws_current, name)
-        self.logout(ws_current)
+        await self.close_connection(ws_current)
         return ws_current
 
     async def send_all(self, message):
@@ -73,12 +70,10 @@ class AioChat(ChatKernel):
 
     async def close_connection(self, connection):
         name = self.get_name_by_connection(connection)
-        self.connections.drop_connection()
+        self.connections.drop_connection(connection)
         mes = {'action': 'disconnect', 'name': name}
         await self.send_all(mes)
 
-
-##
 
 def main(connections=None):
     if connections is None:
