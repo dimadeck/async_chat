@@ -33,7 +33,7 @@ class LaunchProcesses:
     def create_process(self):
         for server in self.servers:
             port = self.get_port()
-            target = Connect(server, port, connections)
+            target = Connect(server, port, self.connections)
             self.processes.append(Process(target=target))
 
     def get_port(self):
@@ -48,10 +48,13 @@ class LaunchProcesses:
             process.join()
 
 
-if __name__ == '__main__':
-    servers = [as_main, tor_main, tw_main]
-    connections = Connected()
-    ports = [8000, 8080, 8888]
+def main():
+    setup = {'servers': [as_main, tor_main, tw_main],
+             'connections': Connected(),
+             'ports': [8000, 8080, 8888]}
 
-    launch = LaunchProcesses(servers=servers, connections=connections, ports=ports)
-    launch.engine()
+    launch = LaunchProcesses(**setup)
+    try:
+        launch.engine()
+    except KeyboardInterrupt:
+        pass
