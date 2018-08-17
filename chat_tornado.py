@@ -27,9 +27,8 @@ class EchoServer(TCPServer, TCPKernel):
         connection.close()
 
 
-def main(connections=None):
+def main(port=8000, connections=None):
     server = EchoServer(connections=connections)
-    port = 8000
     server.listen(port)
     print(f'[SERVER INFO] - Tornado server started on {port} port.')
 

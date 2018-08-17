@@ -23,9 +23,8 @@ class AsyncioChat(TCPKernel):
         connection.close()
 
 
-def main(connections=None):
+def main(port=10000, connections=None):
     server = AsyncioChat(connections=connections)
-    port = 10000
     loop = asyncio.get_event_loop()
     loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
     print(f'[SERVER INFO] - AsyncIO server started on {port} port.')
