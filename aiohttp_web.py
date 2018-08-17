@@ -47,7 +47,8 @@ class AioChat(ChatKernel):
         mes = {'action': 'join', 'name': name}
         await self.send_all(mes)
         await self.chat_engine(ws_current, name)
-        await self.close_connect(ws_current, name)
+        # await self.close_connect(ws_current, name)
+        self.logout(ws_current)
         return ws_current
 
     async def send_all(self, message):
@@ -70,8 +71,9 @@ class AioChat(ChatKernel):
             else:
                 break
 
-    async def close_connect(self, connection, name):
-        self.connections.drop_connection(connection)
+    async def close_connection(self, connection):
+        name = self.get_name_by_connection(connection)
+        self.connections.drop_connection()
         mes = {'action': 'disconnect', 'name': name}
         await self.send_all(mes)
 
