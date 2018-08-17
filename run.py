@@ -1,7 +1,7 @@
 import sys
 
 import aiohttp_web as aio_chat
-import bind_aio_as as all_tcp
+import binder as all_tcp
 import chat_asyncio as as_chat
 import chat_tornado as tor_chat
 import chat_twisted as tw_chat
