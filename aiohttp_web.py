@@ -75,12 +75,12 @@ class AioChat(ChatKernel):
         await self.send_all(mes)
 
 
-def main(connections=None):
+def main(port=8080, connections=None):
     if connections is None:
         connections = Connected()
     server = AioChat(connections)
     app = server.init_app()
-    web.run_app(app)
+    web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
