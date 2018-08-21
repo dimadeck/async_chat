@@ -1,7 +1,8 @@
 from base_server.base_server import ChatKernel
-from base_server.tcp_server.color_module import ColorServer
+# from base_server.tcp_server.color_module import ColorServer
 from base_server.tcp_server.data_parser import DataParser
-from base_server.tcp_server.pack_message import PackMessage
+from chat_pack_message import PackMessage
+# from base_server.tcp_server.pack_message import PackMessage
 from chat_protocol import ChatProtocol
 
 
@@ -13,7 +14,8 @@ class TCPKernel(ChatKernel):
     def engine(self, request, writer, addr):
         if len(request) > 1:
             if self.add_connection(writer) == 0:
-                ColorServer.log_engine(mode='new', addr=addr)
+                PackMessage.engine('server', 'new', addr=addr)
+                # ColorServer.log_engine(mode='new', addr=addr)
 
             req_dict = DataParser(request, strip=self.parse_strip)
             ColorServer.log_engine(mode='request', data_list=req_dict.data_list)
@@ -60,6 +62,9 @@ class TCPKernel(ChatKernel):
         if self.login(connection, username) == 0:
             message = PackMessage.send_success_login(username)
             self.send_all(message)
+        else:
+            # user exist
+            pass
 
     def NEW_alredy_login(self, connection):
         message = 'Already login!'
