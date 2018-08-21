@@ -5,9 +5,13 @@ from chat_protocol import ChatProtocol
 
 
 class TCPKernel(ChatKernel):
-    def __init__(self, connections, parse_strip='\r\n'):
+    def __init__(self, connections=None, parse_strip='\r\n', method_send_message=None, method_close_connection=None):
         super(TCPKernel, self).__init__(connections=connections)
         self.parse_strip = parse_strip
+        if method_send_message is not None:
+            self.send_message = method_send_message
+        if method_close_connection is not None:
+            self.close_connection = method_close_connection
 
     def engine(self, request, writer, addr):
         if len(request) > 1:
@@ -28,12 +32,13 @@ class TCPKernel(ChatKernel):
         cmd = req_dict.cmd
         param = req_dict.parameter
         body = req_dict.body
+        message = ' '.join(req_dict.body) if body is not None else None
 
         if self.is_register(connection):
             methods = {'login': (self.NEW_alredy_login, {'connection': connection}),
                        'logout': (self.logout_engine, {'connection': connection}),
-                       'msg': (self.NEW_send_mess, {'connection': connection, 'username': param, 'message': body}),
-                       'msgall': (self.NEW_send_all, {'connection': connection, 'message': body}),
+                       'msg': (self.NEW_send_mess, {'connection': connection, 'username': param, 'message': message}),
+                       'msgall': (self.NEW_send_all, {'connection': connection, 'message': message}),
                        'debug': (self.NEW_debug, {}),
                        'whoami': (self.NEW_whoami, {'connection': connection}),
                        'userlist': (self.NEW_userlist, {'connection': connection})
@@ -54,9 +59,10 @@ class TCPKernel(ChatKernel):
     def NEW_login(self, connection, username):
         if self.login(connection, username) == 0:
             message = PackMessage.system_message('login', username=username)
+            self.send_all(message)
         else:
             message = PackMessage.system_error('user_exist')
-        self.send_all(message)
+            self.send_message(connection, message)
 
     def NEW_alredy_login(self, connection):
         message = PackMessage.system_error('already_login')
@@ -69,7 +75,6 @@ class TCPKernel(ChatKernel):
     def NEW_send_mess(self, connection, username, message):
         sender = self.get_name_by_connection(connection)
         user = self.get_connection_by_name(username)
-        message = ' '.join(message)
         if user is not None:
             message = PackMessage.chat_message(username=sender, message=message, private=True)
             self.send_message(user, message)
@@ -80,13 +85,13 @@ class TCPKernel(ChatKernel):
 
     def NEW_send_all(self, connection, message):
         sender = self.get_name_by_connection(connection)
-        message = ' '.join(message)
         message = PackMessage.chat_message(username=sender, message=message)
+        print(self.connections.users)
         self.send_all(message)
 
     def NEW_debug(self):
-        connections = ' '.join(self.get_connections())
-        userlist = ' '.join(self.get_users())
+        connections = self.get_connections()
+        userlist = self.get_users()
 
         print(PackMessage.message(connections))
         print(PackMessage.message(userlist))
