@@ -62,7 +62,7 @@ class ChatKernel:
         return self.connections.get_username_list()
 
     def engine(self, request, writer, addr):
-        if len(request) > 1:
+        if len(request) > 0:
             if self.add_connection(writer) == 0:
                 print(PackMessage.server_message('new', addr=addr))
             req_dict = DataParser(request, strip=self.parse_strip)
@@ -104,10 +104,12 @@ class ChatKernel:
             self.logout(connection)
             message = PackMessage.system_message('logout', username=username)
             self.send_all(message)
+            print(PackMessage.server_message('logout', username=username))
             return -1
 
     def login_engine(self, connection, username):
         if self.login(connection, username) == 0:
+            print(PackMessage.server_message('login', username=username))
             message = PackMessage.system_message('login', username=username)
             self.send_all(message)
         else:
