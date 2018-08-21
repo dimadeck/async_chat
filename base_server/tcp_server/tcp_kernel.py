@@ -35,25 +35,19 @@ class TCPKernel(ChatKernel):
         ColorServer.log_engine(mode='parse', cmd=cmd, param=param, body=body)
 
         if self.is_register(connection):
-            methods = {'login': (self.NEW_alredy_login, {}),
-                       'logout': (self.logout_engine, {}),
-                       'msg': (self.NEW_send_mess, {'username': param, 'body': body}),
-                       'msgall': (self.NEW_send_all, {'body': body}),
+            methods = {'login': (self.NEW_alredy_login, {'connection': connection}),
+                       'logout': (self.logout_engine, {'connection': connection}),
+                       'msg': (self.NEW_send_mess, {'connection': connection, 'username': param, 'body': body}),
+                       'msgall': (self.NEW_send_all, {'connection': connection, 'body': body}),
                        'debug': (self.NEW_debug, {}),
-                       'whoami': (self.NEW_whoami, {}),
-                       'userlist': (self.NEW_userlist, {})
+                       'whoami': (self.NEW_whoami, {'connection': connection}),
+                       'userlist': (self.NEW_userlist, {'connection': connection})
                        }
         else:
-            methods = {'login': (self.NEW_login, {'username': param}),
-                       'logout': (self.NEW_first_login, {}),
-                       'msg': (self.NEW_first_login, {}),
-                       'msgall': (self.NEW_first_login, {}),
-                       'debug': (self.NEW_first_login, {}),
-                       'whoami': (self.NEW_first_login, {}),
-                       'userlist': (self.NEW_first_login, {})
-                       }
+            methods = {'login': (self.NEW_login, {'connection': connection, 'username': param}),
+                       'empty': (self.NEW_first_login, {'connection': connection})}
         protocol = ChatProtocol(**methods)
-        return protocol.engine(req_dict.cmd, connection=connection)
+        return protocol.engine(req_dict.cmd)
 
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
@@ -91,7 +85,7 @@ class TCPKernel(ChatKernel):
         message = PackMessage.text_message(is_exist=True, private=False, sender=sender, body=body)
         self.send_all(message)
 
-    def NEW_debug(self, connection):
+    def NEW_debug(self):
         ColorServer.log_engine(mess=self.get_connections())
         ColorServer.log_engine(mess=self.get_users())
 
