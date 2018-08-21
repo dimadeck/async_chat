@@ -87,7 +87,6 @@ class TCPKernel(ChatKernel):
     def NEW_send_all(self, connection, message):
         sender = self.get_name_by_connection(connection)
         message = PackMessage.chat_message(username=sender, message=message)
-        print(self.connections.users)
         self.send_all(message)
 
     def NEW_debug(self):
