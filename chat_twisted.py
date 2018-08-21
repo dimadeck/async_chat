@@ -12,7 +12,11 @@ class Chat(LineReceiver, ChatKernel):
         self.addr = addr
 
     def lineReceived(self, line):
-        self.engine(line, self, self.addr)
+        if self.engine(line, self, self.addr) == -1:
+            self.logout_engine(self)
+
+    def connectionLost(self, reason=None):
+        self.logout_engine(self)
 
     @staticmethod
     def send_message(connection, message):
