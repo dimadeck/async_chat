@@ -85,7 +85,7 @@ class ChatKernel:
             methods = {'login': (self.error_alredy_login, {'connection': connection}),
                        'logout': (self.logout_engine, {'connection': connection}),
                        'msg': (
-                       self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
+                           self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
                        'debug': (self.debug_engine, {}),
                        'whoami': (self.whoami_engine, {'connection': connection}),
