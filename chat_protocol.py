@@ -6,10 +6,8 @@ class ChatProtocol:
     def __init__(self, **methods):
         self.functions = self.unzip_dict(methods, 0)
         self.args = self.unzip_dict(methods, 1)
-        try:
-            self.empty_method = methods['empty']
-        except KeyError:
-            self.empty_method = (self.empty_function, {})
+        self.empty_method = self.get_empty_function(**methods)
+
         self.fill_empty(self.empty_method)
 
     @staticmethod
@@ -19,28 +17,25 @@ class ChatProtocol:
             funcs[key] = methods[key][index]
         return funcs
 
-    # def merge(self, cmd, **kwargs):
-    #     for key, value in kwargs.items():
-    #         self.args[cmd][key] = value
-
     def fill_empty(self, func):
-        print(func)
-        print(func[0])
         for method in ChatProtocol.AVAILABLE_METHODS:
             if method not in self.functions.keys():
                 self.functions[method] = func[0]
                 self.args[method] = func[1]
-        print('')
-        print(self.functions)
-        print('')
+
+    def get_empty_function(self, **methods):
+        try:
+            return methods['empty']
+        except KeyError:
+            return self.empty_function, {}
+
+    def empty_function(self):
+        pass
 
     def engine(self, cmd):
         for method in ChatProtocol.AVAILABLE_METHODS:
             if cmd == method:
                 return self.functions[cmd](**self.args[cmd])
-
-    def empty_function(self):
-        pass
 
 
 if __name__ == '__main__':
