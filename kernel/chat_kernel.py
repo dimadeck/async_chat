@@ -12,6 +12,7 @@ class ChatKernel:
             self.send_message = method_send_message
         if method_close_connection is not None:
             self.close_connection = method_close_connection
+        self.init_connection_list(connections)
 
     @staticmethod
     def init_connection_list(connections):

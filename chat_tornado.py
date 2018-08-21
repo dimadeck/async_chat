@@ -1,15 +1,15 @@
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
+from kernel.chat_kernel import ChatKernel
+from kernel.chat_pack_message import PackMessage
 
-from base_server.tcp_server.tcp_kernel import TCPKernel
 
-
-class EchoServer(TCPServer, TCPKernel):
+class EchoServer(TCPServer, ChatKernel):
     def __init__(self, connections):
+        ChatKernel.__init__(self, connections, parse_strip='\r\n', method_send_message=self.send_message,
+                            method_close_connection=self.close_connection)
         super(EchoServer, self).__init__()
-        self.connections = self.init_connection_list(connections)
-        self.parse_strip = '\r\n'
 
     @gen.coroutine
     def handle_stream(self, stream, address):
@@ -30,7 +30,7 @@ class EchoServer(TCPServer, TCPKernel):
 def main(port=8000, connections=None):
     server = EchoServer(connections=connections)
     server.listen(port)
-    print(f'[SERVER INFO] - Tornado server started on {port} port.')
+    print(PackMessage.server_message('start', version="Tornado_Chat", port=port))
 
     try:
         IOLoop.current().start()
