@@ -3,56 +3,53 @@ import tornado.web
 import tornado.websocket
 
 from base_server.connected import Connected
-from base_server.tcp_server.data_parser import DataParser
+from base_server.tcp_server.tcp_kernel import TCPKernel
 
+
+# var ws = new WebSocket("ws://127.0.0.1:8888/ws");
+# ws.onmessage = function(e) {alert(e.data);};
+# ws.send('hello');
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('view/templates/ws_chat.html', version='1')
+        self.render('view/templates/ws_chat.html', version='TORNADO CHAT')
 
 
 class WebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
         print('open')
-        self.application.connections.add_connection(self)
+        self.application.chat.add_connection(self)
 
     def on_message(self, message):
         message = bytes(message, encoding='utf-8')
-        req_dict = DataParser(message, strip='')
-        print(req_dict.data_list)
-        mes = None
-        # if req_dict[0] == 'login':
-        #     self.application.connections.register_user(self, message_dict[1])
-        #     mes = {'action': 'connect', 'name': }
-        #     self.write_message(mes)
-        #     mes = {'action': 'join', 'name': message_dict[1]}
-        # if mes is not None:
-        #     for ws in self.application.connections.users:
-        #         ws.write_message(mes)
+        self.application.chat.engine(message, self, 'None')
+        # if self.application.chat.engine(message, self, 'None') == -1:
+        #     self.application.chat.logout(self)
+
+    @staticmethod
+    def close_connection(connection):
+        connection.close()
 
     def on_close(self, message=None):
-        self.application.connections.drop_connection(self)
+        self.application.chat.logout(self)
+        print('close')
 
-
-class PackMessage:
-    def __init__(self, mode='ws'):
-        self.mode = mode
-
-    def new_connection(self, name):
-        if self.mode == 'ws':
-            mess = {'action': 'connect', 'name': name}
+    @staticmethod
+    def send_message(connection, message):
+        mes = {'action': 'response', 'message': message}
+        connection.write_message(mes)
 
 
 class Application(tornado.web.Application):
     def __init__(self):
         self.connections = Connected()
-        self.pack_message = PackMessage(mode='ws')
-
+        self.chat = TCPKernel(connections=self.connections, method_send_message=WebSocket.send_message,
+                              method_close_connection=WebSocket.close_connection)
         handlers = (
             (r'/', MainHandler),
             (r'/ws', WebSocket))
 
-        tornado.web.Application.__init__(self, handlers, connections=self.connections)
+        tornado.web.Application.__init__(self, handlers)
 
 
 def main(port=8888):
