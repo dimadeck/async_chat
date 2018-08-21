@@ -26,12 +26,14 @@ class AsyncioChat(ChatKernel):
         connection.close()
 
 
+VERSION = 'AsyncIO_Chat'
+
+
 def main(port=10000, connections=None):
     server = AsyncioChat(connections=connections)
     loop = asyncio.get_event_loop()
     loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
-
-    print(PackMessage.server_message('start', version='AsincIO_Chat', port=port))
+    print(PackMessage.server_message('start', version=VERSION, port=port))
     try:
         loop.run_forever()
     except KeyboardInterrupt:

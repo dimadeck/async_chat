@@ -27,11 +27,13 @@ class EchoServer(TCPServer, ChatKernel):
         connection.close()
 
 
+VERSION = "Tornado_Chat"
+
+
 def main(port=8000, connections=None):
     server = EchoServer(connections=connections)
     server.listen(port)
-    print(PackMessage.server_message('start', version="Tornado_Chat", port=port))
-
+    print(PackMessage.server_message('start', version=VERSION, port=port))
     try:
         IOLoop.current().start()
     except KeyboardInterrupt:
