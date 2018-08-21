@@ -14,7 +14,11 @@ class EchoServer(TCPServer, ChatKernel):
     @gen.coroutine
     def handle_stream(self, stream, address):
         while True:
-            data = yield stream.read_until(b"\n")
+            try:
+                data = yield stream.read_until(b"\n")
+            except:
+                self.logout_engine(stream)
+                break
             if self.engine(data, stream, address) == -1:
                 break
 
