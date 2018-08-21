@@ -1,4 +1,4 @@
-from base_server.connected import Connected
+from kernel.connected import Connected
 
 
 class ChatKernel:

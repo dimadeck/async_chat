@@ -2,7 +2,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from base_server.connected import Connected
+from kernel.connected import Connected
 from base_server.tcp_server.tcp_kernel import TCPKernel
 
 

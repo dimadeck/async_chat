@@ -1,5 +1,5 @@
-from base_server.connected import Connected
-from base_server.tcp_server.data_parser import DataParser
+from kernel.connected import Connected
+from kernel.data_parser import DataParser
 from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
 
