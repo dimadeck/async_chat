@@ -26,12 +26,14 @@ class WebSocket(tornado.websocket.WebSocketHandler):
         # if self.application.chat.engine(message, self, 'None') == -1:
         #     self.application.chat.logout(self)
 
+
     @staticmethod
     def close_connection(connection):
         connection.close()
 
     def on_close(self, message=None):
-        self.application.chat.logout(self)
+        self.application.chat.logout_engine(self)
+        # self.application.chat.logout_engine(self)
         print('close')
 
     @staticmethod

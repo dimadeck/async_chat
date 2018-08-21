@@ -62,9 +62,9 @@
        function disconnect() {
          if (conn != null) {
            conn.send('logout');
-           conn.close();
-           conn = null;
-           name = 'None';
+           //conn.close();
+           //conn = null;
+           //name = 'None';
            update_ui();
          }
        }
