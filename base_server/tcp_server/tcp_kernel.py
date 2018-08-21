@@ -51,10 +51,11 @@ class TCPKernel(ChatKernel):
 
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
-        self.logout(connection)
-        message = PackMessage.system_message('logout', username=username)
-        self.send_all(message)
-        return -1
+        if username != 0:
+            self.logout(connection)
+            message = PackMessage.system_message('logout', username=username)
+            self.send_all(message)
+            return -1
 
     def NEW_login(self, connection, username):
         if self.login(connection, username) == 0:
