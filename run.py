@@ -5,10 +5,11 @@ from binder import main as bind
 import chat_asyncio as as_chat
 import chat_tornado as tor_chat
 import chat_twisted as tw_chat
+import tornado_websocket as tor_ws_chat
 
 
-LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main, 'aio_chat': aio_chat.main,
-          'bind': bind}
+LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main,
+          'aio_chat': aio_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'bind': bind}
 BIND = ['tcp_all', 'as_aio']
 LAUNCH_KEYS = list(LAUNCH.keys())
 
