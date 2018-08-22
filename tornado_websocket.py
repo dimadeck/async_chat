@@ -2,13 +2,13 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from kernel.connected import Connected
-from base_server.tcp_server.tcp_kernel import TCPKernel
+from kernel.chat_kernel import ChatKernel
+from kernel.chat_pack_message import PackMessage
 
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('view/templates/ws_chat.html', version='TORNADO CHAT')
+        self.render('view/templates/ws_chat.html', version=VERSION)
 
 
 class WebSocket(tornado.websocket.WebSocketHandler):
@@ -31,10 +31,10 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
 
 class Application(tornado.web.Application):
-    def __init__(self):
-        self.connections = Connected()
-        self.chat = TCPKernel(connections=self.connections, method_send_message=WebSocket.send_message,
-                              method_close_connection=WebSocket.close_connection)
+    def __init__(self, connections):
+        self.connections = connections
+        self.chat = ChatKernel(connections=self.connections, method_send_message=WebSocket.send_message, parse_strip='',
+                               method_close_connection=WebSocket.close_connection)
         handlers = (
             (r'/', MainHandler),
             (r'/ws', WebSocket))
@@ -42,9 +42,13 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers)
 
 
-def main(port=8888):
-    application = Application()
+VERSION = 'TORNADO_WS_CHAT'
+
+
+def main(port=8888, connections=None):
+    application = Application(connections)
     application.listen(port)
+    PackMessage.server_message('start', version=VERSION, port=port)
     tornado.ioloop.IOLoop.instance().start()
 
 
