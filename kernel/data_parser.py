@@ -1,9 +1,12 @@
+from kernel import AVAILABLE_METHODS
+
+
 class DataParser:
     STATUS_DICT = {0: 'OK',
                    -1: 'null_list', -2: 'unknown command',
                    -10: 'require username', -11: 'overage info',
                    -20: 'empty message', }
-    CMD_LIST = ['login', 'msg', 'msgall', 'logout', 'debug', 'whoami', 'userlist']
+    CMD_LIST = AVAILABLE_METHODS
 
     def __init__(self, request: bytes, strip):
         self.data_list = []
