@@ -6,9 +6,10 @@ from twisted.internet import reactor
 # ws.onmessage = function(e) {alert(e.data);};
 # ws.send('hello');
 from base_server.tcp_server.tcp_kernel import TCPKernel
+from kernel.chat_kernel import ChatKernel
 
 
-class MyServerProtocol(WebSocketServerProtocol, TCPKernel):
+class MyServerProtocol(WebSocketServerProtocol, ChatKernel):
 
     def onConnect(self, request):
         print(f"Client connecting: {request.peer}")
@@ -19,7 +20,7 @@ class MyServerProtocol(WebSocketServerProtocol, TCPKernel):
 
     def onMessage(self, payload, isBinary):
         print(f"Message: {payload.decode('utf8')}")
-        # self.sendMessage(payload, isBinary)
+        self.sendMessage(payload, isBinary)
 
 
 if __name__ == '__main__':
