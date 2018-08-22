@@ -29,8 +29,14 @@ class PackMessage:
 
     @staticmethod
     def chat_message(username, message, private=False):
-        private_sym = '*' if private else ''
-        mess = f'[{username}][{private_sym}]{DELIMETER_CHAT}{message}'
+        private_sym = '[*]' if private else ''
+        mess = f'[{username}]{private_sym}{DELIMETER_CHAT}{message}'
+        mess = Color.color_engine(mess)
+        return mess
+
+    @staticmethod
+    def system_info(message=None):
+        mess = PackMessage.add_suffix(INFO_SUFFIX, message)
         mess = Color.color_engine(mess)
         return mess
 
