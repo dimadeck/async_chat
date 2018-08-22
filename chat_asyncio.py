@@ -3,17 +3,16 @@ import asyncio
 from kernel.chat_kernel import ChatKernel
 
 
-class AsyncioChat(ChatKernel):
+class AsyncioChat:
     def __init__(self, connections, port):
-        super(AsyncioChat, self).__init__(connections=connections, method_send_message=self.send_message,
-                                          method_close_connection=self.close_connection, version=VERSION, port=port)
-        self.init_connection_list(connections)
+        self.chat = ChatKernel(connections=connections, method_send_message=self.send_message,
+                               method_close_connection=self.close_connection, version=VERSION, port=port)
 
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))
             addr = writer.get_extra_info('peername')
-            if self.engine(request, writer, addr) == -1:
+            if self.chat.engine(request, writer, addr) == -1:
                 break
 
     @staticmethod
