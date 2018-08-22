@@ -5,7 +5,8 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel:
-    def __init__(self, connections=None, parse_strip='\r\n', method_send_message=None, method_close_connection=None):
+    def __init__(self, connections=None, parse_strip='\r\n', method_send_message=None, method_close_connection=None,
+                 version=None, port=None):
         self.connections = self.init_connection_list(connections)
         self.parse_strip = parse_strip
         if method_send_message is not None:
@@ -13,6 +14,9 @@ class ChatKernel:
         if method_close_connection is not None:
             self.close_connection = method_close_connection
         self.init_connection_list(connections)
+        self.version = version
+        self.pack_message = PackMessage(version=version)
+        print(self.pack_message.server_message('start', port=port))
 
     @staticmethod
     def init_connection_list(connections):
@@ -64,12 +68,12 @@ class ChatKernel:
     def engine(self, request, writer, addr):
         if len(request) > 0:
             if self.add_connection(writer) == 0:
-                print(PackMessage.server_message('new', addr=addr))
+                print(self.pack_message.server_message('new', addr=addr))
             req_dict = DataParser(request, strip=self.parse_strip)
             if req_dict.status == 0:
                 return self.run_command(req_dict, writer)
             else:
-                message = PackMessage.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])
+                message = self.pack_message.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])
                 self.send_message(writer, message)
         elif not request:
             self.logout_engine(writer)
@@ -102,57 +106,57 @@ class ChatKernel:
         username = self.get_name_by_connection(connection)
         if username != 0:
             self.logout(connection)
-            message = PackMessage.system_message('logout', username=username)
+            message = self.pack_message.system_message('logout', username=username)
             self.send_all(message)
-            print(PackMessage.server_message('logout', username=username))
+            print(self.pack_message.server_message('logout', username=username))
             return -1
 
     def login_engine(self, connection, username):
         if self.login(connection, username) == 0:
-            print(PackMessage.server_message('login', username=username))
-            message = PackMessage.system_message('login', username=username)
+            print(self.pack_message.server_message('login', username=username))
+            message = self.pack_message.system_message('login', username=username)
             self.send_all(message)
         else:
-            message = PackMessage.system_error('user_exist')
+            message = self.pack_message.system_error('user_exist')
             self.send_message(connection, message)
 
     def error_alredy_login(self, connection):
-        message = PackMessage.system_error('already_login')
+        message = self.pack_message.system_error('already_login')
         self.send_message(connection, message)
 
     def error_first_login(self, connection):
-        message = PackMessage.system_error('first_login')
+        message = self.pack_message.system_error('first_login')
         self.send_message(connection, message)
 
     def send_message_engine(self, connection, username, message):
         sender = self.get_name_by_connection(connection)
         user = self.get_connection_by_name(username)
         if user is not None:
-            message = PackMessage.chat_message(username=sender, message=message, private=True)
+            message = self.pack_message.chat_message(username=sender, message=message, private=True)
             self.send_message(user, message)
             self.send_message(connection, message)
         else:
-            message = PackMessage.system_error('not_found', username=username)
+            message = self.pack_message.system_error('not_found', username=username)
             self.send_message(connection, message)
 
     def send_all_engine(self, connection, message):
         sender = self.get_name_by_connection(connection)
-        message = PackMessage.chat_message(username=sender, message=message)
+        message = self.pack_message.chat_message(username=sender, message=message)
         self.send_all(message)
 
     def debug_engine(self):
         connections = self.get_connections()
         userlist = self.get_users()
 
-        print(PackMessage.message(connections))
-        print(PackMessage.message(userlist))
+        print(self.pack_message.message(connections))
+        print(self.pack_message.message(userlist))
 
     def whoami_engine(self, connection):
         username = self.get_name_by_connection(connection)
-        message = PackMessage.system_info(username)
+        message = self.pack_message.system_info(username)
         self.send_message(connection, message)
 
     def userlist_engine(self, connection):
         userlist = f"[{', '.join(self.get_username_list())}]"
-        message = PackMessage.system_info(userlist)
+        message = self.pack_message.system_info(userlist)
         self.send_message(connection, message)
