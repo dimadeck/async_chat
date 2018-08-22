@@ -1,13 +1,14 @@
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
+
 from kernel.chat_kernel import ChatKernel
 
 
-class EchoServer(TCPServer, ChatKernel):
+class EchoServer(TCPServer):
     def __init__(self, connections, port):
-        ChatKernel.__init__(self, connections, parse_strip='\r\n', method_send_message=self.send_message,
-                            method_close_connection=self.close_connection, version=VERSION, port=port)
+        self.chat = ChatKernel(connections, parse_strip='\r\n', method_send_message=self.send_message,
+                               method_close_connection=self.close_connection, version=VERSION, port=port)
         super(EchoServer, self).__init__()
 
     @gen.coroutine
@@ -16,9 +17,9 @@ class EchoServer(TCPServer, ChatKernel):
             try:
                 data = yield stream.read_until(b"\n")
             except:
-                self.logout_engine(stream)
+                self.chat.logout_engine(stream)
                 break
-            if self.engine(data, stream, address) == -1:
+            if self.chat.engine(data, stream, address) == -1:
                 break
 
     @staticmethod
