@@ -1,7 +1,7 @@
+from kernel import AVAILABLE_METHODS
+
+
 class ChatProtocol:
-    BASE_METHODS = ['login', 'msg', 'msgall', 'logout']
-    SPECIAL_METHODS = ['whoami', 'userlist', 'debug']
-    AVAILABLE_METHODS = BASE_METHODS + SPECIAL_METHODS
 
     def __init__(self, **methods):
         self.functions = self.unzip_dict(methods, 0)
@@ -18,7 +18,7 @@ class ChatProtocol:
         return funcs
 
     def fill_empty(self, func):
-        for method in ChatProtocol.AVAILABLE_METHODS:
+        for method in AVAILABLE_METHODS:
             if method not in self.functions.keys():
                 self.functions[method] = func[0]
                 self.args[method] = func[1]
@@ -33,13 +33,6 @@ class ChatProtocol:
         pass
 
     def engine(self, cmd):
-        for method in ChatProtocol.AVAILABLE_METHODS:
+        for method in AVAILABLE_METHODS:
             if cmd == method:
                 return self.functions[cmd](**self.args[cmd])
-
-
-if __name__ == '__main__':
-    methods = {'login': ('1', {}),
-               'logout': ('2', {}),
-               }
-    a = ChatProtocol(**methods)
