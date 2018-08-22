@@ -2,21 +2,21 @@ from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
 from kernel.chat_kernel import ChatKernel
-from kernel.chat_pack_message import PackMessage
+
+VERSION = 'Twisted_Chat'
 
 
-class Chat(LineReceiver, ChatKernel):
-    def __init__(self, connections, addr):
-        super(Chat, self).__init__(connections=connections, parse_strip='', method_send_message=self.send_message,
-                                   method_close_connection=self.close_connection)
+class Chat(LineReceiver):
+    def __init__(self, chat, addr):
+        self.chat = chat
         self.addr = addr
 
     def lineReceived(self, line):
-        if self.engine(line, self, self.addr) == -1:
-            self.logout_engine(self)
+        if self.chat.engine(line, self, self.addr) == -1:
+            self.chat.logout_engine(self)
 
     def connectionLost(self, reason=None):
-        self.logout_engine(self)
+        self.chat.logout_engine(self)
 
     @staticmethod
     def send_message(connection, message):
@@ -28,20 +28,18 @@ class Chat(LineReceiver, ChatKernel):
 
 
 class Factory(protocol.ServerFactory):
-    def __init__(self, connections):
-        self.connections = ChatKernel.init_connection_list(connections)
+    def __init__(self, connections, port):
+        self.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=Chat.send_message,
+                               method_close_connection=Chat.close_connection, version=VERSION, port=port)
+        self.port = port
         super(Factory, self).__init__()
 
     def buildProtocol(self, addr):
-        return Chat(self.connections, addr)
-
-
-VERSION = 'Twisted_Chat'
+        return Chat(self.chat, addr)
 
 
 def main(port=1234, connections=None):
-    print(PackMessage.server_message('start', version=VERSION, port=port))
-    reactor.listenTCP(port, Factory(connections=connections))
+    reactor.listenTCP(port, Factory(connections=connections, port=port))
     reactor.run()
 
 
