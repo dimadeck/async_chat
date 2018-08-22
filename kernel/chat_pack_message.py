@@ -74,3 +74,20 @@ class PackMessage:
     @staticmethod
     def message(message):
         return message
+
+    @staticmethod
+    def test():
+        phrases = [
+            PackMessage.server_message('start', version='test_version', port='test_port'),
+            PackMessage.server_message('new', addr='test_addr'),
+            PackMessage.server_message('login', username='test_user'),
+            PackMessage.server_message('logout', username='test_user'),
+            PackMessage.system_message('login', username='test_user'),
+            PackMessage.system_message('logout', username='test_user'),
+            PackMessage.system_error('bad_request', message='test_error_message'),
+            PackMessage.system_error('not_found', username='test_user'), PackMessage.system_error('first_login'),
+            PackMessage.system_error('already_login'), PackMessage.system_error('user_exist'),
+            PackMessage.chat_message(username='test_user', message='test_message'),
+            PackMessage.chat_message(username='test_user', message='test_private_message', private=True),
+        ]
+        return phrases

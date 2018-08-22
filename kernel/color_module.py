@@ -1,7 +1,8 @@
 from clint.textui import colored
 
-from kernel import *
-from kernel.chat_pack_message import PackMessage
+from kernel import DELIMETER_CHAT, DELIMETER_MESSAGE, ERROR_SUFFIX, INFO_SUFFIX, SERVER_SUFFIX, SYSTEM_SUFFIX, \
+    MESSAGE_NOT_FOUND, MESSAGE_FIRST_LOGIN, MESSAGE_ALREADY_LOGIN, MESSAGE_LOGIN, MESSAGE_LOGOUT, \
+    MESSAGE_NEW_CONNECTION, MESSAGE_SERVER_START, MESSAGE_USER_EXIST
 
 
 class Color:
@@ -91,19 +92,8 @@ class Color:
 
 
 def test():
-    phrases = [
-        PackMessage.server_message('start', version='test_version', port='test_port'),
-        PackMessage.server_message('new', addr='test_addr'),
-        PackMessage.server_message('login', username='test_user'),
-        PackMessage.server_message('logout', username='test_user'),
-        PackMessage.system_message('login', username='test_user'),
-        PackMessage.system_message('logout', username='test_user'),
-        PackMessage.system_error('bad_request', message='test_error_message'),
-        PackMessage.system_error('not_found', username='test_user'), PackMessage.system_error('first_login'),
-        PackMessage.system_error('already_login'), PackMessage.system_error('user_exist'),
-        PackMessage.chat_message(username='test_user', message='test_message'),
-        PackMessage.chat_message(username='test_user', message='test_private_message', private=True),
-    ]
+    from kernel.chat_pack_message import PackMessage
+    phrases = PackMessage.test()
     print('#####################[START]#####################')
     for phrase in phrases:
         print(phrase)
