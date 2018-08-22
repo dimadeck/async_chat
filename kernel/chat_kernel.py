@@ -1,7 +1,7 @@
-from kernel.connected import Connected
-from kernel.data_parser import DataParser
 from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
+from kernel.connected import Connected
+from kernel.data_parser import DataParser
 
 
 class ChatKernel:
@@ -149,10 +149,10 @@ class ChatKernel:
 
     def whoami_engine(self, connection):
         username = self.get_name_by_connection(connection)
-        message = PackMessage.message(username)
+        message = PackMessage.system_info(username)
         self.send_message(connection, message)
 
     def userlist_engine(self, connection):
-        userlist = ', '.join(self.get_username_list())
-        message = PackMessage.message(userlist)
+        userlist = f"[{', '.join(self.get_username_list())}]"
+        message = PackMessage.system_info(userlist)
         self.send_message(connection, message)
