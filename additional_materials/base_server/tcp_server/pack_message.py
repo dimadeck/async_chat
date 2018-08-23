@@ -1,4 +1,4 @@
-from base_server.tcp_server.color_module import ColorChat, ColorServer, Color
+from additional_materials.base_server.tcp_server.color_module import ColorChat, ColorServer, Color
 
 
 class PackMessage:

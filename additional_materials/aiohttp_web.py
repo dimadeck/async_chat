@@ -3,7 +3,7 @@ import aiohttp_jinja2
 import jinja2
 from aiohttp import web
 
-from base_server.base_server import ChatKernel
+from additional_materials.base_server.base_server import ChatKernel
 from kernel.connected import Connected
 
 VERSION = 'aioChat'

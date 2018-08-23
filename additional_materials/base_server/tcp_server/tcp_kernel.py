@@ -1,4 +1,4 @@
-from base_server.base_server import ChatKernel
+from additional_materials.base_server.base_server import ChatKernel
 from kernel.data_parser import DataParser
 from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
