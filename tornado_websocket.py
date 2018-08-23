@@ -4,6 +4,7 @@ import tornado.websocket
 
 from kernel.chat_kernel import ChatKernel
 
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('view/templates/ws_chat.html', version=VERSION)
@@ -20,7 +21,6 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
     def on_close(self, message=None):
         self.application.chat.logout_engine(self)
-        print('close')
 
     @staticmethod
     def send_message(connection, message):
@@ -45,7 +45,10 @@ class Application(tornado.web.Application):
 def main(port=8888, connections=None):
     application = Application(connections, port)
     application.listen(port)
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        tornado.ioloop.IOLoop.instance().start()
+    except:
+        tornado.ioloop.IOLoop.instance().stop()
 
 
 if __name__ == '__main__':
