@@ -1,17 +1,16 @@
 import sys
 
-import aiohttp_web as aio_chat
-import fork_aiohttp_web as fork_aio_chat
-from binder import main as bind
+import aio_websocket as aio_ws_chat
 import chat_asyncio as as_chat
 import chat_tornado as tor_chat
 import chat_twisted as tw_chat
 import tornado_websocket as tor_ws_chat
-
+from binder import main as bind
 
 LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main,
-          'aio_chat': aio_chat.main,'fork_aio_chat': fork_aio_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'bind': bind}
-BIND = ['tcp_all', 'as_aio']
+          'aio_ws_chat': aio_ws_chat.main, 'tor_ws_chat': tor_ws_chat.main,
+          'bind': bind}
+BIND = ['tcp_all', 'as_aio', 'ws_all']
 LAUNCH_KEYS = list(LAUNCH.keys())
 
 if __name__ == '__main__':

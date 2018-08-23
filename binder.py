@@ -1,7 +1,8 @@
 from multiprocessing import Process
 from time import sleep
 
-from aiohttp_web import main as aio_main
+from aio_websocket import main as aio_ws_main
+from tornado_websocket import main as tor_ws_main
 from kernel.connected import Connected
 from chat_asyncio import main as as_main
 from chat_tornado import main as tor_main
@@ -57,7 +58,11 @@ def setup(mode):
                     'connections': connections,
                     'ports': [8000, 8080, 8888]}
     elif mode == 'as_aio':
-        settings = {'servers': [as_main, aio_main],
+        settings = {'servers': [as_main, aio_ws_main],
+                    'connections': connections,
+                    'ports': [8080, 8000]}
+    elif mode == 'ws_all':
+        settings = {'servers': [aio_ws_main, tor_ws_main],
                     'connections': connections,
                     'ports': [8080, 8000]}
     return settings
