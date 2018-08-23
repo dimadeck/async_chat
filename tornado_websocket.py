@@ -4,6 +4,8 @@ import tornado.websocket
 
 from kernel.chat_kernel import ChatKernel
 
+VERSION = 'TORNADO_WS_CHAT'
+
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -26,9 +28,6 @@ class WebSocket(tornado.websocket.WebSocketHandler):
     def send_message(connection, message):
         mes = {'action': 'response', 'message': message}
         connection.write_message(mes)
-
-
-VERSION = 'TORNADO_WS_CHAT'
 
 
 class Application(tornado.web.Application):
