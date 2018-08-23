@@ -1,10 +1,10 @@
 import sys
 
-import aio_websocket as aio_ws_chat
 import chat_asyncio as as_chat
 import chat_tornado as tor_chat
 import chat_twisted as tw_chat
-import tornado_websocket as tor_ws_chat
+import chat_ws_asyncio as aio_ws_chat
+import chat_ws_tornado as tor_ws_chat
 from binder import main as bind
 
 LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main,
