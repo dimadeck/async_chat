@@ -41,6 +41,8 @@ class Color:
 
         for phrase in phrase_set:
             if phrase in body:
+                if phrase == MESSAGE_LOGOUT:
+                    color_set['base'] = 'red'
                 final = ''
                 body_dict = body.split(phrase)
                 body_dict = Color.config_empty_fields(body_dict)
