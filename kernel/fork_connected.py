@@ -9,10 +9,12 @@ class Connected:
         else:
             return -1
 
-    def is_exist_connection(self, connection):
+    @staticmethod
+    def is_exist_connection(connection):
         return connection in Connected.connections
 
-    def is_valid_name(self, username):
+    @staticmethod
+    def is_valid_name(username):
         if username in Connected.users.values():
             return -1
         else:
@@ -24,16 +26,19 @@ class Connected:
             return 0
         return -1
 
-    def is_register(self, connection):
+    @staticmethod
+    def is_register(connection):
         return connection in Connected.users
 
-    def get_connection(self, username):
+    @staticmethod
+    def get_connection(username):
         for connection in Connected.connections:
             if username == Connected.users[connection]:
                 return connection
         return None
 
-    def get_name(self, connection):
+    @staticmethod
+    def get_name(connection):
         try:
             return Connected.users[connection]
         except KeyError:
@@ -45,16 +50,18 @@ class Connected:
         if connection in Connected.connections:
             Connected.connections.remove(connection)
 
-    def get_username_list(self):
+    @staticmethod
+    def get_username_list():
         user_list = []
         for username in Connected.users.values():
             user_list.append(username)
         return user_list
 
-    def get_connections(self):
+    @staticmethod
+    def get_connections():
         return Connected.connections
 
-    def clear_all(self):
+    @staticmethod
+    def clear_all():
         Connected.connections = []
         Connected.users = {}
-
