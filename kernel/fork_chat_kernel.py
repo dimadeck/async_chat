@@ -1,69 +1,16 @@
-from kernel.chat_pack_message import PackMessage
+from kernel.chat_kernel import ChatKernel as CK
 from kernel.chat_protocol import ChatProtocol
-from kernel.connected import Connected
 from kernel.data_parser import DataParser
 
 
-class ChatKernel:
-    def __init__(self, connections=None, parse_strip='\r\n', method_send_message=None, method_close_connection=None,
-                 version=None, port=None):
-        self.connections = self.init_connection_list(connections)
-        self.parse_strip = parse_strip
-        if method_send_message is not None:
-            self.send_message = method_send_message
-        if method_close_connection is not None:
-            self.close_connection = method_close_connection
-        self.init_connection_list(connections)
-        self.version = version
-        self.pack_message = PackMessage(version=version)
-        print(self.pack_message.server_message('start', port=port))
-
-    @staticmethod
-    def init_connection_list(connections):
-        return connections if connections is not None else Connected()
-
-    @staticmethod
-    def send_message(connection, message):
-        raise NotImplementedError
-
-    @staticmethod
-    def close_connection(connection):
-        raise NotImplementedError
-
+class ChatKernel(CK):
     async def send_all(self, message):
         for user in self.get_users():
             await self.send_message(user, message)
 
-    def login(self, connection, username):
-        return self.connections.register_user(connection, username)
-
     async def logout(self, connection):
         await self.close_connection(connection)
         self.connections.drop_connection(connection)
-
-    def add_connection(self, connection):
-        return self.connections.add_connection(connection)
-
-    def is_register(self, connection):
-        return self.connections.is_register(connection)
-
-    def get_connections(self):
-        return self.connections.connections
-
-    def clear_connections(self):
-        self.connections.clear_all()
-
-    def get_users(self):
-        return self.connections.users
-
-    def get_name_by_connection(self, connection):
-        return self.connections.get_name(connection)
-
-    def get_connection_by_name(self, username):
-        return self.connections.get_connection(username)
-
-    def get_username_list(self):
-        return self.connections.get_username_list()
 
     async def engine(self, request, writer, addr):
         if len(request) > 0:
@@ -143,13 +90,6 @@ class ChatKernel:
         sender = self.get_name_by_connection(connection)
         message = self.pack_message.chat_message(username=sender, message=message)
         await self.send_all(message)
-
-    def debug_engine(self):
-        connections = self.get_connections()
-        userlist = self.get_users()
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
 
     async def whoami_engine(self, connection):
         username = self.get_name_by_connection(connection)
