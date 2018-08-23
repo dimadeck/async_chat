@@ -1,6 +1,6 @@
 import aiohttp_jinja2
 import jinja2
-from aiohttp import web
+from aiohttp import web, WSMsgType
 
 from kernel.fork_chat_kernel import ChatKernel
 
@@ -16,25 +16,31 @@ class AioChat:
     def init_app(self):
         aiohttp_jinja2.setup(self.app, loader=jinja2.PackageLoader('view', 'templates'))
         self.app.router.add_get('/', self.index)
+        self.app.router.add_get('/ws', self.ws)
         return self.app
 
-    async def index(self, request):
+    @staticmethod
+    def index(request):
+        return aiohttp_jinja2.render_template('ws_chat.html', request, {'version': VERSION})
+
+    async def ws(self, request):
         ws_current = web.WebSocketResponse()
-        ws_ready = ws_current.can_prepare(request)
-        if not ws_ready.ok:
-            return aiohttp_jinja2.render_template('ws_chat.html', request, {'version': VERSION})
         await ws_current.prepare(request)
         while True:
             msg = await ws_current.receive()
-            msg = bytes(msg.data, encoding='utf-8')
-            if await self.chat.engine(msg, ws_current, 'None') == -1:
+            if msg.type == WSMsgType.CLOSE:
+                await self.chat.logout_engine(ws_current)
                 break
+            else:
+                msg = bytes(msg.data, encoding='utf-8')
+                addr = request.transport.get_extra_info('peername')
+                if await self.chat.engine(msg, ws_current, addr) == -1:
+                    break
         return ws_current
 
     @staticmethod
     async def send_message(connection, message):
-        mes = {'action': 'answer', 'name': message}
-        print(mes)
+        mes = {'action': 'response', 'message': message}
         await connection.send_json(mes)
 
     @staticmethod
