@@ -1,32 +1,43 @@
 # Asyncio, twisted, tornado #
 
-Подготовка:
+    Подготовка:
 
-1) git clone https://github.com/dimadeck/async
+        git clone https://github.com/dimadeck/async
+        cd async
+        python -m venv env
+        source env/bin/activate
+        pip install -r requirements.txt
 
-2) cd async
+## Note [23.08.18]: ##
+    Подключен протокол к aiohttp_web, основанный на форке ChatKernel (некоторые функции теперь async/await)
 
-3) python -m venv env
+Aiohttp WebSocket Chat:
 
-4) source env/bin/activate
+![alt text](additional_materials/img_readme/aio_ws_2308.png)
 
-5) pip install -r requirements.txt
+Tornado WebSocket Chat:
+
+![alt text](additional_materials/img_readme/tor_ws_2308.png)
+
 
 ## Note [22.08.18]: ##
 
 Состояние проекта:
+
     Работают правильно, по протоколу(основанные на ChatKernel):
-        - AsyncIO_chat, Twisted_chat, Tornado_chat
+
+        AsyncIO_chat, Twisted_chat, Tornado_chat
 
         Запуск:
-        -python run.py [program]
+
+        python run.py [program]
 
         program = {as_chat, tw_chat, tor_chat}
         или
         program = {bind tcp_all} для параллельного запуска трех серверов
         В логах будут написаны порты для подключения клиентов через telnet:
 
-        -telnet 127.0.0.1 port
+        telnet 127.0.0.1 port
 
 
     Требуют доработки:
