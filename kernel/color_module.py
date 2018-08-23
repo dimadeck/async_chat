@@ -95,7 +95,7 @@ class Color:
 
 def test():
     from kernel.chat_pack_message import PackMessage
-    phrases = PackMessage.test()
+    phrases = PackMessage(version='testVersion').test()
     print('#####################[START]#####################')
     for phrase in phrases:
         print(phrase)
