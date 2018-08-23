@@ -10,7 +10,7 @@ from binder import main as bind
 LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main,
           'aio_ws_chat': aio_ws_chat.main, 'tor_ws_chat': tor_ws_chat.main,
           'bind': bind}
-BIND = ['tcp_all', 'as_aio', 'ws_all']
+BIND = ['as', 'tor', 'tcp_all', 'ws_all']
 LAUNCH_KEYS = list(LAUNCH.keys())
 
 if __name__ == '__main__':

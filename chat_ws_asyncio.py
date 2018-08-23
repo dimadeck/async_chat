@@ -4,7 +4,7 @@ from aiohttp import web, WSMsgType
 
 from kernel.fork_chat_kernel import ChatKernel
 
-VERSION = 'aioWSChat'
+VERSION = 'AsyncIO_WS_Chat'
 
 
 class AioChat:

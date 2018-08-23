@@ -4,7 +4,7 @@ import tornado.websocket
 
 from kernel.chat_kernel import ChatKernel
 
-VERSION = 'TORNADO_WS_CHAT'
+VERSION = 'Tornado_WS_Chat'
 
 
 class MainHandler(tornado.web.RequestHandler):

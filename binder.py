@@ -57,8 +57,12 @@ def setup(mode):
         settings = {'servers': [as_main, tor_main, tw_main],
                     'connections': connections,
                     'ports': [8000, 8080, 8888]}
-    elif mode == 'as_aio':
+    elif mode == 'as':
         settings = {'servers': [as_main, aio_ws_main],
+                    'connections': connections,
+                    'ports': [8080, 8000]}
+    elif mode == 'tor':
+        settings = {'servers': [tor_main, tor_ws_main],
                     'connections': connections,
                     'ports': [8080, 8000]}
     elif mode == 'ws_all':
