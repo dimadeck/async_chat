@@ -100,3 +100,10 @@ class ChatKernel(CK):
         userlist = f"[{', '.join(self.get_username_list())}]"
         message = self.pack_message.system_info(userlist)
         await self.send_message(connection, message)
+
+    async def debug_engine(self):
+        connections = self.get_connections()
+        userlist = self.get_users()
+
+        print(self.pack_message.message(connections))
+        print(self.pack_message.message(userlist))
