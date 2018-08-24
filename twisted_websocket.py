@@ -13,7 +13,7 @@ VERSION = "Twisted_WS_Chat"
 # ws.onmessage = function(e) {console.info(e.data);};
 # ws.send('message');
 
-class BroadcastServerProtocol(WebSocketServerProtocol):
+class TwistedWsProtocol(WebSocketServerProtocol):
     def onOpen(self):
         print('open')
 
@@ -26,14 +26,9 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
         WebSocketServerProtocol.connectionLost(self, reason)
 
 
-class BroadcastServerFactory(WebSocketServerFactory):
-    def __init__(self, url):
-        super(BroadcastServerFactory, self).__init__(url)
-
-
 def main(connections=None, port=1234):
-    factory = BroadcastServerFactory(f'ws://127.0.0.1:{port}')
-    factory.protocol = BroadcastServerProtocol
+    factory = WebSocketServerFactory(f'ws://127.0.0.1:{port}')
+    factory.protocol = TwistedWsProtocol
     factory.protocol.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=send_message,
                                        method_close_connection=close_connection, version=VERSION, port=port)
     listenWS(factory)
