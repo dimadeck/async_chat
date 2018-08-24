@@ -8,6 +8,41 @@
         source env/bin/activate
         pip install -r requirements.txt
 
+## Note [24.08.18]: ##
+    Подключен протокол к twisted_websocket, однако на данном этапе "общение" возможно только через консоль
+    разработчика в браузере.
+
+    Как пользоваться:
+
+        python run.py tw_ws_chat
+
+        В браузере в консоли разработчика(F12 -> Console) вводить:
+
+        var ws = new WebSocket("ws://127.0.0.1:1234");
+        ws.onmessage = function(e) {alert(e.data);};
+        или
+        ws.onmessage = function(e) {console.info(e.data);};
+        ws.send('<message>');
+
+        <message> = {
+                    'login username',
+                    'userlist',
+                    'msgall <mess>',
+                    'msg <username> <mess>',
+                    ...
+                    }
+
+        Первая строчка - создание объекта WS. В этот момент в терминале сервера отобразится надпись 'open'.
+        Вторая строчка - для отображения входящего сообщения в всплывающей форме.
+        Четвертая строчка - для отображения входящего сообщения в консоли
+        Пятая строчка - отправка сообщения. При отправке сообщения, для правильной работы чата, следует
+        соблюдать протокол. В случае ошибочного запроса сервер в ответном сообщении укажет на ошибку (bad request,
+        syntax error, auth error, etc)
+
+        Демонстрация работы twisted_websocket в консоли:
+        ![alt text](additional_materials/img_readme/tw_ws_console.png)
+
+
 ## Note [23.08.18]: ##
     Подключен протокол к aiohttp_web, основанный на форке ChatKernel (некоторые функции теперь async/await)
 
