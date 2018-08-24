@@ -93,11 +93,11 @@
         Подключение:
         telnet 127.0.0.1 port
 
-    ![alt text](readme_img/tcp_all_clients_2408.png)
+![alt text](readme_img/tcp_all_clients_2408.png)
 
     Серверы:
 
-    ![alt text](readme_img/tcp_all_server_2408.png)
+![alt text](readme_img/tcp_all_server_2408.png)
 
 
     ### WebSocket ###
@@ -108,11 +108,11 @@
 
     Tornado_WS:
 
-    ![alt text](readme_img/tor_ws_2408.png)
+![alt text](readme_img/tor_ws_2408.png)
 
     AsyncIO_WS:
 
-    ![alt text](readme_img/as_ws_2408.png)
+![alt text](readme_img/as_ws_2408.png)
 
     Twisted_WS:
 
@@ -134,8 +134,11 @@
         Первая строчка - создание объекта WS. В этот момент в терминале сервера отобразится надпись 'open'.
         Вторая строчка - для отображения входящего сообщения в консоли
         Третья строчка - отправка сообщения. При отправке сообщения, для правильной работы чата, следует
-        соблюдать протокол. В случае ошибочного запроса сервер в ответном сообщении укажет на ошибку (bad request,
-        syntax error, auth error, etc)
+        соблюдать протокол. В случае ошибочного запроса сервер в ответном сообщении укажет на ошибку
+        (bad request,syntax error, auth error, etc)
 
-    ![alt text](readme_img/tw_ws_2408.png)
+![alt text](readme_img/tw_ws_2408.png)
 
+    ### Примеры ошибочных запросов ###
+
+![alt text](readme_img/protocol_error_list_2408.png)
