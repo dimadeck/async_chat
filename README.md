@@ -39,9 +39,11 @@
         соблюдать протокол. В случае ошибочного запроса сервер в ответном сообщении укажет на ошибку (bad request,
         syntax error, auth error, etc)
 
-        Демонстрация работы twisted_websocket в консоли:
-        ![alt text](additional_materials/img_readme/tw_ws_console.png)
 
+
+Демонстрация работы twisted_websocket в консоли:
+
+![alt text](additional_materials/img_readme/tw_ws_console.png)
 
 ## Note [23.08.18]: ##
     Подключен протокол к aiohttp_web, основанный на форке ChatKernel (некоторые функции теперь async/await)
