@@ -1,12 +1,79 @@
-# Asyncio, twisted, tornado #
+# Chats #
+## AsyncIO, Twisted, Tornado ##
 
     Подготовка:
 
-        git clone https://github.com/dimadeck/async
-        cd async
+        git clone https://github.com/dimadeck/async_chat
+        cd async_chat
         python -m venv env
         source env/bin/activate
         pip install -r requirements.txt
+
+## Note [24.08.18]: ##
+
+    Описание проекта:
+
+    Реализация асинхронных TCP и WebSocket чатов с помощью библиотек AsyncIO, Twisted, Tornado.
+
+    Подключенные модули:
+
+    Run modules:
+
+        - Run - запуск проекта или его частей производится с помощью этого модуля.
+
+            Синтаксис:
+
+            python run.py [program]
+            [program] = ['as_chat', 'tor_chat', 'tw_chat', 'bind',
+                        'aio_ws_chat', 'tor_ws_chat', 'tw_ws_chat']
+
+        - Bind - параллельный запуск серверов.
+
+            Синтаксис:
+
+            python run.py bind [bind_program]
+            [bind_program] = ['as', 'tor', 'tw', 'tcp_all', 'ws_all']
+
+    Kernel modules:
+
+        - ChatKernel - ядро чата, на вход поступает команда, обрабатывается, и выполняется
+        необходимое действие.
+
+        - DataParser - разбор приходящей на сервер команды. На этом уровне происходит
+        валидация данных (синтаксис).
+
+        - Connected - модуль отвечает за хранение информации о подключениях и
+        зарегистрированных пользователях.
+
+        - ChatProtocol - связь приходящих на сервер команд и необходимых дейтствий
+        в ответ на эти команды.
+
+        - ChatPackMessage - упаковщик сообщений, отвечает за информацию, отображаемую
+        в окне терминала сервера, и ответы клиентам (системные сообщения, чат).
+
+            Формат ответа:
+            - '[Suffix] - Message'
+            - '[TimeStamp][username][private]: Message'
+
+        - ColorModule - модуль для добавления цвета тексту, отображаемого в окне сервера
+        и тексту ответов клиентам. Подключен только к TCP чату. Используется на уровне упаковщика.
+
+        - ForkChatKernel - Наследник модуля ChatKernel, изменены некоторые функции на async/await
+        для AsyncIO чатов (TCP + WebSocket).
+
+    Chat modules:
+
+    Серверы, реализующие работу ChatKernel(прием и отправка данных), используя различные модули.
+
+        TCP:
+        - AsyncIO - Модули: asyncio, loop, async/await
+        - Tornado - Модули: tornado, ioloop, tcp_server,
+        - Twisted - Модули: twisted, lineReceiver, reactor, factory, protocol
+
+        WebSocket:
+        - AsyncIO - Модули: aiohttp, web, application, jinja2
+        - Tornado
+        - Twisted
 
 ## Note [24.08.18]: ##
     Подключен протокол к twisted_websocket, однако на данном этапе "общение" возможно только через консоль
