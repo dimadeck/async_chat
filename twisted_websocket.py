@@ -8,11 +8,6 @@ from kernel.chat_kernel import ChatKernel
 VERSION = "Twisted_WS_Chat"
 
 
-# var ws = new WebSocket("ws://127.0.0.1:1234");
-# ws.onmessage = function(e) {alert(e.data);};
-# ws.onmessage = function(e) {console.info(e.data);};
-# ws.send('message');
-
 class TwistedWsProtocol(WebSocketServerProtocol):
     def onOpen(self):
         print('open')
@@ -23,7 +18,7 @@ class TwistedWsProtocol(WebSocketServerProtocol):
 
     def connectionLost(self, reason):
         print('lost')
-        WebSocketServerProtocol.connectionLost(self, reason)
+        self.chat.logout_engine(self)
 
 
 def main(connections=None, port=1234):
@@ -41,9 +36,11 @@ def send_message(connection, message):
 
 
 def close_connection(connection):
-    # WebSocketServerProtocol.connectionLost(connection, '')
     pass
 
 
 if __name__ == '__main__':
+    # var ws = new WebSocket("ws://127.0.0.1:1234");
+    # ws.onmessage = function(e) {console.info(e.data);};
+    # ws.send('message');
     main()
