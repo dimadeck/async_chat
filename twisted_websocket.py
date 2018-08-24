@@ -8,8 +8,9 @@ from kernel.chat_kernel import ChatKernel
 VERSION = "Twisted_WS_Chat"
 
 
-# var ws = new WebSocket("ws://127.0.0.1:9000");
+# var ws = new WebSocket("ws://127.0.0.1:1234");
 # ws.onmessage = function(e) {alert(e.data);};
+# ws.onmessage = function(e) {console.info(e.data);};
 # ws.send('message');
 
 class BroadcastServerProtocol(WebSocketServerProtocol):
@@ -45,7 +46,8 @@ def send_message(connection, message):
 
 
 def close_connection(connection):
-    connection.stopProducing()
+    # WebSocketServerProtocol.connectionLost(connection, '')
+    pass
 
 
 if __name__ == '__main__':
