@@ -84,9 +84,9 @@
         - Tornado - Модули: tornado, tornado.web, tornado.websocket;
         - Twisted - Модули: WebSocketServerProtocol, WebSocketServerFactory
 
-    ## Демонстрация работы ##
+## Демонстрация работы ##
 
-    ### TCP ###
+### TCP ###
 
     Клиенты:
 
@@ -95,28 +95,28 @@
 
 ![alt text](readme_img/tcp_all_clients_2408.png)
 
-    Серверы:
+Серверы:
 
 ![alt text](readme_img/tcp_all_server_2408.png)
 
 
-    ### WebSocket ###
+### WebSocket ###
 
     Tornado_WS и AsyncIO_WS - при подключении к серверу через браузер возвращает html-страницу с js.
     Пользователю предлагается альтернатива ввода данных. Вверху страницы командная строка для ввода
     "чистых" команд (по протоколу). Внизу строка ввода сообщения, которое получат все (аналог msgall)
 
-    Tornado_WS:
+Tornado_WS:
 
 ![alt text](readme_img/tor_ws_2408.png)
 
-    AsyncIO_WS:
+AsyncIO_WS:
 
 ![alt text](readme_img/as_ws_2408.png)
 
-    Twisted_WS:
+Twisted_WS:
 
-    Подключен протокол к twisted_websocket, однако на данном этапе "общение" возможно только через консоль
+    Подключен протокол к chat_ws_twisted, однако на данном этапе "общение" возможно только через консоль
     разработчика в браузере.
 
     Как пользоваться:
@@ -139,6 +139,6 @@
 
 ![alt text](readme_img/tw_ws_2408.png)
 
-    ### Примеры ошибочных запросов ###
+### Примеры ошибочных запросов ###
 
 ![alt text](readme_img/protocol_error_list_2408.png)
