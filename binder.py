@@ -71,9 +71,9 @@ def setup(mode):
                     'connections': connections,
                     'ports': [8080, 8000]}
     elif mode == 'ws_all':
-        settings = {'servers': [aio_ws_main, tor_ws_main],
+        settings = {'servers': [aio_ws_main, tor_ws_main, tw_ws_main],
                     'connections': connections,
-                    'ports': [8080, 8000]}
+                    'ports': [8000, 8080, 8888]}
     return settings
 
 
