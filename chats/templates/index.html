@@ -25,12 +25,19 @@
            update_ui();
          };
          conn.onmessage = function(e) {
+
+         if ($('#chat_version').text() == "Twisted_WS_Chat"){
+         log(e.data)
+         }
+         else
+         {
            var data = JSON.parse(e.data);
            switch (data.action) {
              case 'response':
               log(data.message)
              break;
            }
+         }
          };
          conn.onclose = function() {
            log('Disconnected.');
