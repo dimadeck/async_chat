@@ -36,7 +36,7 @@ def send_message(connection, message):
 
 
 def close_connection(connection):
-    pass
+    connection.sendClose()
 
 
 if __name__ == '__main__':
