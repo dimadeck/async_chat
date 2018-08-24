@@ -1,5 +1,6 @@
 from kernel import *
 from kernel.color_module import Color
+import time
 
 
 class PackMessage:
@@ -36,7 +37,7 @@ class PackMessage:
 
     def chat_message(self, username, message, private=False):
         private_sym = '[*]' if private else ''
-        mess = f'[{username}]{private_sym}{DELIMETER_CHAT}{message}'
+        mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{DELIMETER_CHAT}{message}'
         if self.color:
             mess = Color.color_engine(mess)
         return mess
