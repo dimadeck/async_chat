@@ -18,7 +18,7 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         print(payload)
-        self.sendMessage(payload)
+        self.chat.engine(payload, self, 'None')
 
     def connectionLost(self, reason):
         print('lost')
@@ -26,26 +26,26 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
 
 
 class BroadcastServerFactory(WebSocketServerFactory):
-    def __init__(self, url, connections, port):
+    def __init__(self, url):
         super(BroadcastServerFactory, self).__init__(url)
-        self.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=self.send_message,
-                               method_close_connection=self.close_connection, version=VERSION, port=port)
-
-    @staticmethod
-    def send_message(connection, message):
-        mes = {'action': 'response', 'message': message}
-        connection.sendMessage(mes)
-
-    @staticmethod
-    def close_connection(connection):
-        connection.stopProducing()
 
 
 def main(connections=None, port=1234):
-    factory = BroadcastServerFactory('ws://0.0.0.0:9000', connections, port)
+    factory = BroadcastServerFactory(f'ws://127.0.0.1:{port}')
     factory.protocol = BroadcastServerProtocol
+    factory.protocol.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=send_message,
+                                       method_close_connection=close_connection, version=VERSION, port=port)
     listenWS(factory)
     reactor.run()
+
+
+def send_message(connection, message):
+    # mes = {'action': 'response', 'message': message}
+    connection.sendMessage(bytes(message, encoding='utf-8'))
+
+
+def close_connection(connection):
+    connection.stopProducing()
 
 
 if __name__ == '__main__':
