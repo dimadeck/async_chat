@@ -9,9 +9,17 @@
         source env/bin/activate
         pip install -r requirements.txt
 
-## Note [24.08.18]: ##
+## UPDATE [24.08.18]: ##
 
-    Описание проекта:
+### Twisted WebSocket ###
+
+Добавлено отображение страницы index.html, дописан метод корректного получения сообщений
+(в AsyncIO и Tornado отправляется JSON, в Twisted обычная строка).
+
+![alt text](readme_img/tw_ws_full_2408.png)
+
+
+## Описание проекта: ##
 
     Реализация асинхронных TCP и WebSocket чатов с помощью библиотек AsyncIO, Twisted, Tornado.
 
@@ -125,7 +133,7 @@ Twisted_WS:
 
         В браузере в консоли разработчика(F12 -> Console) вводить:
 
-        var ws = new WebSocket("ws://127.0.0.1:1234");
+        var ws = new WebSocket("ws://127.0.0.1:1234/ws");
         ws.onmessage = function(e) {console.info(e.data);};
         ws.send('<message>');
 
