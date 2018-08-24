@@ -1,60 +1,72 @@
 class Connected:
-    def __init__(self):
-        self.connections = []
-        self.users = {}
+    @classmethod
+    def __init__(cls):
+        cls.connections = []
+        cls.users = {}
 
-    def add_connection(self, connection):
-        if not self.is_exist_connection(connection):
-            self.connections.append(connection)
+    @classmethod
+    def add_connection(cls, connection):
+        if not cls.is_exist_connection(connection):
+            cls.connections.append(connection)
             return 0
         else:
             return -1
 
-    def is_exist_connection(self, connection):
-        return connection in self.connections
+    @classmethod
+    def is_exist_connection(cls, connection):
+        return connection in cls.connections
 
-    def is_valid_name(self, username):
-        if username in self.users.values():
+    @classmethod
+    def is_valid_name(cls, username):
+        if username in cls.users.values():
             return -1
         else:
             return 0
 
-    def register_user(self, connection, username):
-        if self.is_valid_name(username) == 0:
-            self.users[connection] = username
+    @classmethod
+    def register_user(cls, connection, username):
+        if cls.is_valid_name(username) == 0:
+            cls.users[connection] = username
             return 0
         return -1
 
-    def is_register(self, connection):
-        return connection in self.users
+    @classmethod
+    def is_register(cls, connection):
+        return connection in cls.users
 
-    def get_connection(self, username):
-        for connection in self.connections:
-            if username == self.users[connection]:
+    @classmethod
+    def get_connection(cls, username):
+        for connection in cls.connections:
+            if username == cls.users[connection]:
                 return connection
         return None
 
-    def get_name(self, connection):
+    @classmethod
+    def get_name(cls, connection):
         try:
-            return self.users[connection]
+            return cls.users[connection]
         except KeyError:
             return 0
 
-    def drop_connection(self, connection):
-        if self.is_register(connection):
-            self.users.pop(connection)
-        if connection in self.connections:
-            self.connections.remove(connection)
+    @classmethod
+    def drop_connection(cls, connection):
+        if cls.is_register(connection):
+            cls.users.pop(connection)
+        if connection in cls.connections:
+            cls.connections.remove(connection)
 
-    def get_username_list(self):
+    @classmethod
+    def get_username_list(cls):
         user_list = []
-        for username in self.users.values():
+        for username in cls.users.values():
             user_list.append(username)
         return user_list
 
-    def get_connections(self):
-        return self.connections
+    @classmethod
+    def get_connections(cls):
+        return cls.connections
 
-    def clear_all(self):
-        self.connections = []
-        self.users = {}
+    @classmethod
+    def clear_all(cls):
+        cls.connections = []
+        cls.users = {}
