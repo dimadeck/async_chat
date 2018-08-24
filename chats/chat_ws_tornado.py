@@ -1,7 +1,6 @@
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-
 from kernel.chat_kernel import ChatKernel
 
 VERSION = 'Tornado_WS_Chat'
@@ -9,7 +8,7 @@ VERSION = 'Tornado_WS_Chat'
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('view/templates/ws_chat.html', version=VERSION)
+        self.render('templates/index.html', version=VERSION)
 
 
 class WebSocket(tornado.websocket.WebSocketHandler):

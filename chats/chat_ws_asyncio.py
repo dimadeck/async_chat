@@ -14,14 +14,13 @@ class AioChat:
         self.app = web.Application()
 
     def init_app(self):
-        aiohttp_jinja2.setup(self.app, loader=jinja2.PackageLoader('view', 'templates'))
+        aiohttp_jinja2.setup(self.app, loader=jinja2.PackageLoader('chats', 'templates'))
         self.app.router.add_get('/', self.index)
         self.app.router.add_get('/ws', self.ws)
         return self.app
 
-    @staticmethod
-    def index(request):
-        return aiohttp_jinja2.render_template('ws_chat.html', request, {'version': VERSION})
+    def index(self, request):
+        return aiohttp_jinja2.render_template('index.html', request, {'version': VERSION})
 
     async def ws(self, request):
         ws_current = web.WebSocketResponse()
