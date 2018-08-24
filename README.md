@@ -11,14 +11,6 @@
 
 ## UPDATE [24.08.18]: ##
 
-### Twisted WebSocket ###
-
-Добавлено отображение страницы index.html, дописан метод корректного получения сообщений
-(в AsyncIO и Tornado отправляется JSON, в Twisted обычная строка).
-
-![alt text](readme_img/tw_ws_full_2408.png)
-
-
 ## Описание проекта: ##
 
     Реализация асинхронных TCP и WebSocket чатов с помощью библиотек AsyncIO, Twisted, Tornado.
@@ -96,10 +88,10 @@
 
 ### TCP ###
 
-    Клиенты:
+Клиенты:
 
-        Подключение:
-        telnet 127.0.0.1 port
+    Подключение:
+    telnet 127.0.0.1 port
 
 ![alt text](readme_img/tcp_all_clients_2408.png)
 
@@ -107,25 +99,30 @@
 
 ![alt text](readme_img/tcp_all_server_2408.png)
 
+### Примеры ошибочных запросов ###
+
+![alt text](readme_img/protocol_error_list_2408.png)
+
 
 ### WebSocket ###
 
-    Tornado_WS и AsyncIO_WS - при подключении к серверу через браузер возвращает html-страницу с js.
+    При подключении к серверу через браузер возвращается html-страницу с js.
     Пользователю предлагается альтернатива ввода данных. Вверху страницы командная строка для ввода
     "чистых" команд (по протоколу). Внизу строка ввода сообщения, которое получат все (аналог msgall)
 
-Tornado_WS:
+#### Tornado_WS: ####
 
 ![alt text](readme_img/tor_ws_2408.png)
 
-AsyncIO_WS:
+#### AsyncIO_WS: ###
 
 ![alt text](readme_img/as_ws_2408.png)
 
-Twisted_WS:
+#### Twisted_WS: ####
 
-    Подключен протокол к chat_ws_twisted, однако на данном этапе "общение" возможно только через консоль
-    разработчика в браузере.
+![alt text](readme_img/tw_ws_full_2408.png)
+
+### "Общение" через консоль разработчика в браузере. ###
 
     Как пользоваться:
 
@@ -146,7 +143,3 @@ Twisted_WS:
         (bad request,syntax error, auth error, etc)
 
 ![alt text](readme_img/tw_ws_2408.png)
-
-### Примеры ошибочных запросов ###
-
-![alt text](readme_img/protocol_error_list_2408.png)
