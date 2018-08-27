@@ -56,32 +56,22 @@ def tw_ws_close_connection(connection):
     connection.sendClose()
 
 
+send_mess_dict = {VERSION_AS: as_send_message, VERSION_TOR: tor_send_message, VERSION_TW: tw_send_message,
+                  VERSION_AS_WS: as_ws_send_message, VERSION_TOR_WS: tor_ws_send_message,
+                  VERSION_TW_WS: tw_ws_send_message}
+close_connection_dict = {VERSION_AS: as_close_connection, VERSION_TOR: tor_close_connection,
+                         VERSION_TW: tw_close_connection,
+                         VERSION_AS_WS: as_ws_close_connection, VERSION_TOR_WS: tor_ws_close_connection,
+                         VERSION_TW_WS: tw_ws_close_connection}
+
+
 def get_setup_dict(connections, version, port):
     setup_dict = {'connections': connections, 'version': version, 'port': port, 'parse_strip': ''}
-
     if version == VERSION_AS or version == VERSION_TOR:
         setup_dict['parse_strip'] = '\r\n'
+    setup_dict['method_send_message'] = send_mess_dict[version]
+    setup_dict['method_close_connection'] = close_connection_dict[version]
 
-    as_dict = {'method_send_message': as_send_message,
-               'method_close_connection': as_close_connection}
-
-    tor_dict = {'method_send_message': tor_send_message,
-                'method_close_connection': tor_close_connection}
-
-    tw_dict = {'method_send_message': tw_send_message,
-               'method_close_connection': tw_close_connection}
-
-    as_ws_dict = {'method_send_message': as_ws_send_message,
-                  'method_close_connection': as_ws_close_connection}
-
-    tor_ws_dict = {'method_send_message': tor_ws_send_message,
-                   'method_close_connection': tor_ws_close_connection}
-
-    tw_ws_dict = {'method_send_message': tw_ws_send_message,
-                  'method_close_connection': tw_ws_close_connection}
-    update_dict = {VERSION_AS: as_dict, VERSION_TOR: tor_dict, VERSION_TW: tw_dict,
-                   VERSION_AS_WS: as_ws_dict, VERSION_TOR_WS: tor_ws_dict, VERSION_TW_WS: tw_ws_dict}
-    setup_dict.update(update_dict[version])
     return setup_dict
 
 
