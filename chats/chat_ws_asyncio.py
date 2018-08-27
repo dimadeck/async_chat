@@ -2,15 +2,14 @@ import aiohttp_jinja2
 import jinja2
 from aiohttp import web, WSMsgType
 
+from chats import VERSION_AS_WS as VERSION, get_setup_dict
 from kernel.fork_chat_kernel import ChatKernel
-
-VERSION = 'AsyncIO_WS_Chat'
 
 
 class AioChat:
     def __init__(self, connections, port):
-        self.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=self.send_message,
-                               method_close_connection=self.close_connection, version=VERSION, port=port)
+        setup_dict = get_setup_dict(connections, VERSION, port)
+        self.chat = ChatKernel(setup_dict)
         self.app = web.Application()
 
     def init_app(self):
@@ -36,15 +35,6 @@ class AioChat:
                 if await self.chat.engine(msg, ws_current, addr) == -1:
                     break
         return ws_current
-
-    @staticmethod
-    async def send_message(connection, message):
-        mes = {'action': 'response', 'message': message}
-        await connection.send_json(mes)
-
-    @staticmethod
-    async def close_connection(connection):
-        await connection.close()
 
 
 def main(port=8080, connections=None):

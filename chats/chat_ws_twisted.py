@@ -7,9 +7,9 @@ from twisted.internet import reactor
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 
+from chats import VERSION_TW_WS as VERSION, get_setup_dict
 from kernel.chat_kernel import ChatKernel
 
-VERSION = "Twisted_WS_Chat"
 CURRENT_DIR = os.path.dirname(os.path.abspath(__name__))
 TEMPLATES_DIR = os.path.join(CURRENT_DIR, 'chats', 'templates')
 index = os.path.join(TEMPLATES_DIR, 'index.html')
@@ -37,9 +37,8 @@ class TwistedWsProtocol(WebSocketServerProtocol):
 def main(connections=None, port=1234):
     factory = WebSocketServerFactory(f'ws://127.0.0.1:{port}/ws')
     factory.protocol = TwistedWsProtocol
-    factory.protocol.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=send_message,
-                                       method_close_connection=close_connection, version=VERSION, port=port)
-
+    setup_dict = get_setup_dict(connections, VERSION, port)
+    factory.protocol.chat = ChatKernel(setup_dict)
     ws_resource = WebSocketResource(factory)
 
     root = Resource()
@@ -49,14 +48,6 @@ def main(connections=None, port=1234):
     site = Site(root)
     reactor.listenTCP(port, site)
     reactor.run()
-
-
-def send_message(connection, message):
-    connection.sendMessage(bytes(message, 'utf-8'))
-
-
-def close_connection(connection):
-    connection.sendClose()
 
 
 if __name__ == '__main__':
