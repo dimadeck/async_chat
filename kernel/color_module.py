@@ -6,6 +6,15 @@ from kernel import DELIMETER_CHAT, DELIMETER_MESSAGE, ERROR_SUFFIX, INFO_SUFFIX,
 
 
 class Color:
+    suffix_set = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'green', ERROR_SUFFIX: 'red', INFO_SUFFIX: 'blue'}
+    suffix_set_html = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'SteelBlue', ERROR_SUFFIX: 'Maroon', INFO_SUFFIX: 'blue'}
+
+    body_set = {'base': 'green', 'add': 'yellow'}
+    body_set_html = {'base': 'FireBrick', 'add': 'DarkOliveGreen'}
+
+    chat_set = {'base': 'white', 'add': 'yellow'}
+    chat_set_html = {'base': 'Black', 'add': 'DarkSlateBlue'}
+
     @staticmethod
     def change_color(color, message):
         color_set = {'red': colored.red, 'green': colored.green, 'white': colored.white, 'yellow': colored.yellow,
@@ -16,10 +25,16 @@ class Color:
             return message
 
     @staticmethod
-    def color_suffix(suffix):
-        suffix_set = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'green', ERROR_SUFFIX: 'red', INFO_SUFFIX: 'blue'}
-        if suffix in suffix_set:
-            return Color.change_color(suffix_set[suffix], suffix)
+    def change_html_color(color, message):
+        return f'<font color="{color}">{message}</font>'
+
+    @staticmethod
+    def color_suffix(suffix, mode):
+
+        if suffix in Color.suffix_set and mode == 'tcp':
+            return Color.change_color(Color.suffix_set[suffix], suffix)
+        elif suffix in Color.suffix_set_html and mode == 'ws':
+            return Color.change_html_color(Color.suffix_set_html[suffix], suffix)
         else:
             return suffix
 
@@ -32,39 +47,60 @@ class Color:
         return body_parse
 
     @staticmethod
-    def color_body(body):
-        color_set = {'base': 'green', 'add': 'yellow'}
+    def color_body(body, mode):
         phrase_set = [MESSAGE_SERVER_START, MESSAGE_NEW_CONNECTION, MESSAGE_LOGIN, MESSAGE_LOGOUT, MESSAGE_FIRST_LOGIN,
                       MESSAGE_ALREADY_LOGIN, MESSAGE_USER_EXIST, MESSAGE_NOT_FOUND]
-
-        final = Color.change_color(color_set['base'], body)
+        final = body
+        if mode == 'tcp':
+            Color.body_set['base'] = 'green'
+            final = Color.change_color(Color.body_set['base'], body)
+        elif mode == 'ws':
+            Color.body_set_html['base'] = 'FireBrick'
+            final = Color.change_html_color(Color.body_set_html['base'], body)
 
         for phrase in phrase_set:
             if phrase in body:
                 if phrase == MESSAGE_LOGOUT:
-                    color_set['base'] = 'red'
+                    Color.body_set['base'] = 'red'
+                    Color.body_set_html['base'] = 'DarkRed'
+                elif phrase == MESSAGE_LOGIN:
+                    Color.body_set['base'] = 'green'
+                    Color.body_set_html['base'] = 'DarkGreen'
+                else:
+                    Color.body_set['base'] = 'green'
+                    Color.body_set_html['base'] = 'FireBrick'
                 final = ''
                 body_dict = body.split(phrase)
                 body_dict = Color.config_empty_fields(body_dict)
                 for chunk in body_dict:
                     if chunk == '':
-                        add = Color.change_color(color_set['base'], phrase)
+                        if mode == 'tcp':
+                            add = Color.change_color(Color.body_set['base'], phrase)
+                        elif mode == 'ws':
+                            add = Color.change_html_color(Color.body_set_html['base'], phrase)
                     else:
-                        add = Color.change_color(color_set['add'], chunk)
+                        if mode == 'tcp':
+                            add = Color.change_color(Color.body_set['add'], chunk)
+                        elif mode == 'ws':
+                            add = Color.change_html_color(Color.body_set_html['add'], chunk)
                     final = f'{final}{add}'
         return final
 
     @staticmethod
-    def color_message(suffix, body):
-        color_suffix = Color.color_suffix(suffix)
-        color_body = Color.color_body(body)
-        return color_suffix, color_body
+    def color_message(suffix, body, mode):
+        suffix = Color.color_suffix(suffix, mode)
+        body = Color.color_body(body, mode)
+        return suffix, body
 
     @staticmethod
-    def color_chat(suffix, body):
-        color_suffix = Color.change_color('yellow', suffix)
-        color_body = Color.change_color('white', body)
-        return color_suffix, color_body
+    def color_chat(suffix, body, mode):
+        if mode == 'tcp':
+            suffix = Color.change_color(Color.chat_set['add'], suffix)
+            body = Color.change_color(Color.chat_set['base'], body)
+        elif mode == 'ws':
+            suffix = Color.change_html_color(Color.chat_set_html['add'], suffix)
+            body = Color.change_html_color(Color.chat_set_html['base'], body)
+        return suffix, body
 
     @staticmethod
     def get_delimeter(phrase):
@@ -81,27 +117,30 @@ class Color:
         return parse[0], parse[1]
 
     @staticmethod
-    def color_engine(phrase):
+    def color_engine(phrase, mode='tcp'):
         delimeter = Color.get_delimeter(phrase)
         if delimeter == -1:
             return phrase
         else:
             make_color = {DELIMETER_MESSAGE: Color.color_message, DELIMETER_CHAT: Color.color_chat}
             suffix, body = Color.get_suffix_body(phrase, delimeter)
-            color_suffix, color_body = make_color[delimeter](suffix, body)
-
+            color_suffix, color_body = make_color[delimeter](suffix, body, mode)
             return f"{color_suffix}{delimeter}{color_body}"
 
 
 def test():
     from kernel.chat_pack_message import PackMessage
-    phrases = PackMessage(version='testVersion').test()
-    print('#####################[START]#####################')
+    # print('#####################[START TCP]#####################')
+    # phrases = PackMessage(version='testVersion').test()
+    # for phrase in phrases:
+    #     print(phrase)
+    # print('#####################[END TCP]#####################')
+
+    print('#####################[START WS]#####################<br>')
+    phrases = PackMessage(version='testVersionWS').test()
     for phrase in phrases:
-        print(phrase)
-    for phrase in phrases:
-        print(Color.color_engine(phrase))
-    print('#####################[END]#####################')
+        print(f'{phrase}<br>')
+    print('#####################[END WS]#####################')
 
 
 if __name__ == '__main__':

@@ -9,7 +9,9 @@ class PackMessage:
         self.color = True
         if self.version is not None:
             if 'WS' in self.version:
-                self.color = False
+                self.color_mode = 'ws'
+            else:
+                self.color_mode = 'tcp'
 
     def server_message(self, server_mode, port=None, addr=None, username=None, message=None):
         if server_mode == 'start':
@@ -30,21 +32,18 @@ class PackMessage:
         elif system_mode == 'logout':
             message = self.logout(username)
         mess = self.add_suffix(SYSTEM_SUFFIX, message)
-        if self.color:
-            mess = Color.color_engine(mess)
+        mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def chat_message(self, username, message, private=False):
         private_sym = '[*]' if private else ''
         mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{DELIMETER_CHAT}{message}'
-        if self.color:
-            mess = Color.color_engine(mess)
+        mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def system_info(self, message=None):
         mess = self.add_suffix(INFO_SUFFIX, message)
-        if self.color:
-            mess = Color.color_engine(mess)
+        mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def system_error(self, error_mode, message=None, username=None):
@@ -55,8 +54,7 @@ class PackMessage:
                            'not_found': f'[{username}] {MESSAGE_NOT_FOUND}'}
 
         mess = self.add_suffix(ERROR_SUFFIX, error_messaging[error_mode])
-        if self.color:
-            mess = Color.color_engine(mess)
+        mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     @staticmethod
