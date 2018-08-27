@@ -130,11 +130,11 @@ class Color:
 
 def test():
     from kernel.chat_pack_message import PackMessage
-    # print('#####################[START TCP]#####################')
-    # phrases = PackMessage(version='testVersion').test()
-    # for phrase in phrases:
-    #     print(phrase)
-    # print('#####################[END TCP]#####################')
+    print('#####################[START TCP]#####################')
+    phrases = PackMessage(version='testVersion').test()
+    for phrase in phrases:
+        print(phrase)
+    print('#####################[END TCP]#####################')
 
     print('#####################[START WS]#####################<br>')
     phrases = PackMessage(version='testVersionWS').test()
