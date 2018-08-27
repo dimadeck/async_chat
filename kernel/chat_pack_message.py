@@ -8,10 +8,7 @@ class PackMessage:
         self.version = version
         self.color = True
         if self.version is not None:
-            if 'WS' in self.version:
-                self.color_mode = 'ws'
-            else:
-                self.color_mode = 'tcp'
+            self.color_mode = 'ws' if 'WS' in self.version else 'tcp'
 
     def server_message(self, server_mode, port=None, addr=None, username=None, message=None):
         if server_mode == 'start':

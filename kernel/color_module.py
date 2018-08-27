@@ -6,11 +6,14 @@ from kernel import DELIMETER_CHAT, DELIMETER_MESSAGE, ERROR_SUFFIX, INFO_SUFFIX,
 
 
 class Color:
+    phrase_set = [MESSAGE_SERVER_START, MESSAGE_NEW_CONNECTION, MESSAGE_LOGIN, MESSAGE_LOGOUT, MESSAGE_FIRST_LOGIN,
+                  MESSAGE_ALREADY_LOGIN, MESSAGE_USER_EXIST, MESSAGE_NOT_FOUND]
+
     suffix_set = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'green', ERROR_SUFFIX: 'red', INFO_SUFFIX: 'blue'}
     suffix_set_html = {SYSTEM_SUFFIX: 'SteelBlue', ERROR_SUFFIX: 'Maroon', INFO_SUFFIX: 'blue'}
 
-    body_set = {'base': 'green', 'add': 'yellow'}
-    body_set_html = {'base': 'FireBrick', 'add': 'DarkOliveGreen'}
+    body_set = {'base': 'green', 'add': 'yellow', 'login': 'green', 'logout': 'red'}
+    body_set_html = {'base': 'FireBrick', 'add': 'DarkOliveGreen', 'login': 'DarkGreen', 'logout': 'DarkRed'}
 
     chat_set = {'base': 'white', 'add': 'yellow'}
     chat_set_html = {'base': 'Black', 'add': 'DarkSlateBlue'}
@@ -47,33 +50,31 @@ class Color:
 
     @staticmethod
     def color_body(body, mode):
-        phrase_set = [MESSAGE_SERVER_START, MESSAGE_NEW_CONNECTION, MESSAGE_LOGIN, MESSAGE_LOGOUT, MESSAGE_FIRST_LOGIN,
-                      MESSAGE_ALREADY_LOGIN, MESSAGE_USER_EXIST, MESSAGE_NOT_FOUND]
-        final = body
-        if mode == 'tcp':
-            Color.body_set['base'] = 'green'
-            final = Color.change_color(Color.body_set['base'], body)
-        elif mode == 'ws':
-            Color.body_set_html['base'] = 'FireBrick'
+        if mode == 'ws':
             final = Color.change_html_color(Color.body_set_html['base'], body)
+        else:
+            final = Color.change_color(Color.body_set['base'], body)
 
-        for phrase in phrase_set:
+        for phrase in Color.phrase_set:
             if phrase in body:
                 if phrase == MESSAGE_LOGOUT:
-                    Color.body_set['base'] = 'red'
-                    Color.body_set_html['base'] = 'DarkRed'
+                    current_col = Color.body_set['logout']
+                    current_col_html = Color.body_set_html['logout']
                 elif phrase == MESSAGE_LOGIN:
-                    Color.body_set['base'] = 'green'
-                    Color.body_set_html['base'] = 'DarkGreen'
+                    current_col = Color.body_set['login']
+                    current_col_html = Color.body_set_html['login']
+                else:
+                    current_col = Color.body_set['base']
+                    current_col_html = Color.body_set_html['base']
                 final = ''
                 body_dict = body.split(phrase)
                 body_dict = Color.config_empty_fields(body_dict)
                 for chunk in body_dict:
                     if chunk == '':
                         if mode == 'tcp':
-                            add = Color.change_color(Color.body_set['base'], phrase)
+                            add = Color.change_color(current_col, phrase)
                         elif mode == 'ws':
-                            add = Color.change_html_color(Color.body_set_html['base'], phrase)
+                            add = Color.change_html_color(current_col_html, phrase)
                     else:
                         if mode == 'tcp':
                             add = Color.change_color(Color.body_set['add'], chunk)
