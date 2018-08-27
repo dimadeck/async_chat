@@ -7,8 +7,9 @@ VERSION = 'AsyncIO_Chat'
 
 class AsyncioChat:
     def __init__(self, connections, port):
-        self.chat = ChatKernel(connections=connections, method_send_message=self.send_message,
-                               method_close_connection=self.close_connection, version=VERSION, port=port)
+        setup_dict = {'connections': connections, 'method_send_message': self.send_message, 'parse_strip': '\r\n',
+                      'method_close_connection': self.close_connection, 'version': VERSION, 'port': port}
+        self.chat = ChatKernel(setup_dict)
 
     async def handle_client(self, reader, writer):
         while True:

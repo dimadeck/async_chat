@@ -29,8 +29,9 @@ class Chat(LineReceiver):
 
 class Factory(protocol.ServerFactory):
     def __init__(self, connections, port):
-        self.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=Chat.send_message,
-                               method_close_connection=Chat.close_connection, version=VERSION, port=port)
+        setup_dict = {'connections': connections, 'method_send_message': Chat.send_message, 'parse_strip': '',
+                      'method_close_connection': Chat.close_connection, 'version': VERSION, 'port': port}
+        self.chat = ChatKernel(setup_dict)
         super(Factory, self).__init__()
 
     def buildProtocol(self, addr):

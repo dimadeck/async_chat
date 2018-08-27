@@ -7,8 +7,9 @@ from kernel.chat_kernel import ChatKernel
 
 class EchoServer(TCPServer):
     def __init__(self, connections, port):
-        self.chat = ChatKernel(connections, parse_strip='\r\n', method_send_message=self.send_message,
-                               method_close_connection=self.close_connection, version=VERSION, port=port)
+        setup_dict = {'connections': connections, 'method_send_message': self.send_message, 'parse_strip': '\r\n',
+                      'method_close_connection': self.close_connection, 'version': VERSION, 'port': port}
+        self.chat = ChatKernel(setup_dict)
         super(EchoServer, self).__init__()
 
     @gen.coroutine

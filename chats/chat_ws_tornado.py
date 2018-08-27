@@ -31,8 +31,9 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
 class Application(tornado.web.Application):
     def __init__(self, connections, port):
-        self.chat = ChatKernel(connections=connections, method_send_message=WebSocket.send_message, parse_strip='',
-                               method_close_connection=WebSocket.close_connection, version=VERSION, port=port)
+        setup_dict = {'connections': connections, 'method_send_message': WebSocket.send_message, 'parse_strip': '',
+                      'method_close_connection': WebSocket.close_connection, 'version': VERSION, 'port': port}
+        self.chat = ChatKernel(setup_dict)
         handlers = (
             (r'/', MainHandler),
             (r'/ws', WebSocket))

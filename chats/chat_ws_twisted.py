@@ -37,9 +37,9 @@ class TwistedWsProtocol(WebSocketServerProtocol):
 def main(connections=None, port=1234):
     factory = WebSocketServerFactory(f'ws://127.0.0.1:{port}/ws')
     factory.protocol = TwistedWsProtocol
-    factory.protocol.chat = ChatKernel(connections=connections, parse_strip='', method_send_message=send_message,
-                                       method_close_connection=close_connection, version=VERSION, port=port)
-
+    setup_dict = {'connections': connections, 'method_send_message': send_message, 'parse_strip': '',
+                  'method_close_connection': close_connection, 'version': VERSION, 'port': port}
+    factory.protocol.chat = ChatKernel(setup_dict)
     ws_resource = WebSocketResource(factory)
 
     root = Resource()

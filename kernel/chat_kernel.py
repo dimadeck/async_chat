@@ -5,18 +5,16 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel:
-    def __init__(self, connections=None, parse_strip='\r\n', method_send_message=None, method_close_connection=None,
-                 version=None, port=None):
-        self.connections = self.init_connection_list(connections)
-        self.parse_strip = parse_strip
-        if method_send_message is not None:
-            self.send_message = method_send_message
-        if method_close_connection is not None:
-            self.close_connection = method_close_connection
-        self.init_connection_list(connections)
-        self.version = version
-        self.pack_message = PackMessage(version=version)
-        print(self.pack_message.server_message('start', port=port))
+    def __init__(self, setup):
+        self.connections = self.init_connection_list(setup['connections'])
+        self.parse_strip = setup['parse_strip']
+        if setup['method_send_message'] is not None:
+            self.send_message = setup['method_send_message']
+        if setup['method_close_connection'] is not None:
+            self.close_connection = setup['method_close_connection']
+        self.version = setup['version']
+        self.pack_message = PackMessage(version=self.version)
+        print(self.pack_message.server_message('start', port=setup['port']))
 
     @staticmethod
     def init_connection_list(connections):
