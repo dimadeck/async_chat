@@ -7,7 +7,7 @@ from kernel import DELIMETER_CHAT, DELIMETER_MESSAGE, ERROR_SUFFIX, INFO_SUFFIX,
 
 class Color:
     suffix_set = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'green', ERROR_SUFFIX: 'red', INFO_SUFFIX: 'blue'}
-    suffix_set_html = {SERVER_SUFFIX: 'blue', SYSTEM_SUFFIX: 'SteelBlue', ERROR_SUFFIX: 'Maroon', INFO_SUFFIX: 'blue'}
+    suffix_set_html = {SYSTEM_SUFFIX: 'SteelBlue', ERROR_SUFFIX: 'Maroon', INFO_SUFFIX: 'blue'}
 
     body_set = {'base': 'green', 'add': 'yellow'}
     body_set_html = {'base': 'FireBrick', 'add': 'DarkOliveGreen'}
@@ -30,7 +30,6 @@ class Color:
 
     @staticmethod
     def color_suffix(suffix, mode):
-
         if suffix in Color.suffix_set and mode == 'tcp':
             return Color.change_color(Color.suffix_set[suffix], suffix)
         elif suffix in Color.suffix_set_html and mode == 'ws':
@@ -66,9 +65,6 @@ class Color:
                 elif phrase == MESSAGE_LOGIN:
                     Color.body_set['base'] = 'green'
                     Color.body_set_html['base'] = 'DarkGreen'
-                else:
-                    Color.body_set['base'] = 'green'
-                    Color.body_set_html['base'] = 'FireBrick'
                 final = ''
                 body_dict = body.split(phrase)
                 body_dict = Color.config_empty_fields(body_dict)
