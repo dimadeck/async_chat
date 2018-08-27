@@ -21,8 +21,7 @@ class PackMessage:
         elif server_mode == 'logout':
             message = self.logout(username)
         mess = self.add_suffix(SERVER_SUFFIX, message)
-        if self.color:
-            mess = Color.color_engine(mess)
+        mess = Color.color_engine(mess)
         return mess
 
     def system_message(self, system_mode, username=None, message=None):
