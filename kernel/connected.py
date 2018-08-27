@@ -1,8 +1,6 @@
 class Connected:
-    @classmethod
-    def __init__(cls):
-        cls.connections = []
-        cls.users = {}
+    connections = []
+    users = {}
 
     @classmethod
     def add_connection(cls, connection):
