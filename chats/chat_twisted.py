@@ -1,9 +1,8 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
+from chats import VERSION_TW as VERSION, get_setup_dict
 from kernel.chat_kernel import ChatKernel
-
-VERSION = 'Twisted_Chat'
 
 
 class Chat(LineReceiver):
@@ -18,19 +17,10 @@ class Chat(LineReceiver):
     def connectionLost(self, reason=None):
         self.chat.logout_engine(self)
 
-    @staticmethod
-    def send_message(connection, message):
-        connection.sendLine(bytes(f'{message}', 'utf-8'))
-
-    @staticmethod
-    def close_connection(connection):
-        connection.stopProducing()
-
 
 class Factory(protocol.ServerFactory):
     def __init__(self, connections, port):
-        setup_dict = {'connections': connections, 'method_send_message': Chat.send_message, 'parse_strip': '',
-                      'method_close_connection': Chat.close_connection, 'version': VERSION, 'port': port}
+        setup_dict = get_setup_dict(connections, VERSION, port)
         self.chat = ChatKernel(setup_dict)
         super(Factory, self).__init__()
 

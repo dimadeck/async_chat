@@ -1,9 +1,9 @@
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-from kernel.chat_kernel import ChatKernel
 
-VERSION = 'Tornado_WS_Chat'
+from chats import VERSION_TOR_WS as VERSION, get_setup_dict
+from kernel.chat_kernel import ChatKernel
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -16,23 +16,13 @@ class WebSocket(tornado.websocket.WebSocketHandler):
         message = bytes(message, encoding='utf-8')
         self.application.chat.engine(message, self, 'None')
 
-    @staticmethod
-    def close_connection(connection):
-        connection.close()
-
     def on_close(self, message=None):
         self.application.chat.logout_engine(self)
-
-    @staticmethod
-    def send_message(connection, message):
-        mes = {'action': 'response', 'message': message}
-        connection.write_message(mes)
 
 
 class Application(tornado.web.Application):
     def __init__(self, connections, port):
-        setup_dict = {'connections': connections, 'method_send_message': WebSocket.send_message, 'parse_strip': '',
-                      'method_close_connection': WebSocket.close_connection, 'version': VERSION, 'port': port}
+        setup_dict = get_setup_dict(connections, VERSION, port)
         self.chat = ChatKernel(setup_dict)
         handlers = (
             (r'/', MainHandler),

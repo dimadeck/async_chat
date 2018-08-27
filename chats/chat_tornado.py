@@ -2,13 +2,13 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 
+from chats import VERSION_TOR as VERSION, get_setup_dict
 from kernel.chat_kernel import ChatKernel
 
 
 class EchoServer(TCPServer):
     def __init__(self, connections, port):
-        setup_dict = {'connections': connections, 'method_send_message': self.send_message, 'parse_strip': '\r\n',
-                      'method_close_connection': self.close_connection, 'version': VERSION, 'port': port}
+        setup_dict = get_setup_dict(connections, VERSION, port)
         self.chat = ChatKernel(setup_dict)
         super(EchoServer, self).__init__()
 
@@ -22,17 +22,6 @@ class EchoServer(TCPServer):
                 break
             if self.chat.engine(data, stream, address) == -1:
                 break
-
-    @staticmethod
-    def send_message(connection, message):
-        connection.write(bytes(f'{message}\n', 'utf-8'))
-
-    @staticmethod
-    def close_connection(connection):
-        connection.close()
-
-
-VERSION = "Tornado_Chat"
 
 
 def main(port=8000, connections=None):

@@ -1,14 +1,12 @@
 import asyncio
 
+from chats import VERSION_AS as VERSION, get_setup_dict
 from kernel.fork_chat_kernel import ChatKernel
-
-VERSION = 'AsyncIO_Chat'
 
 
 class AsyncioChat:
     def __init__(self, connections, port):
-        setup_dict = {'connections': connections, 'method_send_message': self.send_message, 'parse_strip': '\r\n',
-                      'method_close_connection': self.close_connection, 'version': VERSION, 'port': port}
+        setup_dict = get_setup_dict(connections, VERSION, port)
         self.chat = ChatKernel(setup_dict)
 
     async def handle_client(self, reader, writer):
@@ -17,14 +15,6 @@ class AsyncioChat:
             addr = writer.get_extra_info('peername')
             if await self.chat.engine(request, writer, addr) == -1:
                 break
-
-    @staticmethod
-    async def send_message(connection, message):
-        connection.write(bytes(f'{message}\n', 'utf-8'))
-
-    @staticmethod
-    async def close_connection(connection):
-        connection.close()
 
 
 def main(port=10000, connections=None):
