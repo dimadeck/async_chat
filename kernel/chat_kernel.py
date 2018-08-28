@@ -38,13 +38,13 @@ class ChatKernel:
         return self.connections.is_register(connection)
 
     def get_connections(self):
-        return self.connections.connections
+        return self.connections.get_connections()
 
     def clear_connections(self):
         self.connections.clear_all()
 
     def get_users(self):
-        return self.connections.users
+        return self.connections.get_users()
 
     def get_name_by_connection(self, connection):
         return self.connections.get_name(connection)
