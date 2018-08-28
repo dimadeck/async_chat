@@ -151,5 +151,4 @@ class ChatKernel:
         message = self.pack_message.system_info(userlist, clear_data)
         if 'WS' in self.version and clear_data:
             message = message.split(sep=', ')
-            print(message)
         self.send_message(connection, message)

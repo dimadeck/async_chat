@@ -99,6 +99,8 @@ class ChatKernel(CK):
     async def userlist_engine(self, connection, clear_data):
         userlist = ', '.join(self.get_username_list())
         message = self.pack_message.system_info(userlist, clear_data)
+        if 'WS' in self.version and clear_data:
+            message = message.split(sep=', ')
         await self.send_message(connection, message)
 
     async def debug_engine(self):
