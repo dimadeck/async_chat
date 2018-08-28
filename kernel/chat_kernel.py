@@ -20,14 +20,6 @@ class ChatKernel:
     def init_connection_list(connections):
         return connections if connections is not None else Connected()
 
-    @staticmethod
-    def send_message(connection, message):
-        raise NotImplementedError
-
-    @staticmethod
-    def close_connection(connection):
-        raise NotImplementedError
-
     def send_all(self, message):
         for user in self.get_users():
             self.send_message(user, message)
@@ -157,4 +149,7 @@ class ChatKernel:
     def userlist_engine(self, connection, clear_data):
         userlist = ', '.join(self.get_username_list())
         message = self.pack_message.system_info(userlist, clear_data)
+        if 'WS' in self.version and clear_data:
+            message = message.split(sep=', ')
+            print(message)
         self.send_message(connection, message)
