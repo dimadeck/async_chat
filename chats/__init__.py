@@ -23,7 +23,10 @@ async def as_ws_close_connection(connection):
 
 
 def tor_ws_send_message(connection, message):
-    mes = {'action': 'response', 'message': message}
+    if type(message) == list:
+        mes = {'action': 'list', 'message': message}
+    else:
+        mes = {'action': 'response', 'message': message}
     connection.write_message(mes)
 
 
