@@ -7,25 +7,23 @@ from chats.chat_twisted import main as tw_main
 from chats.chat_ws_asyncio import main as aio_ws_main
 from chats.chat_ws_tornado import main as tor_ws_main
 from chats.chat_ws_twisted import main as tw_ws_main
-from kernel.connected import Connected
+from kernel.connected import main as connected_main
 
 
 class Connect:
-    def __init__(self, server, port, connections):
+    def __init__(self, server, port):
         self.server = server
-        self.connections = connections
         self.port = port
 
     def __call__(self, sleep_time=0.5):
-        self.server(port=self.port, connections=self.connections)
+        self.server(port=self.port)
         sleep(sleep_time)
 
 
 class LaunchProcesses:
-    def __init__(self, servers, connections, ports):
+    def __init__(self, servers, ports):
         self.processes = []
         self.ports = ports
-        self.connections = connections
         self.servers = servers
 
     def engine(self):
@@ -36,7 +34,7 @@ class LaunchProcesses:
     def create_process(self):
         for server in self.servers:
             port = self.get_port()
-            target = Connect(server, port, self.connections)
+            target = Connect(server, port)
             self.processes.append(Process(target=target))
 
     def get_port(self):
@@ -53,26 +51,20 @@ class LaunchProcesses:
 
 def setup(mode):
     settings = None
-    connections = Connected()
     if mode == 'tcp_all':
         settings = {'servers': [as_main, tor_main, tw_main],
-                    'connections': connections,
                     'ports': [8000, 8080, 8888]}
     elif mode == 'as':
         settings = {'servers': [as_main, aio_ws_main],
-                    'connections': connections,
                     'ports': [8080, 8000]}
     elif mode == 'tor':
-        settings = {'servers': [tor_main, tor_ws_main],
-                    'connections': connections,
-                    'ports': [8080, 8000]}
+        settings = {'servers': [tor_main, tor_ws_main, connected_main],
+                    'ports': [8080, 8000, 10000]}
     elif mode == 'tw':
         settings = {'servers': [tw_main, tw_ws_main],
-                    'connections': connections,
                     'ports': [8080, 8000]}
     elif mode == 'ws_all':
         settings = {'servers': [aio_ws_main, tor_ws_main, tw_ws_main],
-                    'connections': connections,
                     'ports': [8000, 8080, 8888]}
     return settings
 
