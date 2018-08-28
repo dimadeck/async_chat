@@ -115,16 +115,6 @@ class ConnectedServer:
             return answer_set[cmd](*args)
         except:
             return -100
-        # register_user(connection, username)
-        # drop_connection(connection)
-        # add_connection(connection)
-        # is_register(connection)
-        # get_connections()
-        # clear_all()
-        # get_users()
-        # get_name(connection)
-        # get_connection(username)
-        # get_username_list()
 
 
 class ConnectedClient:
@@ -198,7 +188,7 @@ def main(port=10000):
 
 def main_client():
     client = ConnectedClient()
-    sleep(4)
+    client.test()
     client.close()
 
 
