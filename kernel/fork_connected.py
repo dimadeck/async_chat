@@ -55,6 +55,9 @@ class Connected:
     def get_connections(self):
         return self.connections
 
+    def get_users(self):
+        return self.users
+
     def clear_all(self):
         self.connections = []
         self.users = {}

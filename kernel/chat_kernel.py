@@ -1,11 +1,12 @@
 from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
-from kernel.connected import Connected
 from kernel.data_parser import DataParser
+from kernel.fork_connected import Connected
 
 
 class ChatKernel:
     def __init__(self, setup):
+        # self.connections = ConnectedClient()
         self.connections = self.init_connection_list(setup['connections'])
         self.parse_strip = setup['parse_strip']
         if setup['method_send_message'] is not None:

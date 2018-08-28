@@ -1,63 +1,191 @@
+import asyncio
+
+
 class Connected:
-    def __init__(self):
-        self.connections = []
-        self.users = {}
+    connections = []
+    users = {}
 
-    def add_connection(self, connection):
-        if not self.is_exist_connection(connection):
-            self.connections.append(connection)
+    @staticmethod
+    def clear_all():
+        Connected.connections = []
+        Connected.users = {}
+
+    @staticmethod
+    def add_connection(connection):
+        if not Connected.is_exist_connection(connection):
+            Connected.connections.append(connection)
             return 0
         else:
             return -1
 
-    def is_exist_connection(self, connection):
-        return connection in self.connections
+    @staticmethod
+    def is_exist_connection(connection):
+        return connection in Connected.connections
 
-    def is_valid_name(self, username):
-        if username in self.users.values():
+    @staticmethod
+    def is_valid_name(username):
+        if username in Connected.users.values():
             return -1
         else:
             return 0
 
-    def register_user(self, connection, username):
-        if self.is_valid_name(username) == 0:
-            self.users[connection] = username
+    @staticmethod
+    def register_user(connection, username):
+        if Connected.is_valid_name(username) == 0:
+            Connected.users[connection] = username
             return 0
         return -1
 
-    def is_register(self, connection):
-        return connection in self.users
+    @staticmethod
+    def is_register(connection):
+        return connection in Connected.users
 
-    def get_connection(self, username):
-        for connection in self.connections:
-            if username == self.users[connection]:
+    @staticmethod
+    def get_connection(username):
+        for connection in Connected.connections:
+            if username == Connected.users[connection]:
                 return connection
         return None
 
-    def get_name(self, connection):
+    @staticmethod
+    def get_name(connection):
         try:
-            return self.users[connection]
+            return Connected.users[connection]
         except KeyError:
             return 0
 
-    def drop_connection(self, connection):
-        if self.is_register(connection):
-            self.users.pop(connection)
-        if connection in self.connections:
-            self.connections.remove(connection)
+    @staticmethod
+    def drop_connection(connection):
+        if Connected.is_register(connection):
+            Connected.users.pop(connection)
+        if connection in Connected.connections:
+            Connected.connections.remove(connection)
 
-    def get_username_list(self):
+    @staticmethod
+    def get_username_list():
         user_list = []
-        for username in self.users.values():
+        for username in Connected.users.values():
             user_list.append(username)
         return user_list
 
-    def get_connections(self):
-        return self.connections
+    @staticmethod
+    def get_connections():
+        return Connected.connections
 
-    def get_users(self):
-        return self.users
+    @staticmethod
+    def get_users():
+        return Connected.users
+
+
+class ConnectedServer:
+    def __init__(self):
+        self.connections = Connected
+
+    async def handle_client(self, reader, writer):
+        while True:
+            request = (await reader.read(1024))
+            req_dict = self.parse_request(request)
+            print(req_dict)
+            answer = self.engine(req_dict)
+            writer.write(bytes(f'{answer}\n', 'utf-8'))
+
+    def parse_request(self, request):
+        req_words = request.decode('utf-8').strip('\r\n').split(' ')
+        return {'cmd': req_words[0], 'args': req_words[1:]}
+
+    def engine(self, req_dict):
+        cmd = req_dict['cmd']
+        args = req_dict['args']
+        answer_set = {
+            'register_user': self.connections.register_user,
+            'drop_connection': self.connections.drop_connection,
+            'add_connection': self.connections.add_connection,
+            'is_register': self.connections.is_register,
+            'get_connections': self.connections.get_connections,
+            'clear_all': self.connections.clear_all,
+            'get_users': self.connections.get_users,
+            'get_name': self.connections.get_name,
+            'get_connection': self.connections.get_connection,
+            'get_username_list': self.connections.get_username_list,
+        }
+        try:
+            return answer_set[cmd](*args)
+        except:
+            return -100
+        # register_user(connection, username)
+        # drop_connection(connection)
+        # add_connection(connection)
+        # is_register(connection)
+        # get_connections()
+        # clear_all()
+        # get_users()
+        # get_name(connection)
+        # get_connection(username)
+        # get_username_list()
+
+
+class ConnectedClient:
+    def register_user(self, connection, username):
+        return self.conn_write.write(f'register_user {connection} {username}')
+
+    def drop_connection(self, connection):
+        self.conn_write.write(f'drop_connection {connection}')
+
+    def add_connection(self, connection):
+        return self.conn_write.write(f'add_connection {connection}')
+
+    def is_register(self, connection):
+        return self.conn_write.write(f'is_register {connection}')
+
+    def get_connections(self):
+        return self.conn_write.write(f'get_connections')
 
     def clear_all(self):
-        self.connections = []
-        self.users = {}
+        self.conn_write.write(f'clear_all')
+
+    def get_users(self):
+        return self.conn_write.write(f'get_users')
+
+    def get_name(self, connection):
+        return self.conn_write.write(f'get_name {connection}')
+
+    def get_connection(self, username):
+        return self.conn_write.write(f'get_connection {username}')
+
+    def get_username_list(self):
+        return self.conn_write.write(f'get_username_list')
+
+    async def handle_client(self, loop):
+        self.conn_read, self.conn_write = await asyncio.open_connection('127.0.0.1', 10000, loop=loop)
+
+
+
+def main(port=10000):
+    server = ConnectedServer()
+    loop = asyncio.get_event_loop()
+    loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
+    print(f'Connection server start on port{port}')
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        loop.close()
+
+
+def main_client(port=20000):
+    client = ConnectedClient()
+    loop = asyncio.get_event_loop()
+    loop.run_forever() (client.handle_client(loop))
+    loop.close()
+
+    client = ConnectedClient()
+    loop = asyncio.get_event_loop()
+    loop.create_task(asyncio.start_server(client.handle_client, '127.0.0.1', port))
+    print(f'Connection server start on port{port}')
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        loop.close()
+
+
+if __name__ == '__main__':
+    main_client()
