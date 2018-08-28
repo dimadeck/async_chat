@@ -5,119 +5,122 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
     </script>
     <script language="javascript" type="text/javascript">
-     $(function() {
-       var conn = null;
-       var name = "None";
-       $('#field_name').val('').focus();
-       function log(msg) {
-         var control = $('#log');
-         control.html(control.html() + msg + '<br/>');
-         control.scrollTop(control.scrollTop() + 1000);
-       }
-       function connect() {
-         disconnect();
-         var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host+'/ws';
-         conn = new WebSocket(wsUri);
-         name = $('#field_name').val()
+    $(function() {
+      var conn = null;
+      var name = "None";
+      $('#field_name').val('').focus();
+      function log(msg) {
+        var control = $('#log');
+        control.html(control.html() + msg + '<br/>');
+        control.scrollTop(control.scrollTop() + 1000);
+      }
+      function connect() {
+        disconnect();
+        var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host+'/ws';
+        conn = new WebSocket(wsUri);
+        name = $('#field_name').val()
 
-         conn.onopen = function() {
-           conn.send('login '+name)
-           update_ui();
-         };
-         conn.onmessage = function(e) {
-
-         if ($('#chat_version').text() == "Twisted_WS_Chat"){
-         log(e.data)
-         }
-         else
-         {
-           var data = JSON.parse(e.data);
-           switch (data.action) {
-             case 'response':
-              log(data.message)
-             break;
-           }
-         }
-         };
-         conn.onclose = function() {
-           log('Disconnected.');
-           conn = null;
-           update_ui();
-         };
-       }
-       function disconnect() {
-         if (conn != null) {
-           conn.send('logout');
-           update_ui();
-         }
-       }
-
-       function update_ui() {
-         if (conn == null) {
-           $('#status').text('disconnected');
-           $('#connect').prop("value", 'Login');
-           $('#send').prop("disabled", true);
-           $('#name').prop("hidden", true);
-           $('#field_name').prop("hidden", false);
-           $('#field_name').val('').focus();
-         } else {
-           $('#status').text('Connected');
-           $('#connect').prop("value", 'Logout');
-           $('#send').prop("disabled", false);
-           $('#name').prop("hidden", false);
-           $('#field_name').prop("hidden", true);
-           $('#text').val('').focus();
-         }
-         $('#name').text(name);
-       };
-       // Login start
-       $('#connect').on('click', function() {
-         if (conn == null) {
-           connect();
-         } else {
-           disconnect();
-         }
-         update_ui();
-         return false;
-       });
-       $('#field_name').on('keyup', function(e) {
-         if (e.keyCode === 13) {
-           $('#connect').click();
-           return false;
-         }
-       });
-       // Login end
-       // Send start
-       $('#send').on('click', function() {
-         var text = $('#text').val();
-         conn.send('msgall '+text);
-         $('#text').val('').focus();
-         return false;
-       });
-       $('#text').on('keyup', function(e) {
-         if (e.keyCode === 13) {
-           $('#send').click();
-           return false;
-         }
-       });
-      // Send end
-      // Command line start
-       $('#cmd_btn').on('click', function() {
-         var cmd = $('#cmd_line').val();
-         conn.send(cmd);
-         $('#cmd_line').val('').focus();
-         return false;
-       });
-       $('#cmd_line').on('keyup', function(e) {
-         if (e.keyCode === 13) {
-           $('#cmd_btn').click();
-           return false;
-         }
-       });
-       // Command line end
-
-     });
-    </script>
+        conn.onopen = function() {
+          conn.send('login '+name)
+          update_ui();
+        };
+        conn.onmessage = function(e) {
+          var data = JSON.parse(e.data);
+          switch (data.action)
+          {
+            case 'response':
+             log(data.message)
+            break;
+            case 'list':
+            $('#user_list').empty();
+            for (i in data.message)
+            {
+              $('#user_list').append($('<option>',
+              {
+                value: data.message[i],
+                text: data.message[i]
+              }));
+            }
+            break;
+          }
+        };
+        conn.onclose = function() {
+          log('Disconnected.');
+          conn = null;
+          update_ui();
+        };
+      }
+      function disconnect() {
+        if (conn != null) {
+          conn.send('logout');
+          update_ui();
+        }
+      }
+      function update_ui() {
+        if (conn == null) {
+          $('#status').text('disconnected');
+          $('#connect').prop("value", 'Login');
+          $('#send').prop("disabled", true);
+          $('#name').prop("hidden", true);
+          $('#field_name').prop("hidden", false);
+          $('#field_name').val('').focus();
+        } else {
+          $('#status').text('Connected');
+          $('#connect').prop("value", 'Logout');
+          $('#send').prop("disabled", false);
+          $('#name').prop("hidden", false);
+          $('#field_name').prop("hidden", true);
+          $('#text').val('').focus();
+        }
+        $('#name').text(name);
+      };
+      // Login start
+      $('#connect').on('click', function() {
+        if (conn == null) {
+          connect();
+        } else {
+          disconnect();
+        }
+        update_ui();
+        return false;
+      });
+      $('#field_name').on('keyup', function(e) {
+        if (e.keyCode === 13) {
+          $('#connect').click();
+          return false;
+        }
+      });
+      // Login end
+      // Send start
+      $('#send').on('click', function() {
+        var text = $('#text').val();
+        conn.send('msgall '+text);
+        $('#text').val('').focus();
+        return false;
+      });
+      $('#text').on('keyup', function(e) {
+        if (e.keyCode === 13) {
+          $('#send').click();
+          return false;
+        }
+      });
+     // Send end
+     // Command line start
+      $('#cmd_btn').on('click', function() {
+        var cmd = $('#cmd_line').val();
+        conn.send(cmd);
+        $('#cmd_line').val('').focus();
+        return false;
+      });
+      $('#cmd_line').on('keyup', function(e) {
+        if (e.keyCode === 13) {
+          $('#cmd_btn').click();
+          return false;
+        }
+      });
+      // Command line end
+    });
+   </script>
 </head>
 <body>
 <h3><span id="chat_version">{{version}}</span></h3>
@@ -127,6 +130,11 @@
           <input style="width:20em" id="cmd_line" type="text"/>
           <input id="cmd_btn" type="button" value="SEND">
       </form>
+    </div>
+    <br>
+    <div>
+      <select size=5 style="width:20em" id="user_list">
+      </select>
     </div>
     <br>
     <div>Status: <span id="status">disconnected</span></div>

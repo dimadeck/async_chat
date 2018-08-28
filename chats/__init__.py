@@ -1,3 +1,5 @@
+import json
+
 VERSION_AS = 'AsyncIO_Chat'
 VERSION_TW = 'Twisted_Chat'
 VERSION_TOR = 'Tornado_Chat'
@@ -22,16 +24,27 @@ async def as_ws_close_connection(connection):
     await connection.close()
 
 
+async def as_ws_send_message(connection, message):
+    mes = prepare_ws_message(message)
+    await connection.send_json(mes)
+
+
 def tor_ws_send_message(connection, message):
-    if type(message) == list:
-        mes = {'action': 'list', 'message': message}
-    else:
-        mes = {'action': 'response', 'message': message}
+    mes = prepare_ws_message(message)
     connection.write_message(mes)
 
 
 def tw_ws_send_message(connection, message):
-    connection.sendMessage(bytes(message, 'utf-8'))
+    mes = json.dumps(prepare_ws_message(message))
+    connection.sendMessage(bytes(mes, encoding='utf-8'))
+
+
+def prepare_ws_message(message):
+    if type(message) == list:
+        mes = {'action': 'list', 'message': message}
+    else:
+        mes = {'action': 'response', 'message': message}
+    return mes
 
 
 async def as_close_connection(connection):
@@ -44,11 +57,6 @@ def tor_close_connection(connection):
 
 def tw_close_connection(connection):
     connection.stopProducing()
-
-
-async def as_ws_send_message(connection, message):
-    mes = {'action': 'response', 'message': message}
-    await connection.send_json(mes)
 
 
 def tor_ws_close_connection(connection):
