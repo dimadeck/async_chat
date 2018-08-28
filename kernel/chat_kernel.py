@@ -155,6 +155,6 @@ class ChatKernel:
         self.send_message(connection, message)
 
     def userlist_engine(self, connection, clear_data):
-        userlist = f"[{', '.join(self.get_username_list())}]"
+        userlist = ', '.join(self.get_username_list())
         message = self.pack_message.system_info(userlist, clear_data)
         self.send_message(connection, message)
