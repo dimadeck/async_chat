@@ -40,8 +40,8 @@ class ChatKernel(CK):
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
                        'debug': (self.debug_engine, {}),
-                       'whoami': (self.whoami_engine, {'connection': connection}),
-                       'userlist': (self.userlist_engine, {'connection': connection})
+                       'whoami': (self.whoami_engine, {'connection': connection, 'clear_data': req_dict.clear_data}),
+                       'userlist': (self.userlist_engine, {'connection': connection, 'clear_data': req_dict.clear_data})
                        }
         else:
             methods = {'login': (self.login_engine, {'connection': connection, 'username': param}),
@@ -91,14 +91,14 @@ class ChatKernel(CK):
         message = self.pack_message.chat_message(username=sender, message=message)
         await self.send_all(message)
 
-    async def whoami_engine(self, connection):
+    async def whoami_engine(self, connection, clear_data):
         username = self.get_name_by_connection(connection)
-        message = self.pack_message.system_info(username)
+        message = self.pack_message.system_info(username, clear_data)
         await self.send_message(connection, message)
 
-    async def userlist_engine(self, connection):
+    async def userlist_engine(self, connection, clear_data):
         userlist = f"[{', '.join(self.get_username_list())}]"
-        message = self.pack_message.system_info(userlist)
+        message = self.pack_message.system_info(userlist, clear_data)
         await self.send_message(connection, message)
 
     async def debug_engine(self):

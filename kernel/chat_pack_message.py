@@ -38,7 +38,9 @@ class PackMessage:
         mess = Color.color_engine(mess, self.color_mode)
         return mess
 
-    def system_info(self, message=None):
+    def system_info(self, message=None, clear_data=False):
+        if clear_data:
+            return message
         mess = self.add_suffix(INFO_SUFFIX, message)
         mess = Color.color_engine(mess, self.color_mode)
         return mess

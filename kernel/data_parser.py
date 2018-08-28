@@ -16,6 +16,7 @@ class DataParser:
         self.body = None
         self.status = 0
         self.strip = strip
+        self.clear_data = False
         self.parse_engine()
 
     def parse_engine(self):
@@ -36,7 +37,13 @@ class DataParser:
             return -1
 
     def get_command(self):
-        return self.data_list[0]
+        cmd = self.data_list[0]
+        if cmd.startswith('/'):
+            cmd = cmd[1:]
+            self.clear_data = True
+        else:
+            self.clear_data = False
+        return cmd
 
     def get_parameter(self):
         if self.cmd == 'login' or self.cmd == 'msg':
