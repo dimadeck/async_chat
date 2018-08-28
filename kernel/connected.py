@@ -1,4 +1,6 @@
 import asyncio
+import sys
+from time import sleep
 
 
 class Connected:
@@ -84,10 +86,11 @@ class ConnectedServer:
     async def handle_client(self, reader, writer):
         while True:
             request = (await reader.read(1024))
-            req_dict = self.parse_request(request)
-            print(req_dict)
-            answer = self.engine(req_dict)
-            writer.write(bytes(f'{answer}\n', 'utf-8'))
+            if len(request) > 0:
+                req_dict = self.parse_request(request)
+                print(req_dict)
+                answer = self.engine(req_dict)
+                writer.write(bytes(f'{answer}', 'utf-8'))
 
     def parse_request(self, request):
         req_words = request.decode('utf-8').strip('\r\n').split(' ')
@@ -125,39 +128,61 @@ class ConnectedServer:
 
 
 class ConnectedClient:
+    def __init__(self):
+        self.conn_read = None
+        self.conn_write = None
+        self.loop = asyncio.get_event_loop()
+        self.engine()
+
+    async def send_request(self, request):
+        await self.conn_write.write(bytes(request, encoding='utf-8'))
+        data = await self.conn_read.read(100)
+        print(data.decode())
+
     def register_user(self, connection, username):
-        return self.conn_write.write(f'register_user {connection} {username}')
+        return self.send_request(f'register_user {connection} {username}')
 
     def drop_connection(self, connection):
-        self.conn_write.write(f'drop_connection {connection}')
+        self.send_request(f'drop_connection {connection}')
 
     def add_connection(self, connection):
-        return self.conn_write.write(f'add_connection {connection}')
+        return self.send_request(f'add_connection {connection}')
 
     def is_register(self, connection):
-        return self.conn_write.write(f'is_register {connection}')
+        return self.send_request(f'is_register {connection}')
 
     def get_connections(self):
-        return self.conn_write.write(f'get_connections')
+        return self.send_request(f'get_connections')
 
     def clear_all(self):
-        self.conn_write.write(f'clear_all')
+        self.send_request(f'clear_all')
 
     def get_users(self):
-        return self.conn_write.write(f'get_users')
+        return self.send_request(f'get_users')
 
     def get_name(self, connection):
-        return self.conn_write.write(f'get_name {connection}')
+        return self.send_request(f'get_name {connection}')
 
     def get_connection(self, username):
-        return self.conn_write.write(f'get_connection {username}')
+        return self.send_request(f'get_connection {username}')
 
     def get_username_list(self):
-        return self.conn_write.write(f'get_username_list')
+        return self.send_request(f'get_username_list')
 
-    async def handle_client(self, loop):
-        self.conn_read, self.conn_write = await asyncio.open_connection('127.0.0.1', 10000, loop=loop)
+    async def handle_client(self):
+        self.conn_read, self.conn_write = await asyncio.open_connection('127.0.0.1', 10000, loop=self.loop)
 
+    def engine(self):
+        self.loop.run_until_complete(self.handle_client())
+
+    def test(self):
+        self.add_connection('1')
+        self.register_user('1', '2')
+        self.get_username_list()
+
+    def close(self):
+        print('close')
+        self.loop.close()
 
 
 def main(port=10000):
@@ -171,21 +196,14 @@ def main(port=10000):
         loop.close()
 
 
-def main_client(port=20000):
+def main_client():
     client = ConnectedClient()
-    loop = asyncio.get_event_loop()
-    loop.run_forever() (client.handle_client(loop))
-    loop.close()
-
-    client = ConnectedClient()
-    loop = asyncio.get_event_loop()
-    loop.create_task(asyncio.start_server(client.handle_client, '127.0.0.1', port))
-    print(f'Connection server start on port{port}')
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        loop.close()
+    sleep(4)
+    client.close()
 
 
 if __name__ == '__main__':
-    main_client()
+    if sys.argv[1] == 'client':
+        main_client()
+    else:
+        main()
