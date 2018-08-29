@@ -11,9 +11,13 @@
 
 ## UPDATE [29.08.18]: ##
     
-    Запуск asyncIO + asyncIO_websocket:
+    Запуск TCP + WebSocket:
         
         python run.py as_chats
+        или
+        tw_chats
+        или
+        tor_chats
         
     Демонстрация общения между tcp, ws:
 
