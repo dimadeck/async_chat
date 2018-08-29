@@ -1,6 +1,7 @@
+import time
+
 from kernel import *
 from kernel.color_module import Color
-import time
 
 
 class PackMessage:
@@ -21,6 +22,7 @@ class PackMessage:
             message = self.logout(username)
         mess = self.add_suffix(SERVER_SUFFIX, message)
         mess = Color.color_engine(mess)
+        mess = f'[{self.version}] - {mess}'
         return mess
 
     def system_message(self, system_mode, username=None, message=None):
