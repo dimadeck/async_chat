@@ -1,4 +1,3 @@
-# self.connections = {'tcp': [], 'ws': []}
 class Connected:
     def __init__(self):
         self.connections_list = []
