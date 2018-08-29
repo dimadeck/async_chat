@@ -39,6 +39,7 @@ def main(connections=None, port=1234):
     factory.protocol = TwistedWsProtocol
     setup_dict = get_setup_dict(connections, VERSION, port)
     factory.protocol.chat = ChatKernel(setup_dict)
+
     ws_resource = WebSocketResource(factory)
 
     root = Resource()

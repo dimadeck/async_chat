@@ -9,7 +9,19 @@
         source env/bin/activate
         pip install -r requirements.txt
 
-## UPDATE [24.08.18]: ##
+## UPDATE [29.08.18]: ##
+    
+    Запуск TCP + WebSocket:
+        
+        python run.py as_chats
+        или
+        tw_chats
+        или
+        tor_chats
+        
+    Демонстрация общения между tcp, ws:
+
+![alt text](readme_img/as+29.png)
 
 ## Описание проекта: ##
 
