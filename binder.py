@@ -7,7 +7,6 @@ from chats.chat_twisted import main as tw_main
 from chats.chat_ws_asyncio import main as aio_ws_main
 from chats.chat_ws_tornado import main as tor_ws_main
 from chats.chat_ws_twisted import main as tw_ws_main
-from kernel.connected import main as connected_main
 
 
 class Connect:
@@ -58,8 +57,8 @@ def setup(mode):
         settings = {'servers': [as_main, aio_ws_main],
                     'ports': [8080, 8000]}
     elif mode == 'tor':
-        settings = {'servers': [tor_main, tor_ws_main, connected_main],
-                    'ports': [8080, 8000, 10000]}
+        settings = {'servers': [tor_main, tor_ws_main],
+                    'ports': [8080, 8000]}
     elif mode == 'tw':
         settings = {'servers': [tw_main, tw_ws_main],
                     'ports': [8080, 8000]}

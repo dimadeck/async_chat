@@ -1,12 +1,12 @@
 import sys
 
 from chats import chat_asyncio as as_chat, chat_twisted as tw_chat, chat_tornado as tor_chat, \
-    chat_ws_asyncio as as_ws_chat, chat_ws_twisted as tw_ws_chat, chat_ws_tornado as tor_ws_chat
+    chat_ws_asyncio as as_ws_chat, chat_ws_twisted as tw_ws_chat, chat_ws_tornado as tor_ws_chat, AsyncIO as as_chats
 from binder import main as bind
 
 LAUNCH = {'tw_chat': tw_chat.main, 'as_chat': as_chat.main, 'tor_chat': tor_chat.main,
           'as_ws_chat': as_ws_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'tw_ws_chat': tw_ws_chat.main,
-          'bind': bind}
+          'bind': bind, 'as_chats': as_chats.main}
 BIND = ['as', 'tor', 'tw', 'tcp_all', 'ws_all']
 LAUNCH_KEYS = list(LAUNCH.keys())
 
