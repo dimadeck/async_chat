@@ -4,8 +4,6 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
-    async def send_message(self, connection, message):
-        await self.send_message1(connection, message)
 
     async def send_all(self, message):
         for user in self.get_users():
@@ -15,9 +13,21 @@ class ChatKernel(CK):
         await self.close_connection(connection)
         self.connections.drop_connection(connection)
 
-    async def from_outside(self, request, connection):
-        print(f'{self.version} - {request}')
-        await self.run_command(request, connection)
+    async def from_outside(self, req_dict, connection):
+        cmd = req_dict.cmd
+        param = req_dict.parameter
+        body = req_dict.body
+        message = ' '.join(req_dict.body) if body is not None else None
+
+        methods = {'login': (self.login_messaging, {'username': param}),
+                   'logout': (self.logout_messaging, {'username': param}),
+                   'msg': (
+                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
+                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
+                   }
+        if cmd in ['login', 'logout', 'msg', 'msgall']:
+            protocol = ChatProtocol(**methods)
+            await self.send_all(protocol.engine(cmd))
 
     async def engine(self, request, writer, addr):
         if len(request) > 0:
@@ -61,16 +71,14 @@ class ChatKernel(CK):
     async def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
+            message = self.logout_messaging(connection)
             await self.logout(connection)
-            message = self.pack_message.system_message('logout', username=username)
             await self.send_all(message)
-            print(self.pack_message.server_message('logout', username=username))
             return -1
 
     async def login_engine(self, connection, username):
         if self.login(connection, username) == 0:
-            print(self.pack_message.server_message('login', username=username))
-            message = self.pack_message.system_message('login', username=username)
+            message = self.login_messaging(username)
             await self.send_all(message)
         else:
             message = self.pack_message.system_error('user_exist')
@@ -85,10 +93,9 @@ class ChatKernel(CK):
         await self.send_message(connection, message)
 
     async def send_message_engine(self, connection, username, message):
-        sender = self.get_name_by_connection(connection)
-        user = self.get_connection_by_name(username)
-        if user is not None:
-            message = self.pack_message.chat_message(username=sender, message=message, private=True)
+        message = self.send_message_messaging(connection, username, message)
+        if message != -1:
+            user = self.get_connection_by_name(username)
             await self.send_message(user, message)
             await self.send_message(connection, message)
         else:
@@ -96,8 +103,7 @@ class ChatKernel(CK):
             await self.send_message(connection, message)
 
     async def send_all_engine(self, connection, message):
-        sender = self.get_name_by_connection(connection)
-        message = self.pack_message.chat_message(username=sender, message=message)
+        message = self.send_all_messaging(connection, message)
         await self.send_all(message)
 
     async def whoami_engine(self, connection, clear_data):

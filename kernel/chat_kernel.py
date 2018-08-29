@@ -10,7 +10,7 @@ class ChatKernel:
         self.parse_strip = setup['parse_strip']
         self.outside_request = None
         if setup['method_send_message'] is not None:
-            self.send_message1 = setup['method_send_message']
+            self.send_message = setup['method_send_message']
         if setup['method_close_connection'] is not None:
             self.close_connection = setup['method_close_connection']
         self.version = setup['version']
@@ -25,9 +25,6 @@ class ChatKernel:
     def set_outside_request(self, func):
         print(func)
         self.outside_request = func
-
-    def send_message(self, connection, message):
-        self.send_message1(connection, message)
 
     def send_all(self, message):
         for user in self.get_users():
@@ -100,6 +97,28 @@ class ChatKernel:
                        'empty': (self.error_first_login, {'connection': connection})}
         protocol = ChatProtocol(**methods)
         return protocol.engine(cmd)
+
+    def login_messaging(self, username):
+        print(self.pack_message.server_message('login', username=username))
+        message = self.pack_message.system_message('login', username=username)
+        return message
+
+    def logout_messaging(self, username):
+        message = self.pack_message.system_message('logout', username=username)
+        print(self.pack_message.server_message('logout', username=username))
+        return message
+
+    def send_message_messaging(self, connection, username, message):
+        sender = self.get_name_by_connection(connection)
+        if self.get_connection_by_name(username) is not None:
+            message = self.pack_message.chat_message(username=sender, message=message, private=True)
+            return message
+        return -1
+
+    def send_all_messaging(self, connection, message):
+        sender = self.get_name_by_connection(connection)
+        message = self.pack_message.chat_message(username=sender, message=message)
+        return message
 
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
