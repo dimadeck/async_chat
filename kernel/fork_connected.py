@@ -1,17 +1,23 @@
+# self.connections = {'tcp': [], 'ws': []}
 class Connected:
     def __init__(self):
-        self.connections = []
+        self.connections_list = []
+        self.connections = {}
         self.users = {}
 
-    def add_connection(self, connection):
+    def add_version_header(self, version):
+        self.connections[version] = []
+
+    def add_connection(self, connection, version):
         if not self.is_exist_connection(connection):
-            self.connections.append(connection)
+            self.connections_list.append(connection)
+            self.connections[version].append(connection)
             return 0
         else:
             return -1
 
     def is_exist_connection(self, connection):
-        return connection in self.connections
+        return connection in self.connections_list
 
     def is_valid_name(self, username):
         if username in self.users.values():
@@ -29,7 +35,7 @@ class Connected:
         return connection in self.users
 
     def get_connection(self, username):
-        for connection in self.connections:
+        for connection in self.connections_list:
             if username == self.users[connection]:
                 return connection
         return None
@@ -43,8 +49,9 @@ class Connected:
     def drop_connection(self, connection):
         if self.is_register(connection):
             self.users.pop(connection)
-        if connection in self.connections:
-            self.connections.remove(connection)
+        if connection in self.connections_list:
+            self.connections_list.remove(connection)
+            self.connections.pop(connection)
 
     def get_username_list(self):
         user_list = []
@@ -53,11 +60,16 @@ class Connected:
         return user_list
 
     def get_connections(self):
-        return self.connections
+        return self.connections_list
 
-    def get_users(self):
-        return self.users
+    def get_users(self, version):
+        user_list = {}
+        for connection, username in self.users.items():
+            if connection in self.connections[version]:
+                user_list[connection] = username
+        return user_list
 
     def clear_all(self):
-        self.connections = []
+        self.connections_list = []
+        self.connections = {}
         self.users = {}

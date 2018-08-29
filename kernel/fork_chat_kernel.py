@@ -4,6 +4,9 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
+    async def send_message(self, connection, message):
+        await self.send_message1(connection, message)
+
     async def send_all(self, message):
         for user in self.get_users():
             await self.send_message(user, message)
@@ -12,12 +15,18 @@ class ChatKernel(CK):
         await self.close_connection(connection)
         self.connections.drop_connection(connection)
 
+    async def from_outside(self, request, connection):
+        print(f'{self.version} - {request}')
+        await self.run_command(request, connection)
+
     async def engine(self, request, writer, addr):
         if len(request) > 0:
             if self.add_connection(writer) == 0:
                 print(self.pack_message.server_message('new', addr=addr))
             req_dict = DataParser(request, strip=self.parse_strip)
             if req_dict.status == 0:
+                if self.outside_request is not None:
+                    await self.outside_request(req_dict, writer)
                 return await self.run_command(req_dict, writer)
             else:
                 message = self.pack_message.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])

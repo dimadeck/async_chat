@@ -6,20 +6,28 @@ from kernel.fork_connected import Connected
 
 class ChatKernel:
     def __init__(self, setup):
-        # self.connections = ConnectedClient()
         self.connections = self.init_connection_list(setup['connections'])
         self.parse_strip = setup['parse_strip']
+        self.outside_request = None
         if setup['method_send_message'] is not None:
-            self.send_message = setup['method_send_message']
+            self.send_message1 = setup['method_send_message']
         if setup['method_close_connection'] is not None:
             self.close_connection = setup['method_close_connection']
         self.version = setup['version']
         self.pack_message = PackMessage(version=self.version)
+        self.connections.add_version_header(self.version)
         print(self.pack_message.server_message('start', port=setup['port']))
 
     @staticmethod
     def init_connection_list(connections):
         return connections if connections is not None else Connected()
+
+    def set_outside_request(self, func):
+        print(func)
+        self.outside_request = func
+
+    def send_message(self, connection, message):
+        self.send_message1(connection, message)
 
     def send_all(self, message):
         for user in self.get_users():
@@ -33,7 +41,7 @@ class ChatKernel:
         self.connections.drop_connection(connection)
 
     def add_connection(self, connection):
-        return self.connections.add_connection(connection)
+        return self.connections.add_connection(connection, self.version)
 
     def is_register(self, connection):
         return self.connections.is_register(connection)
@@ -45,7 +53,7 @@ class ChatKernel:
         self.connections.clear_all()
 
     def get_users(self):
-        return self.connections.get_users()
+        return self.connections.get_users(self.version)
 
     def get_name_by_connection(self, connection):
         return self.connections.get_name(connection)
