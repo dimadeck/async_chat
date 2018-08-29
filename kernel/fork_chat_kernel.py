@@ -68,7 +68,10 @@ class ChatKernel(CK):
         message = self.send_message_messaging(connection, username, message)
         if message != -1:
             user = self.get_connection_by_name(username)
-            await self.send_message(user, message)
+            try:
+                await self.send_message(user, message)
+            except:
+                pass
             await self.send_message(connection, message)
         else:
             message = self.pack_message.system_error('not_found', username=username)
