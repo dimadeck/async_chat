@@ -4,7 +4,6 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
-
     async def send_all(self, message):
         for user in self.get_users():
             await self.send_message(user, message)
@@ -14,20 +13,10 @@ class ChatKernel(CK):
         self.connections.drop_connection(connection)
 
     async def from_outside(self, req_dict, connection):
-        cmd = req_dict.cmd
-        param = req_dict.parameter
-        body = req_dict.body
-        message = ' '.join(req_dict.body) if body is not None else None
-
-        methods = {'login': (self.login_messaging, {'username': param}),
-                   'logout': (self.logout_messaging, {'username': param}),
-                   'msg': (
-                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
-                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
-                   }
-        if cmd in ['login', 'logout', 'msg', 'msgall']:
+        methods = self.prepare_outside(req_dict, connection)
+        if methods != -1:
             protocol = ChatProtocol(**methods)
-            await self.send_all(protocol.engine(cmd))
+            await self.send_all(protocol.engine(req_dict.cmd))
 
     async def engine(self, request, writer, addr):
         if len(request) > 0:
@@ -47,26 +36,9 @@ class ChatKernel(CK):
         return 0
 
     async def run_command(self, req_dict, connection):
-        cmd = req_dict.cmd
-        param = req_dict.parameter
-        body = req_dict.body
-        message = ' '.join(req_dict.body) if body is not None else None
-
-        if self.is_register(connection):
-            methods = {'login': (self.error_alredy_login, {'connection': connection}),
-                       'logout': (self.logout_engine, {'connection': connection}),
-                       'msg': (
-                           self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
-                       'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
-                       'debug': (self.debug_engine, {}),
-                       'whoami': (self.whoami_engine, {'connection': connection, 'clear_data': req_dict.clear_data}),
-                       'userlist': (self.userlist_engine, {'connection': connection, 'clear_data': req_dict.clear_data})
-                       }
-        else:
-            methods = {'login': (self.login_engine, {'connection': connection, 'username': param}),
-                       'empty': (self.error_first_login, {'connection': connection})}
+        methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
-        return await protocol.engine(cmd)
+        return await protocol.engine(req_dict.cmd)
 
     async def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
@@ -106,6 +78,13 @@ class ChatKernel(CK):
         message = self.send_all_messaging(connection, message)
         await self.send_all(message)
 
+    async def debug_engine(self):
+        connections = self.get_connections()
+        userlist = self.get_users()
+
+        print(self.pack_message.message(connections))
+        print(self.pack_message.message(userlist))
+
     async def whoami_engine(self, connection, clear_data):
         username = self.get_name_by_connection(connection)
         message = self.pack_message.system_info(username, clear_data)
@@ -117,10 +96,3 @@ class ChatKernel(CK):
         if 'WS' in self.version and clear_data:
             message = message.split(sep=', ')
         await self.send_message(connection, message)
-
-    async def debug_engine(self):
-        connections = self.get_connections()
-        userlist = self.get_users()
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
