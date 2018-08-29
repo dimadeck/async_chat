@@ -45,12 +45,12 @@ class Connected:
         except KeyError:
             return 0
 
-    def drop_connection(self, connection):
+    def drop_connection(self, connection, version):
         if self.is_register(connection):
             self.users.pop(connection)
         if connection in self.connections_list:
             self.connections_list.remove(connection)
-            self.connections.pop(connection)
+            self.connections[version].remove(connection)
 
     def get_username_list(self):
         user_list = []

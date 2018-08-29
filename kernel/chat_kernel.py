@@ -34,7 +34,7 @@ class ChatKernel:
 
     def logout(self, connection):
         self.close_connection(connection)
-        self.connections.drop_connection(connection)
+        self.connections.drop_connection(connection, self.version)
 
     def add_connection(self, connection):
         return self.connections.add_connection(connection, self.version)
@@ -150,7 +150,7 @@ class ChatKernel:
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
-            message = self.logout_messaging(connection)
+            message = self.logout_messaging(username)
             self.logout(connection)
             self.send_all(message)
             return -1

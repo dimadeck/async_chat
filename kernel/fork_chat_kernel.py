@@ -10,7 +10,7 @@ class ChatKernel(CK):
 
     async def logout(self, connection):
         await self.close_connection(connection)
-        self.connections.drop_connection(connection)
+        self.connections.drop_connection(connection, self.version)
 
     async def from_outside(self, req_dict, connection):
         methods = self.prepare_outside(req_dict, connection)
@@ -43,7 +43,7 @@ class ChatKernel(CK):
     async def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
-            message = self.logout_messaging(connection)
+            message = self.logout_messaging(username)
             await self.logout(connection)
             await self.send_all(message)
             return -1
