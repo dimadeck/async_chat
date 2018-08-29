@@ -12,10 +12,6 @@ async def as_send_message(connection, message):
     connection.write(bytes(f'{message}\n', 'utf-8'))
 
 
-def tor_send_message(connection, message):
-    connection.write(bytes(f'{message}\n', 'utf-8'))
-
-
 def tw_send_message(connection, message):
     connection.sendLine(bytes(f'{message}', 'utf-8'))
 
@@ -25,8 +21,13 @@ async def as_ws_close_connection(connection):
 
 
 async def as_ws_send_message(connection, message):
+    print(f'ws:{message}')
     mes = prepare_ws_message(message)
     await connection.send_json(mes)
+
+
+def tor_send_message(connect, message):
+    connect.write(bytes(f'{message}\n', 'utf-8'))
 
 
 def tor_ws_send_message(connection, message):

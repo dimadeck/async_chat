@@ -15,8 +15,13 @@ class ChatKernel(CK):
     async def from_outside(self, req_dict, connection):
         methods = self.prepare_outside(req_dict, connection)
         if methods != -1:
+            cmd = req_dict.cmd
             protocol = ChatProtocol(**methods)
-            await self.send_all(protocol.engine(req_dict.cmd))
+            if cmd == 'msg':
+                user = self.get_connection_by_name(req_dict.parameter)
+                await self.send_message(user, protocol.engine(cmd))
+            else:
+                await self.send_all(protocol.engine(cmd))
 
     async def engine(self, request, writer, addr):
         if len(request) > 0:

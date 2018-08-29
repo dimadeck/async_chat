@@ -113,9 +113,9 @@ class ChatKernel:
         param = req_dict.parameter
         body = req_dict.body
         message = ' '.join(req_dict.body) if body is not None else None
-
+        username = self.get_name_by_connection(connection)
         methods = {'login': (self.login_messaging, {'username': param}),
-                   'logout': (self.logout_messaging, {'username': param}),
+                   'logout': (self.logout_messaging, {'username': username}),
                    'msg': (
                        self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
                    'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
@@ -140,7 +140,7 @@ class ChatKernel:
         if self.get_connection_by_name(username) is not None:
             message = self.pack_message.chat_message(username=sender, message=message, private=True)
             return message
-        return -1
+        return -12
 
     def send_all_messaging(self, connection, message):
         sender = self.get_name_by_connection(connection)
