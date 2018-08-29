@@ -1,6 +1,6 @@
-import asyncio
 import sys
-from time import sleep
+
+from twisted.internet import protocol, reactor
 
 
 class Connected:
@@ -80,116 +80,110 @@ class Connected:
 
 
 class ConnectedServer:
-    def __init__(self):
-        self.connections = Connected
+    def __init__(self, port):
+        self.factory = protocol.Factory()
+        self.factory.protocol = ConnectedServer.ConnectedServerProtocol
+        print(f'Connected server start on port: {port}')
+        reactor.listenTCP(port, self.factory)
+        reactor.run()
 
-    async def handle_client(self, reader, writer):
-        while True:
-            request = (await reader.read(1024))
+    class ConnectedServerProtocol(protocol.Protocol):
+        def __init__(self):
+            self.connections = Connected()
+
+        def dataReceived(self, request):
+            print(request)
             if len(request) > 0:
                 req_dict = self.parse_request(request)
                 print(req_dict)
                 answer = self.engine(req_dict)
-                writer.write(bytes(f'{answer}', 'utf-8'))
+                self.transport.write(bytes(f'{answer}', 'utf-8'))
 
-    def parse_request(self, request):
-        req_words = request.decode('utf-8').strip('\r\n').split(' ')
-        return {'cmd': req_words[0], 'args': req_words[1:]}
+        @staticmethod
+        def parse_request(request):
+            req_words = request.decode('utf-8').strip('\r\n').split(' ')
+            return {'cmd': req_words[0], 'args': req_words[1:]}
 
-    def engine(self, req_dict):
-        cmd = req_dict['cmd']
-        args = req_dict['args']
-        answer_set = {
-            'register_user': self.connections.register_user,
-            'drop_connection': self.connections.drop_connection,
-            'add_connection': self.connections.add_connection,
-            'is_register': self.connections.is_register,
-            'get_connections': self.connections.get_connections,
-            'clear_all': self.connections.clear_all,
-            'get_users': self.connections.get_users,
-            'get_name': self.connections.get_name,
-            'get_connection': self.connections.get_connection,
-            'get_username_list': self.connections.get_username_list,
-        }
-        try:
-            return answer_set[cmd](*args)
-        except:
-            return -100
+        def engine(self, req_dict):
+            cmd = req_dict['cmd']
+            args = req_dict['args']
+            answer_set = {
+                'register_user': self.connections.register_user,
+                'drop_connection': self.connections.drop_connection,
+                'add_connection': self.connections.add_connection,
+                'is_register': self.connections.is_register,
+                'get_connections': self.connections.get_connections,
+                'clear_all': self.connections.clear_all,
+                'get_users': self.connections.get_users,
+                'get_name': self.connections.get_name,
+                'get_connection': self.connections.get_connection,
+                'get_username_list': self.connections.get_username_list,
+            }
+            try:
+                return answer_set[cmd](*args)
+            except:
+                return -100
 
 
 class ConnectedClient:
-    def __init__(self):
-        self.conn_read = None
-        self.conn_write = None
-        self.loop = asyncio.get_event_loop()
-        self.engine()
+    def __init__(self, port):
+        self.var = 1
+        self.factory = protocol.ClientFactory()
+        self.factory.protocol = ConnectedClient.ConnectedClientProtocol
+        reactor.connectTCP('127.0.0.1', port, self.factory)
+        reactor.run()
 
-    async def send_request(self, request):
-        await self.conn_write.write(bytes(request, encoding='utf-8'))
-        data = await self.conn_read.read(100)
-        print(data.decode())
+    class ConnectedClientProtocol(protocol.Protocol):
+        def connectionMade(self):
+            self.engine()
 
-    def register_user(self, connection, username):
-        return self.send_request(f'register_user {connection} {username}')
+        def dataReceived(self, data):
+            print(data)
 
-    def drop_connection(self, connection):
-        self.send_request(f'drop_connection {connection}')
+        def send_request(self, request):
+            print(request)
+            self.transport.write(bytes(request, 'utf-8'))
 
-    def add_connection(self, connection):
-        return self.send_request(f'add_connection {connection}')
+        def register_user(self, connection, username):
+            return self.send_request(f'register_user {connection} {username}')
 
-    def is_register(self, connection):
-        return self.send_request(f'is_register {connection}')
+        def drop_connection(self, connection):
+            self.send_request(f'drop_connection {connection}')
 
-    def get_connections(self):
-        return self.send_request(f'get_connections')
+        def add_connection(self, connection):
+            return self.send_request(f'add_connection {connection}')
 
-    def clear_all(self):
-        self.send_request(f'clear_all')
+        def is_register(self, connection):
+            return self.send_request(f'is_register {connection}')
 
-    def get_users(self):
-        return self.send_request(f'get_users')
+        def get_connections(self):
+            return self.send_request(f'get_connections')
 
-    def get_name(self, connection):
-        return self.send_request(f'get_name {connection}')
+        def clear_all(self):
+            self.send_request(f'clear_all')
 
-    def get_connection(self, username):
-        return self.send_request(f'get_connection {username}')
+        def get_users(self):
+            return self.send_request(f'get_users')
 
-    def get_username_list(self):
-        return self.send_request(f'get_username_list')
+        def get_name(self, connection):
+            return self.send_request(f'get_name {connection}')
 
-    async def handle_client(self):
-        self.conn_read, self.conn_write = await asyncio.open_connection('127.0.0.1', 10000, loop=self.loop)
+        def get_connection(self, username):
+            return self.send_request(f'get_connection {username}')
 
-    def engine(self):
-        self.loop.run_until_complete(self.handle_client())
+        def get_username_list(self):
+            return self.send_request(f'get_username_list')
 
-    def test(self):
-        self.add_connection('1')
-        self.register_user('1', '2')
-        self.get_username_list()
-
-    def close(self):
-        print('close')
-        self.loop.close()
+        def engine(self):
+            return self.add_connection('1')
 
 
 def main(port=10000):
-    server = ConnectedServer()
-    loop = asyncio.get_event_loop()
-    loop.create_task(asyncio.start_server(server.handle_client, '127.0.0.1', port))
-    print(f'Connection server start on port{port}')
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        loop.close()
+    server = ConnectedServer(port)
 
 
-def main_client():
-    client = ConnectedClient()
-    client.test()
-    client.close()
+def main_client(port=10000):
+    client = ConnectedClient(port)
 
 
 if __name__ == '__main__':
