@@ -63,8 +63,31 @@ class ChatKernel:
     def from_outside(self, req_dict, connection):
         methods = self.prepare_outside(req_dict, connection)
         if methods != -1:
+            cmd = req_dict.cmd
             protocol = ChatProtocol(**methods)
-            self.send_all(protocol.engine(req_dict.cmd))
+            if cmd == 'msg':
+                user = self.get_connection_by_name(req_dict.parameter)
+                if user in self.connections.connections[self.version]:
+                    self.send_message(user, protocol.engine(cmd))
+            else:
+                self.send_all(protocol.engine(cmd))
+
+    def prepare_outside(self, req_dict, connection):
+        cmd = req_dict.cmd
+        param = req_dict.parameter
+        body = req_dict.body
+        message = ' '.join(req_dict.body) if body is not None else None
+        username = self.get_name_by_connection(connection)
+        methods = {'login': (self.login_messaging, {'username': param}),
+                   'logout': (self.logout_messaging, {'username': username}),
+                   'msg': (
+                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
+                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
+                   }
+        if cmd in ['login', 'logout', 'msg', 'msgall']:
+            return methods
+        else:
+            return -1
 
     def engine(self, request, writer, addr):
         if len(request) > 0:
@@ -107,23 +130,6 @@ class ChatKernel:
         methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
         return protocol.engine(req_dict.cmd)
-
-    def prepare_outside(self, req_dict, connection):
-        cmd = req_dict.cmd
-        param = req_dict.parameter
-        body = req_dict.body
-        message = ' '.join(req_dict.body) if body is not None else None
-        username = self.get_name_by_connection(connection)
-        methods = {'login': (self.login_messaging, {'username': param}),
-                   'logout': (self.logout_messaging, {'username': username}),
-                   'msg': (
-                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
-                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
-                   }
-        if cmd in ['login', 'logout', 'msg', 'msgall']:
-            return methods
-        else:
-            return -1
 
     def login_messaging(self, username):
         print(self.pack_message.server_message('login', username=username))
@@ -175,7 +181,10 @@ class ChatKernel:
         message = self.send_message_messaging(connection, username, message)
         if message != -1:
             user = self.get_connection_by_name(username)
-            self.send_message(user, message)
+            try:
+                self.send_message(user, message)
+            except:
+                pass
             self.send_message(connection, message)
         else:
             message = self.pack_message.system_error('not_found', username=username)
