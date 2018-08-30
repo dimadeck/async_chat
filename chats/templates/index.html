@@ -7,7 +7,7 @@
     <script language="javascript" type="text/javascript">
     $(function() {
       var conn = null;
-      var name = "None";
+      var login_status = false;
       var send_mode = 'msgall';
       update_ui();
       $('#field_name').val('').focus();
@@ -20,29 +20,35 @@
         disconnect();
         var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host+'/ws';
         conn = new WebSocket(wsUri);
-        name = $('#field_name').val()
-
+        var name = $('#field_name').val();
+        login_status = false;
         conn.onopen = function() {
-          conn.send('login '+name);
-          update_ui();
-          conn.send('/userlist');
-        };
+                  conn.send('login '+name);
+                  update_ui();
+                };
         conn.onmessage = function(e) {
           var data = JSON.parse(e.data);
           switch (data.action)
           {
             case 'response':
-             log(data.message)
-             conn.send('/userlist');
+            log(data.message);
+            if (login_status == false){
+              if (data.message.indexOf('login to chat')>0){
+                login_status = true;
+              }
+            }
+            if (login_status == true){
+            conn.send('/userlist');
+            update_ui();
+            }
             break;
             case 'list':
             $('#user_list').empty();
             $('#user_list').append($('<option>',
             {
               value: 'all',
-              text: 'Отправить всем'
+              text: 'All'
             }));
-
             for (i in data.message)
             {
               $('#user_list').append($('<option>',
@@ -57,17 +63,18 @@
         conn.onclose = function() {
           log('Disconnected.');
           conn = null;
+          login_status = false;
           update_ui();
         };
       }
       function disconnect() {
-        if (conn != null) {
+        if (login_status == true) {
           conn.send('logout');
           update_ui();
         }
       }
       function update_ui() {
-        if (conn == null) {
+        if (login_status == false) {
           $('#status').prop("src", 'http://3d-zambia.chordsrt.com/assets/button_red_50-0e9cba6bd7edd35e3a03f351748610225ed9c3d6208b6a705973d314014fe8da.png');
           $('#connect').prop("value", 'Login');
           $('#send').prop("disabled", true);
@@ -84,12 +91,15 @@
         }
         $('#name').text(name);
       };
-      // Login start
       $('#connect').on('click', function() {
         if (conn == null) {
           connect();
         } else {
           disconnect();
+        }
+        if (login_status == false){
+          name = $('#field_name').val();
+          conn.send('login '+name);
         }
         update_ui();
         return false;
