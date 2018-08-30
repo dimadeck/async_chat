@@ -9,19 +9,18 @@
         source env/bin/activate
         pip install -r requirements.txt
 
-## UPDATE [29.08.18]: ##
+## UPDATE [30.08.18]: ##
     
     Запуск TCP + WebSocket:
         
-        python run.py as_chats
-        или
-        tw_chats
-        или
-        tor_chats
+        python run.py [as_chats, tw_chats, tor_chats]
         
-    Демонстрация общения между tcp, ws:
+    Демонстрация общения между tcp, ws на примере tw_chats:
+![alt text](readme_img/tw_tcp_ws_3008.png)
+    
+    Вывод сервера:
+![alt text](readme_img/tw_tcp_ws_server_3008.png)
 
-![alt text](readme_img/as+29.png)
 
 ## Описание проекта: ##
 
@@ -36,15 +35,10 @@
             Синтаксис:
 
             python run.py [program]
-            [program] = ['as_chat', 'tor_chat', 'tw_chat', 'bind',
-                        'aio_ws_chat', 'tor_ws_chat', 'tw_ws_chat']
+            [program] = ['as_chat', 'tor_chat', 'tw_chat',
+                        'aio_ws_chat', 'tor_ws_chat', 'tw_ws_chat',
+                        'as_chats', 'tor_chats', 'tw_chats']
 
-        - Bind - параллельный запуск серверов.
-
-            Синтаксис:
-
-            python run.py bind [bind_program]
-            [bind_program] = ['as', 'tor', 'tw', 'tcp_all', 'ws_all']
 
     Kernel modules:
 
