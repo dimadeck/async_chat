@@ -19,7 +19,8 @@ class ChatKernel(CK):
             protocol = ChatProtocol(**methods)
             if cmd == 'msg':
                 user = self.get_connection_by_name(req_dict.parameter)
-                await self.send_message(user, protocol.engine(cmd))
+                if user in self.get_connections_by_version():
+                    await self.send_message(user, protocol.engine(cmd))
             else:
                 await self.send_all(protocol.engine(cmd))
 
@@ -71,7 +72,7 @@ class ChatKernel(CK):
 
     async def send_message_engine(self, connection, username, message):
         message = self.send_message_messaging(connection, username, message)
-        if message != -1:
+        if message != -12:
             user = self.get_connection_by_name(username)
             try:
                 await self.send_message(user, message)

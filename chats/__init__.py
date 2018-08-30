@@ -21,7 +21,6 @@ async def as_ws_close_connection(connection):
 
 
 async def as_ws_send_message(connection, message):
-    print(f'ws:{message}')
     mes = prepare_ws_message(message)
     await connection.send_json(mes)
 
