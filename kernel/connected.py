@@ -15,6 +15,9 @@ class Connected:
         else:
             return -1
 
+    def get_connections_by_version(self, version):
+        return self.connections[version]
+
     def is_exist_connection(self, connection):
         return connection in self.connections_list
 
