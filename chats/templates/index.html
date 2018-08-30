@@ -8,6 +8,8 @@
     $(function() {
       var conn = null;
       var name = "None";
+      var send_mode = 'msgall';
+      update_ui();
       $('#field_name').val('').focus();
       function log(msg) {
         var control = $('#log');
@@ -21,8 +23,9 @@
         name = $('#field_name').val()
 
         conn.onopen = function() {
-          conn.send('login '+name)
+          conn.send('login '+name);
           update_ui();
+          conn.send('/userlist');
         };
         conn.onmessage = function(e) {
           var data = JSON.parse(e.data);
@@ -30,9 +33,16 @@
           {
             case 'response':
              log(data.message)
+             conn.send('/userlist');
             break;
             case 'list':
             $('#user_list').empty();
+            $('#user_list').append($('<option>',
+            {
+              value: 'all',
+              text: 'Отправить всем'
+            }));
+
             for (i in data.message)
             {
               $('#user_list').append($('<option>',
@@ -58,14 +68,14 @@
       }
       function update_ui() {
         if (conn == null) {
-          $('#status').text('disconnected');
+          $('#status').prop("src", 'http://3d-zambia.chordsrt.com/assets/button_red_50-0e9cba6bd7edd35e3a03f351748610225ed9c3d6208b6a705973d314014fe8da.png');
           $('#connect').prop("value", 'Login');
           $('#send').prop("disabled", true);
           $('#name').prop("hidden", true);
           $('#field_name').prop("hidden", false);
           $('#field_name').val('').focus();
         } else {
-          $('#status').text('Connected');
+          $('#status').prop("src", 'http://www.clker.com/cliparts/4/t/n/Q/b/d/green-glossy-icon-th.png');
           $('#connect').prop("value", 'Logout');
           $('#send').prop("disabled", false);
           $('#name').prop("hidden", false);
@@ -94,7 +104,7 @@
       // Send start
       $('#send').on('click', function() {
         var text = $('#text').val();
-        conn.send('msgall '+text);
+        conn.send(send_mode+' '+text);
         $('#text').val('').focus();
         return false;
       });
@@ -119,11 +129,29 @@
         }
       });
       // Command line end
+      $('#user_list').on('dblclick', function() {
+        var list = document.getElementById("user_list");
+        index = list.options.selectedIndex;
+        if (index >= 0)
+        {
+          value = list.options[index].value;
+          if (value == 'all'){
+            send_mode = 'msgall';
+          }
+          else{
+            send_mode = 'msg '+value;
+          }
+        }
+        else{
+          send_mode = 'msgall';
+        }
+        return false;
+      });
     });
    </script>
 </head>
 <body>
-<h3><span id="chat_version">{{version}}</span></h3>
+<h3><img id="status" width=15 height=15> <span id="chat_version">{{version}}</span></h3>
 <div>
     <div>Command Line
       <form id="cmdform" onsubmit="return false;">
@@ -137,7 +165,6 @@
       </select>
     </div>
     <br>
-    <div>Status: <span id="status">disconnected</span></div>
     <div>Name:<span hidden=true id="name"></span>
     <form id="loginform" onsubmit="return false;">
         <input style="width:15em" id="field_name" type="text"/>
