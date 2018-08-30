@@ -107,7 +107,8 @@ class ChatKernel:
         if self.get_connection_by_name(username) is not None:
             message = self.pack_message.chat_message(username=sender, message=message, private=True, target=username)
             return message
-        return -12
+        else:
+            return -1
 
     def send_all_messaging(self, connection, message):
         sender = self.get_name_by_connection(connection)
