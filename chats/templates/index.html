@@ -8,13 +8,26 @@
     $(function() {
       var conn = null;
       var login_status = false;
-      var send_mode = 'msgall';
+      var send_mode = null;
       update_ui();
       $('#field_name').val('').focus();
       function log(msg) {
         var control = $('#log');
         control.html(control.html() + msg + '<br/>');
         control.scrollTop(control.scrollTop() + 1000);
+      }
+      function set_send_mode() {
+        var list = document.getElementById("user_list");
+        index = list.options.selectedIndex;
+        if (index == -1){
+          index = 0;
+        }
+        if (index >= 0)
+        {
+          option = list.options[index];
+          send_mode = option.value;
+          $('#target').text(option.text);
+        }
       }
       function connect() {
         disconnect();
@@ -46,16 +59,24 @@
             $('#user_list').empty();
             $('#user_list').append($('<option>',
             {
-              value: 'all',
+              value: 'msgall ',
               text: 'All'
+            }));
+            $('#user_list').append($('<option>',
+            {
+              value: '',
+              text: 'Clear data'
             }));
             for (i in data.message)
             {
               $('#user_list').append($('<option>',
               {
-                value: data.message[i],
+                value: 'msg '+data.message[i]+' ',
                 text: data.message[i]
               }));
+            }
+            if (send_mode == null){
+              set_send_mode();
             }
             break;
           }
@@ -76,14 +97,14 @@
       function update_ui() {
         if (login_status == false) {
           $('#status').prop("src", 'http://3d-zambia.chordsrt.com/assets/button_red_50-0e9cba6bd7edd35e3a03f351748610225ed9c3d6208b6a705973d314014fe8da.png');
-          $('#connect').prop("value", 'Login');
+          $('#connect').prop("src", 'http://mebeldes.nashko.ru/sites/default/files/images/disign/possible/all-on_0.png');
           $('#send').prop("disabled", true);
           $('#name').prop("hidden", true);
           $('#field_name').prop("hidden", false);
-          $('#field_name').val('').focus();
+          $('#field_name').val(name).focus();
         } else {
           $('#status').prop("src", 'http://www.clker.com/cliparts/4/t/n/Q/b/d/green-glossy-icon-th.png');
-          $('#connect').prop("value", 'Logout');
+          $('#connect').prop("src", 'https://kusnendiblog.files.wordpress.com/2010/11/shutdown-48.png');
           $('#send').prop("disabled", false);
           $('#name').prop("hidden", false);
           $('#field_name').prop("hidden", true);
@@ -114,10 +135,16 @@
       // Send start
       $('#send').on('click', function() {
         var text = $('#text').val();
-        conn.send(send_mode+' '+text);
+        conn.send(send_mode+text);
         $('#text').val('').focus();
         return false;
       });
+      $('#text').on('keydown', function( e ) {
+  if( e.keyCode === 13 ) {
+    e.preventDefault();
+    whenEnterPressed();
+  }
+});
       $('#text').on('keyup', function(e) {
         if (e.keyCode === 13) {
           $('#send').click();
@@ -125,36 +152,8 @@
         }
       });
      // Send end
-     // Command line start
-      $('#cmd_btn').on('click', function() {
-        var cmd = $('#cmd_line').val();
-        conn.send(cmd);
-        $('#cmd_line').val('').focus();
-        return false;
-      });
-      $('#cmd_line').on('keyup', function(e) {
-        if (e.keyCode === 13) {
-          $('#cmd_btn').click();
-          return false;
-        }
-      });
-      // Command line end
       $('#user_list').on('dblclick', function() {
-        var list = document.getElementById("user_list");
-        index = list.options.selectedIndex;
-        if (index >= 0)
-        {
-          value = list.options[index].value;
-          if (value == 'all'){
-            send_mode = 'msgall';
-          }
-          else{
-            send_mode = 'msg '+value;
-          }
-        }
-        else{
-          send_mode = 'msgall';
-        }
+          set_send_mode();
         return false;
       });
     });
@@ -162,32 +161,22 @@
 </head>
 <body>
 <h3><img id="status" width=15 height=15> <span id="chat_version">{{version}}</span></h3>
-<div>
-    <div>Command Line
-      <form id="cmdform" onsubmit="return false;">
-          <input style="width:20em" id="cmd_line" type="text"/>
-          <input id="cmd_btn" type="button" value="SEND">
-      </form>
-    </div>
-    <br>
-    <div>
-      <select size=5 style="width:20em" id="user_list">
-      </select>
-    </div>
-    <br>
-    <div>Name:<span hidden=true id="name"></span>
-    <form id="loginform" onsubmit="return false;">
-        <input style="width:15em" id="field_name" type="text"/>
-        <input id="connect" type="button" value="Login">
-    </form>
-    </div>
-</div>
-<div id="log"
-     style="width:20em;height:15em;overflow:auto;border:1px solid black">
-</div>
-<form id="chatform" onsubmit="return false;">
-    <input id="text" type="text"/>
-    <input id="send" type="button" value="Send" disabled/>
+<form id="loginform" onsubmit="return false;">
+      <div>Name: <span hidden=true id="name"></span>
+        <input style="width:10em" id="field_name" type="text"/>
+        <img id="connect" width="30" height="30">
+      </div>
 </form>
+<br>
+<div>Userlist:</div>
+<select size=5 style="width:25em" id="user_list"></select>
+<br>
+Chat:
+<div id="log"
+     style="width:20em;height:15em;overflow:auto;border:3px double gray">
+</div>
+    <div>Send to: <span id='target'></span></div>
+    <textarea id="text" style="width:20em; height:3em"></textarea>
+    <input id="send" type="button" value="Send" disabled/>
 </body>
 </html>
