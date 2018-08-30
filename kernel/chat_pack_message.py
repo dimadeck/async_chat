@@ -34,9 +34,10 @@ class PackMessage:
         mess = Color.color_engine(mess, self.color_mode)
         return mess
 
-    def chat_message(self, username, message, private=False):
-        private_sym = '[*]' if private else ''
-        mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{DELIMETER_CHAT}{message}'
+    def chat_message(self, username, message, private=False, target=None):
+        private_sym = '[->]' if private else ''
+        target = f'[{target}]' if target is not None else ''
+        mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{target}{DELIMETER_CHAT}{message}'
         mess = Color.color_engine(mess, self.color_mode)
         return mess
 
