@@ -56,7 +56,7 @@ class ChatKernel(CK):
         state = await protocol.engine(req_dict.cmd)
         if state == 0:
             if self.outside_request is not None:
-                self.outside_request(req_dict, connection)
+                await self.outside_request(req_dict, connection)
         return state
 
     async def logout_engine(self, connection):
@@ -64,7 +64,7 @@ class ChatKernel(CK):
         if username != 0:
             message = self.logout_messaging(username)
             if self.outside_request is not None:
-                self.outside_request(self.kostil, connection)
+                await self.outside_request(self.kostil, connection)
             await self.send_all(message)
             await self.logout(connection)
             return -1
