@@ -4,17 +4,23 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
+    async def send(self, connection, message):
+        try:
+            await self.send_message(connection, message)
+        except:
+            pass
+
     async def send_error(self, connection, error_mode, mess=None, username=None):
         message = self.pack_message.system_error(error_mode, message=mess, username=username)
-        await self.send_message(connection, message)
+        await self.send(connection, message)
 
     async def send_info(self, connection, info_mode, clear_data):
         message = self.prepare_info(connection, info_mode, clear_data)
-        await self.send_message(connection, message)
+        await self.send(connection, message)
 
     async def send_all(self, message):
         for user in self.get_users():
-            await self.send_message(user, message)
+            await self.send(user, message)
 
     async def logout(self, connection):
         await self.close_connection(connection)
@@ -28,26 +34,23 @@ class ChatKernel(CK):
             if cmd == 'msg':
                 user = self.get_connection_by_name(req_dict.parameter)
                 if user in self.get_connections_by_version():
-                    await self.send_message(user, protocol.engine(cmd))
+                    await self.send(user, protocol.engine(cmd))
             else:
                 await self.send_all(protocol.engine(cmd))
 
     async def engine(self, request, writer, addr):
-        if len(request) > 0:
-            if self.add_connection(writer) == 0:
-                print(self.pack_message.server_message('new', addr=addr))
-            req_dict = DataParser(request, strip=self.parse_strip)
-            if req_dict.status == 0:
+        if not request:
+            await self.logout_engine(writer)
+            return -1
+        else:
+            req_dict = self.validate_request(request, writer, addr)
+            if type(req_dict) == DataParser:
                 if self.outside_request is not None:
                     await self.outside_request(req_dict, writer)
                 return await self.run_command(req_dict, writer)
             else:
-                message = self.pack_message.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])
-                await self.send_message(writer, message)
-        elif not request:
-            await self.logout_engine(writer)
-            return -1
-        return 0
+                await self.send_error(writer, 'bad_request', mess=req_dict)
+            return 0
 
     async def run_command(self, req_dict, connection):
         methods = self.prepare_run(req_dict, connection)
@@ -73,11 +76,8 @@ class ChatKernel(CK):
         message = self.send_message_messaging(connection, username, message)
         if message != -1:
             user = self.get_connection_by_name(username)
-            try:
-                await self.send_message(user, message)
-            except:
-                pass
-            await self.send_message(connection, message)
+            await self.send(user, message)
+            await self.send(connection, message)
         else:
             await self.send_error(connection, 'not_found', username=username)
 
