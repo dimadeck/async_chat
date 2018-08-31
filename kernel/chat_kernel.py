@@ -17,6 +17,7 @@ class ChatKernel:
         self.pack_message = PackMessage(version=self.version)
         self.connections.add_version_header(self.version)
         print(self.pack_message.server_message('start', port=setup['port']))
+        self.kostil = DataParser(b'logout', strip='')
 
     @staticmethod
     def init_connection_list(connections):
@@ -185,18 +186,19 @@ class ChatKernel:
         methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
         state = protocol.engine(req_dict.cmd)
-        if state in [-1, 0]:
+        if state == 0:
             if self.outside_request is not None:
                 self.outside_request(req_dict, connection)
-            if state == -1:
-                self.logout(connection)
         return state
 
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
             message = self.logout_messaging(username)
+            if self.outside_request is not None:
+                self.outside_request(self.kostil, connection)
             self.send_all(message)
+            self.logout(connection)
             return -1
 
     def login_engine(self, connection, username):
