@@ -20,7 +20,8 @@ class EchoServer(TCPServer):
             except:
                 self.chat.logout_engine(stream)
                 break
-            if self.chat.engine(data, stream, address) == -1:
+            request = data.decode('utf-8').strip('\r\n')
+            if self.chat.engine(request, stream, address) == -1:
                 break
 
 

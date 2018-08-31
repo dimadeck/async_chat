@@ -14,7 +14,8 @@ class MainHandler(tornado.web.RequestHandler):
 class WebSocket(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         message = bytes(message, encoding='utf-8')
-        self.application.chat.engine(message, self, 'None')
+        request = message.decode('utf-8').strip('')
+        self.application.chat.engine(request, self, 'None')
 
     def on_close(self, message=None):
         self.application.chat.logout_engine(self)

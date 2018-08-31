@@ -27,7 +27,8 @@ class TwistedWsProtocol(WebSocketServerProtocol):
         print('open')
 
     def onMessage(self, payload, isBinary):
-        self.chat.engine(payload, self, 'None')
+        request = payload.decode('utf-8').strip('')
+        self.chat.engine(request, self, 'None')
 
     def connectionLost(self, reason):
         print('lost')

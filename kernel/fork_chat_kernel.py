@@ -64,7 +64,7 @@ class ChatKernel(CK):
         if username != 0:
             message = self.logout_messaging(username)
             if self.outside_request is not None:
-                await self.outside_request(self.kostil, connection)
+                await self.outside_request(DataParser('logout'), connection)
             await self.send_all(message)
             await self.logout(connection)
             return -1

@@ -7,7 +7,6 @@ from kernel.data_parser import DataParser
 class ChatKernel:
     def __init__(self, setup):
         self.connections = self.init_connection_list(setup['connections'])
-        self.parse_strip = setup['parse_strip']
         self.outside_request = None
         if setup['method_send_message'] is not None:
             self.send_message = setup['method_send_message']
@@ -17,7 +16,6 @@ class ChatKernel:
         self.pack_message = PackMessage(version=self.version)
         self.connections.add_version_header(self.version)
         print(self.pack_message.server_message('start', port=setup['port']))
-        self.kostil = DataParser(b'logout', strip='')
 
     @staticmethod
     def init_connection_list(connections):
@@ -137,7 +135,7 @@ class ChatKernel:
     def validate_request(self, request, connection, addr):
         if self.add_connection(connection) == 0:
             print(self.pack_message.server_message('new', addr=addr))
-        req_dict = DataParser(request, strip=self.parse_strip)
+        req_dict = DataParser(request)
         if req_dict.status == 0:
             return req_dict
         else:
@@ -203,7 +201,7 @@ class ChatKernel:
         if username != 0:
             message = self.logout_messaging(username)
             if self.outside_request is not None:
-                self.outside_request(self.kostil, connection)
+                self.outside_request(DataParser('logout'), connection)
             self.send_all(message)
             self.logout(connection)
             return -1

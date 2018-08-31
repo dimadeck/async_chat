@@ -11,7 +11,8 @@ class Chat(LineReceiver):
         self.addr = addr
 
     def lineReceived(self, line):
-        if self.chat.engine(line, self, self.addr) == -1:
+        request = line.decode('utf-8').strip('')
+        if self.chat.engine(request, self, self.addr) == -1:
             self.chat.logout_engine(self)
 
     def connectionLost(self, reason=None):

@@ -13,6 +13,7 @@ class AsyncioChat:
         while True:
             request = (await reader.read(1024))
             addr = writer.get_extra_info('peername')
+            request = request.decode('utf-8').strip('\r\n')
             if await self.chat.engine(request, writer, addr) == -1:
                 break
 

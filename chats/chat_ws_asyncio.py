@@ -32,7 +32,8 @@ class AioChat:
             else:
                 msg = bytes(msg.data, encoding='utf-8')
                 addr = request.transport.get_extra_info('peername')
-                if await self.chat.engine(msg, ws_current, addr) == -1:
+                req = msg.decode('utf-8').strip('')
+                if await self.chat.engine(req, ws_current, addr) == -1:
                     break
         return ws_current
 

@@ -77,11 +77,9 @@ close_connection_dict = {VERSION_AS: as_close_connection, VERSION_TOR: tor_close
 
 
 def get_setup_dict(connections, version, port):
-    setup_dict = {'connections': connections, 'version': version, 'port': port, 'parse_strip': ''}
-    if version == VERSION_AS or version == VERSION_TOR:
-        setup_dict['parse_strip'] = '\r\n'
-    setup_dict['method_send_message'] = send_mess_dict[version]
-    setup_dict['method_close_connection'] = close_connection_dict[version]
+    setup_dict = {'connections': connections, 'version': version, 'port': port,
+                  'method_send_message': send_mess_dict[version],
+                  'method_close_connection': close_connection_dict[version]}
 
     return setup_dict
 
