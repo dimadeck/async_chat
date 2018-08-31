@@ -37,8 +37,8 @@ class Connected:
         return connection in self.users
 
     def get_connection(self, username):
-        for connection in self.connections_list:
-            if username == self.users[connection]:
+        for connection, user in self.users.items():
+            if user == username:
                 return connection
         return None
 
