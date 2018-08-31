@@ -27,6 +27,7 @@
           option = list.options[index];
           send_mode = option.value;
           $('#target').text(option.text);
+          $('#text').focus();
         }
       }
       function connect() {
@@ -176,7 +177,7 @@ Chat:
      style="width:20em;height:15em;overflow:auto;border:3px double gray">
 </div>
     <div>Send to: <span id='target'></span></div>
-    <textarea id="text" style="width:20em; height:3em"></textarea>
-    <input id="send" type="button" value="Send" disabled/>
+    <textarea id="text" style="width:25em; height:3em"></textarea>
+    <input hidden=true id="send" type="button" value="Send" disabled/>
 </body>
 </html>
