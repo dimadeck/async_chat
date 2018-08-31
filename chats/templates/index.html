@@ -2,6 +2,9 @@
 <meta charset="utf-8"/>
 <html>
 <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
     </script>
     <script language="javascript" type="text/javascript">
@@ -161,23 +164,34 @@
    </script>
 </head>
 <body>
-<h3><img id="status" width=15 height=15> <span id="chat_version">{{version}}</span></h3>
-<form id="loginform" onsubmit="return false;">
-      <div>Name: <span hidden=true id="name"></span>
-        <input style="width:10em" id="field_name" type="text"/>
+<br>
+<h3 class="d-flex justify-content-center"><img id="status" width=15 height=15> <span
+        id="chat_version">{{version}}</span></h3>
+<br>
+<form class="d-flex justify-content-center" id="loginform" onsubmit="return false;">
+    <div>Name: <span hidden=true id="name"></span>
+        <input id="field_name" type="text"/>
         <img id="connect" width="30" height="30">
-      </div>
+    </div>
 </form>
 <br>
-<div>Userlist:</div>
-<select size=5 style="width:25em" id="user_list"></select>
-<br>
-Chat:
-<div id="log"
-     style="width:20em;height:15em;overflow:auto;border:3px double gray">
+<div class="row justify-content-center">
+    <div class="col col-3">
+        <div class="container">
+            <div>Userlist:</div>
+            <select class="container" size="15" id="user_list"></select>
+        </div>
+    </div>
+    <br>
+    <div class="col col-9">
+        <div class="container">
+            Chat:
+            <div id="log" style="min-width:20em;min-height:15em;overflow:auto;border:3px double gray"></div>
+            <div>Send to: <span id='target'></span></div>
+            <textarea class="container" style="min-height:4em" id="text"></textarea>
+            <input hidden=true id="send" type="button" value="Send" disabled/>
+        </div>
+    </div>
 </div>
-    <div>Send to: <span id='target'></span></div>
-    <textarea id="text" style="width:25em; height:3em"></textarea>
-    <input hidden=true id="send" type="button" value="Send" disabled/>
 </body>
 </html>
