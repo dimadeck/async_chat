@@ -31,9 +31,6 @@ class ChatKernel:
     def get_connections(self):
         return self.connections.get_connections()
 
-    def clear_connections(self):
-        self.connections.clear_all()
-
     def get_users(self):
         return self.connections.get_users(self.version)
 
@@ -57,17 +54,18 @@ class ChatKernel:
 
     def prepare_outside(self, req_dict, connection):
         cmd = req_dict.cmd
-        param = req_dict.parameter
-        body = req_dict.body
-        message = ' '.join(req_dict.body) if body is not None else None
-        username = self.get_name_by_connection(connection)
-        methods = {'login': (self.login_messaging, {'username': param}),
-                   'logout': (self.logout_messaging, {'username': username}),
-                   'msg': (
-                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
-                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
-                   }
         if cmd in ['login', 'logout', 'msg', 'msgall']:
+            param = req_dict.parameter
+            body = req_dict.body
+            message = ' '.join(req_dict.body) if body is not None else None
+            username = self.get_name_by_connection(connection)
+            methods = {'login': (self.login_messaging, {'username': param}),
+                       'logout': (self.logout_messaging, {'username': username}),
+                       'msg': (
+                           self.send_message_messaging,
+                           {'connection': connection, 'username': param, 'message': message}),
+                       'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
+                       }
             return methods
         else:
             return -1
@@ -128,17 +126,32 @@ class ChatKernel:
             message = self.pack_message.system_info(info_set[info_mode], clear_data)
         return message
 
+    def validate_request(self, request, connection, addr):
+        if self.add_connection(connection) == 0:
+            print(self.pack_message.server_message('new', addr=addr))
+        req_dict = DataParser(request, strip=self.parse_strip)
+        if req_dict.status == 0:
+            return req_dict
+        else:
+            return req_dict.STATUS_DICT[req_dict.status]
+
+    def send(self, connection, message):
+        try:
+            self.send_message(connection, message)
+        except:
+            pass
+
     def send_error(self, connection, error_mode, mess=None, username=None):
         message = self.pack_message.system_error(error_mode, message=mess, username=username)
-        self.send_message(connection, message)
+        self.send(connection, message)
 
     def send_info(self, connection, info_mode, clear_data):
         message = self.prepare_info(connection, info_mode, clear_data)
-        self.send_message(connection, message)
+        self.send(connection, message)
 
     def send_all(self, message):
         for user in self.get_users():
-            self.send_message(user, message)
+            self.send(user, message)
 
     def logout(self, connection):
         self.close_connection(connection)
@@ -152,26 +165,23 @@ class ChatKernel:
             if cmd == 'msg':
                 user = self.get_connection_by_name(req_dict.parameter)
                 if user in self.get_connections_by_version():
-                    self.send_message(user, protocol.engine(cmd))
+                    self.send(user, protocol.engine(cmd))
             else:
                 self.send_all(protocol.engine(cmd))
 
     def engine(self, request, writer, addr):
-        if len(request) > 0:
-            if self.add_connection(writer) == 0:
-                print(self.pack_message.server_message('new', addr=addr))
-            req_dict = DataParser(request, strip=self.parse_strip)
-            if req_dict.status == 0:
+        if not request:
+            self.logout_engine(writer)
+            return -1
+        else:
+            req_dict = self.validate_request(request, writer, addr)
+            if type(req_dict) == DataParser:
                 if self.outside_request is not None:
                     self.outside_request(req_dict, writer)
                 return self.run_command(req_dict, writer)
             else:
-                message = self.pack_message.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])
-                self.send_message(writer, message)
-        elif not request:
-            self.logout_engine(writer)
-            return -1
-        return 0
+                self.send_error(writer, 'bad_request', mess=req_dict)
+            return 0
 
     def run_command(self, req_dict, connection):
         methods = self.prepare_run(req_dict, connection)
@@ -197,11 +207,8 @@ class ChatKernel:
         message = self.send_message_messaging(connection, username, message)
         if message != -1:
             user = self.get_connection_by_name(username)
-            try:
-                self.send_message(user, message)
-            except:
-                pass
-            self.send_message(connection, message)
+            self.send(user, message)
+            self.send(connection, message)
         else:
             self.send_error(connection, 'not_found', username=username)
 
