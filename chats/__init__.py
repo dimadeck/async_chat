@@ -9,7 +9,7 @@ VERSION_TOR_WS = 'Tornado_WS_Chat'
 
 
 async def as_send_message(connection, message):
-    connection.write(bytes(f'{message}\n', 'utf-8'))
+    await connection.write(bytes(f'{message}\n', 'utf-8'))
 
 
 def tw_send_message(connection, message):
