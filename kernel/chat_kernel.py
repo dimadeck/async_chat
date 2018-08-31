@@ -78,18 +78,20 @@ class ChatKernel:
         message = ' '.join(req_dict.body) if body is not None else None
 
         if self.is_register(connection):
-            methods = {'login': (self.error_alredy_login, {'connection': connection}),
+            methods = {'login': (self.send_error, {'connection': connection, 'error_mode': 'already_login'}),
                        'logout': (self.logout_engine, {'connection': connection}),
                        'msg': (
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
                        'debug': (self.debug_engine, {}),
-                       'whoami': (self.whoami_engine, {'connection': connection, 'clear_data': req_dict.clear_data}),
-                       'userlist': (self.userlist_engine, {'connection': connection, 'clear_data': req_dict.clear_data})
+                       'whoami': (self.send_info,
+                                  {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
+                       'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
+                                                           'clear_data': req_dict.clear_data})
                        }
         else:
             methods = {'login': (self.login_engine, {'connection': connection, 'username': param}),
-                       'empty': (self.error_first_login, {'connection': connection})}
+                       'empty': (self.send_error, {'connection': connection, 'error_mode': 'first_login'})}
         return methods
 
     def login_messaging(self, username):
@@ -157,6 +159,21 @@ class ChatKernel:
         protocol = ChatProtocol(**methods)
         return protocol.engine(req_dict.cmd)
 
+    def send_error(self, connection, error_mode, mess=None, username=None):
+        message = self.pack_message.system_error(error_mode, message=mess, username=username)
+        self.send_message(connection, message)
+
+    def send_info(self, connection, info_mode, clear_data):
+        if clear_data and 'WS' in self.version:
+            info_set = {'whoami': self.get_name_by_connection(connection),
+                        'userlist': self.get_username_list()}
+            message = info_set[info_mode]
+        else:
+            info_set = {'whoami': self.get_name_by_connection(connection),
+                        'userlist': ', '.join(self.get_username_list())}
+            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        self.send_message(connection, message)
+
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
@@ -170,16 +187,7 @@ class ChatKernel:
             message = self.login_messaging(username)
             self.send_all(message)
         else:
-            message = self.pack_message.system_error('user_exist')
-            self.send_message(connection, message)
-
-    def error_alredy_login(self, connection):
-        message = self.pack_message.system_error('already_login')
-        self.send_message(connection, message)
-
-    def error_first_login(self, connection):
-        message = self.pack_message.system_error('first_login')
-        self.send_message(connection, message)
+            self.send_error(connection, 'user_exist')
 
     def send_message_engine(self, connection, username, message):
         message = self.send_message_messaging(connection, username, message)
@@ -191,8 +199,7 @@ class ChatKernel:
                 pass
             self.send_message(connection, message)
         else:
-            message = self.pack_message.system_error('not_found', username=username)
-            self.send_message(connection, message)
+            self.send_error(connection, 'not_found', username=username)
 
     def send_all_engine(self, connection, message):
         message = self.send_all_messaging(connection, message)
@@ -204,15 +211,3 @@ class ChatKernel:
 
         print(self.pack_message.message(connections))
         print(self.pack_message.message(userlist))
-
-    def whoami_engine(self, connection, clear_data):
-        username = self.get_name_by_connection(connection)
-        message = self.pack_message.system_info(username, clear_data)
-        self.send_message(connection, message)
-
-    def userlist_engine(self, connection, clear_data):
-        userlist = ', '.join(self.get_username_list())
-        message = self.pack_message.system_info(userlist, clear_data)
-        if 'WS' in self.version and clear_data:
-            message = message.split(sep=', ')
-        self.send_message(connection, message)
