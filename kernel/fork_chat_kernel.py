@@ -45,8 +45,6 @@ class ChatKernel(CK):
         else:
             req_dict = self.validate_request(request, writer, addr)
             if type(req_dict) == DataParser:
-                if self.outside_request is not None:
-                    await self.outside_request(req_dict, writer)
                 return await self.run_command(req_dict, writer)
             else:
                 await self.send_error(writer, 'bad_request', mess=req_dict)
@@ -55,22 +53,30 @@ class ChatKernel(CK):
     async def run_command(self, req_dict, connection):
         methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
-        return await protocol.engine(req_dict.cmd)
+        state = await protocol.engine(req_dict.cmd)
+        if state == 0:
+            if self.outside_request is not None:
+                self.outside_request(req_dict, connection)
+        return state
 
     async def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)
         if username != 0:
             message = self.logout_messaging(username)
-            await self.logout(connection)
+            if self.outside_request is not None:
+                self.outside_request(self.kostil, connection)
             await self.send_all(message)
+            await self.logout(connection)
             return -1
 
     async def login_engine(self, connection, username):
         if self.login(connection, username) == 0:
             message = self.login_messaging(username)
             await self.send_all(message)
+            return 0
         else:
             await self.send_error(connection, 'user_exist')
+            return -10
 
     async def send_message_engine(self, connection, username, message):
         message = self.send_message_messaging(connection, username, message)
@@ -78,16 +84,15 @@ class ChatKernel(CK):
             user = self.get_connection_by_name(username)
             await self.send(user, message)
             await self.send(connection, message)
+            return 0
         else:
             await self.send_error(connection, 'not_found', username=username)
+            return -10
 
     async def send_all_engine(self, connection, message):
         message = self.send_all_messaging(connection, message)
         await self.send_all(message)
+        return 0
 
     async def debug_engine(self):
-        connections = self.get_connections()
-        userlist = self.get_users()
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
+        self.prepare_debug()

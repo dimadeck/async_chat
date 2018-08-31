@@ -127,6 +127,13 @@ class ChatKernel:
             message = self.pack_message.system_info(info_set[info_mode], clear_data)
         return message
 
+    def prepare_debug(self):
+        connections = self.get_connections()
+        userlist = self.get_users()
+
+        print(self.pack_message.message(connections))
+        print(self.pack_message.message(userlist))
+
     def validate_request(self, request, connection, addr):
         if self.add_connection(connection) == 0:
             print(self.pack_message.server_message('new', addr=addr))
@@ -227,8 +234,4 @@ class ChatKernel:
         return 0
 
     def debug_engine(self):
-        connections = self.get_connections()
-        userlist = self.get_users()
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
+        self.prepare_debug()
