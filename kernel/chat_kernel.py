@@ -87,7 +87,7 @@ class ChatKernel:
                        'whoami': (self.send_info,
                                   {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
                        'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
-                                                           'clear_data': req_dict.clear_data})
+                                                     'clear_data': req_dict.clear_data})
                        }
         else:
             methods = {'login': (self.login_engine, {'connection': connection, 'username': param}),
@@ -116,6 +116,25 @@ class ChatKernel:
         sender = self.get_name_by_connection(connection)
         message = self.pack_message.chat_message(username=sender, message=message)
         return message
+
+    def prepare_info(self, connection, info_mode, clear_data):
+        if clear_data and 'WS' in self.version:
+            info_set = {'whoami': self.get_name_by_connection(connection),
+                        'userlist': self.get_username_list()}
+            message = info_set[info_mode]
+        else:
+            info_set = {'whoami': self.get_name_by_connection(connection),
+                        'userlist': ', '.join(self.get_username_list())}
+            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        return message
+
+    def send_error(self, connection, error_mode, mess=None, username=None):
+        message = self.pack_message.system_error(error_mode, message=mess, username=username)
+        self.send_message(connection, message)
+
+    def send_info(self, connection, info_mode, clear_data):
+        message = self.prepare_info(connection, info_mode, clear_data)
+        self.send_message(connection, message)
 
     def send_all(self, message):
         for user in self.get_users():
@@ -158,21 +177,6 @@ class ChatKernel:
         methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
         return protocol.engine(req_dict.cmd)
-
-    def send_error(self, connection, error_mode, mess=None, username=None):
-        message = self.pack_message.system_error(error_mode, message=mess, username=username)
-        self.send_message(connection, message)
-
-    def send_info(self, connection, info_mode, clear_data):
-        if clear_data and 'WS' in self.version:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': self.get_username_list()}
-            message = info_set[info_mode]
-        else:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': ', '.join(self.get_username_list())}
-            message = self.pack_message.system_info(info_set[info_mode], clear_data)
-        self.send_message(connection, message)
 
     def logout_engine(self, connection):
         username = self.get_name_by_connection(connection)

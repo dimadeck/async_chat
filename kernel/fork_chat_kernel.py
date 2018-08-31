@@ -4,6 +4,14 @@ from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
+    async def send_error(self, connection, error_mode, mess=None, username=None):
+        message = self.pack_message.system_error(error_mode, message=mess, username=username)
+        await self.send_message(connection, message)
+
+    async def send_info(self, connection, info_mode, clear_data):
+        message = self.prepare_info(connection, info_mode, clear_data)
+        await self.send_message(connection, message)
+
     async def send_all(self, message):
         for user in self.get_users():
             await self.send_message(user, message)
@@ -59,20 +67,11 @@ class ChatKernel(CK):
             message = self.login_messaging(username)
             await self.send_all(message)
         else:
-            message = self.pack_message.system_error('user_exist')
-            await self.send_message(connection, message)
-
-    async def error_alredy_login(self, connection):
-        message = self.pack_message.system_error('already_login')
-        await self.send_message(connection, message)
-
-    async def error_first_login(self, connection):
-        message = self.pack_message.system_error('first_login')
-        await self.send_message(connection, message)
+            await self.send_error(connection, 'user_exist')
 
     async def send_message_engine(self, connection, username, message):
         message = self.send_message_messaging(connection, username, message)
-        if message != -12:
+        if message != -1:
             user = self.get_connection_by_name(username)
             try:
                 await self.send_message(user, message)
@@ -80,8 +79,7 @@ class ChatKernel(CK):
                 pass
             await self.send_message(connection, message)
         else:
-            message = self.pack_message.system_error('not_found', username=username)
-            await self.send_message(connection, message)
+            await self.send_error(connection, 'not_found', username=username)
 
     async def send_all_engine(self, connection, message):
         message = self.send_all_messaging(connection, message)
@@ -93,15 +91,3 @@ class ChatKernel(CK):
 
         print(self.pack_message.message(connections))
         print(self.pack_message.message(userlist))
-
-    async def whoami_engine(self, connection, clear_data):
-        username = self.get_name_by_connection(connection)
-        message = self.pack_message.system_info(username, clear_data)
-        await self.send_message(connection, message)
-
-    async def userlist_engine(self, connection, clear_data):
-        userlist = ', '.join(self.get_username_list())
-        message = self.pack_message.system_info(userlist, clear_data)
-        if 'WS' in self.version and clear_data:
-            message = message.split(sep=', ')
-        await self.send_message(connection, message)
