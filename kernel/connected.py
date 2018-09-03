@@ -22,7 +22,7 @@ class Connected:
         return connection in self.connections_list
 
     def is_valid_name(self, username):
-        if username in self.users.values():
+        if username in self.users.values() or username == '':
             return -1
         else:
             return 0
