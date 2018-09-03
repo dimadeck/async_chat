@@ -9,6 +9,11 @@
         source env/bin/activate
         pip install -r requirements.txt
 
+## UPDATE [03.09.18]: ##
+    Обновлен внешний вид страницы WS-чата
+    
+![alt text](readme_img/new_template_0309.png)
+
 ## UPDATE [31.08.18]: ##
     
     Исправлены ошибки отправки информации "соседнему" серверу. Оптимизирован код ChatKernel, 
