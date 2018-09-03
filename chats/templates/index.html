@@ -165,6 +165,17 @@
       });
     });
    </script>
+    <style>
+ body, .navbar {
+    background: url(http://arenda-uds114.ru/wp-content/uploads/2018/05/os-x-apple-canvas-trxture.jpg);
+    background-size: 100%;}
+.log {
+        background: url(https://img.as-creation.com/app/items/s/873422.jpg);}
+.text {
+    color: white;
+}
+
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -186,16 +197,16 @@
 <div id="chat_viewport" class="container">
     <div class="row">
         <div class="col col-md-3 col-sm-3">
-            <div>Userlist:</div>
+            <div class="text">Userlist:</div>
             <select class="container" size=15 style="min-width:7em;height:50vh" id="user_list"></select>
     </div>
     <br>
         <div class="col col-md-9 col-sm-9">
         <div class="container">
-            Chat:
-            <div class="container" id="log"
+            <div class="text">Chat:</div>
+            <div class="container log" id="log"
                  style="min-width:20em;height:50vh;overflow:auto;border:3px double gray"></div>
-            <div>Send to: <span id='target'></span></div>
+            <div class="text">Send to: <span id='target'></span></div>
             <textarea class="container" style="min-height:4em" id="text"></textarea>
             <input hidden=true id="send" type="button" value="Send" disabled/>
         </div>
