@@ -30,7 +30,7 @@ class DataParser:
 
     def fill_list(self):
         try:
-            self.data_list = self.request.split(' ')
+            self.data_list = self.request.strip(' ').split(' ')
             return 0
         except:
             return -1
