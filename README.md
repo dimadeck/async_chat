@@ -12,7 +12,7 @@
 ## UPDATE [03.09.18]: ##
     Обновлен внешний вид страницы WS-чата
     
-![alt text](readme_img/new_template_0309.png)
+![alt text](readme_img/template_0309.png)
 
 ## UPDATE [31.08.18]: ##
     
