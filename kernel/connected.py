@@ -5,7 +5,8 @@ class Connected:
         self.users = {}
 
     def add_version_header(self, version):
-        self.connections[version] = []
+        if version not in self.connections:
+            self.connections[version] = []
 
     def add_connection(self, connection, version):
         if not self.is_exist_connection(connection):
@@ -15,11 +16,20 @@ class Connected:
         else:
             return -1
 
+    def get_connections_by_version(self, version):
+        return self.connections[version]
+
+    def get_version_by_connection(self, connection):
+        for version in self.connections:
+            if connection in self.connections[version]:
+                return version
+        return -1
+
     def is_exist_connection(self, connection):
         return connection in self.connections_list
 
     def is_valid_name(self, username):
-        if username in self.users.values():
+        if username in self.users.values() or username == '':
             return -1
         else:
             return 0
@@ -34,8 +44,8 @@ class Connected:
         return connection in self.users
 
     def get_connection(self, username):
-        for connection in self.connections_list:
-            if username == self.users[connection]:
+        for connection, user in self.users.items():
+            if user == username:
                 return connection
         return None
 
@@ -45,11 +55,12 @@ class Connected:
         except KeyError:
             return 0
 
-    def drop_connection(self, connection, version):
+    def drop_connection(self, connection):
         if self.is_register(connection):
             self.users.pop(connection)
         if connection in self.connections_list:
             self.connections_list.remove(connection)
+            version = self.get_version_by_connection(connection)
             self.connections[version].remove(connection)
 
     def get_username_list(self):
@@ -60,6 +71,12 @@ class Connected:
 
     def get_connections(self):
         return self.connections_list
+
+    def get_register_connections(self):
+        register_list = []
+        for connection in self.users:
+            register_list.append(connection)
+        return register_list
 
     def get_users(self, version):
         user_list = {}

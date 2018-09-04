@@ -1,214 +1,120 @@
 from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
-from kernel.connected import Connected
 from kernel.data_parser import DataParser
 
 
 class ChatKernel:
-    def __init__(self, setup):
-        self.connections = self.init_connection_list(setup['connections'])
-        self.parse_strip = setup['parse_strip']
-        self.outside_request = None
-        if setup['method_send_message'] is not None:
-            self.send_message = setup['method_send_message']
-        if setup['method_close_connection'] is not None:
-            self.close_connection = setup['method_close_connection']
-        self.version = setup['version']
+    def __init__(self, server, port, sender):
+        self.version = server.VERSION
         self.pack_message = PackMessage(version=self.version)
-        self.connections.add_version_header(self.version)
-        print(self.pack_message.server_message('start', port=setup['port']))
+        self.sender = sender
+        print(self.pack_message.server_message('start', port=port))
 
-    @staticmethod
-    def init_connection_list(connections):
-        return connections if connections is not None else Connected()
-
-    def set_outside_request(self, func):
-        self.outside_request = func
-
-    def send_all(self, message):
-        for user in self.get_users():
-            self.send_message(user, message)
-
-    def login(self, connection, username):
-        return self.connections.register_user(connection, username)
-
-    def logout(self, connection):
-        self.close_connection(connection)
-        self.connections.drop_connection(connection, self.version)
-
-    def add_connection(self, connection):
-        return self.connections.add_connection(connection, self.version)
-
-    def is_register(self, connection):
-        return self.connections.is_register(connection)
-
-    def get_connections(self):
-        return self.connections.get_connections()
-
-    def clear_connections(self):
-        self.connections.clear_all()
-
-    def get_users(self):
-        return self.connections.get_users(self.version)
-
-    def get_name_by_connection(self, connection):
-        return self.connections.get_name(connection)
-
-    def get_connection_by_name(self, username):
-        return self.connections.get_connection(username)
-
-    def get_username_list(self):
-        return self.connections.get_username_list()
-
-    def from_outside(self, req_dict, connection):
-        methods = self.prepare_outside(req_dict, connection)
-        if methods != -1:
-            cmd = req_dict.cmd
-            protocol = ChatProtocol(**methods)
-            if cmd == 'msg':
-                user = self.get_connection_by_name(req_dict.parameter)
-                if user in self.connections.connections[self.version]:
-                    self.send_message(user, protocol.engine(cmd))
-            else:
-                self.send_all(protocol.engine(cmd))
-
-    def prepare_outside(self, req_dict, connection):
-        cmd = req_dict.cmd
-        param = req_dict.parameter
-        body = req_dict.body
-        message = ' '.join(req_dict.body) if body is not None else None
-        username = self.get_name_by_connection(connection)
-        methods = {'login': (self.login_messaging, {'username': param}),
-                   'logout': (self.logout_messaging, {'username': username}),
-                   'msg': (
-                       self.send_message_messaging, {'connection': connection, 'username': param, 'message': message}),
-                   'msgall': (self.send_all_messaging, {'connection': connection, 'message': message}),
-                   }
-        if cmd in ['login', 'logout', 'msg', 'msgall']:
-            return methods
-        else:
-            return -1
-
-    def engine(self, request, writer, addr):
-        if len(request) > 0:
-            if self.add_connection(writer) == 0:
-                print(self.pack_message.server_message('new', addr=addr))
-            req_dict = DataParser(request, strip=self.parse_strip)
-            if req_dict.status == 0:
-                if self.outside_request is not None:
-                    self.outside_request(req_dict, writer)
-                return self.run_command(req_dict, writer)
-            else:
-                message = self.pack_message.system_error('bad_request', message=req_dict.STATUS_DICT[req_dict.status])
-                self.send_message(writer, message)
-        elif not request:
-            self.logout_engine(writer)
-            return -1
-        return 0
+    def add_server(self, server):
+        self.sender.add_server(server)
 
     def prepare_run(self, req_dict, connection):
         param = req_dict.parameter
         body = req_dict.body
         message = ' '.join(req_dict.body) if body is not None else None
 
-        if self.is_register(connection):
-            methods = {'login': (self.error_alredy_login, {'connection': connection}),
+        if self.sender.is_register(connection):
+            methods = {'login': (self.send_error, {'connection': connection, 'error_mode': 'already_login'}),
                        'logout': (self.logout_engine, {'connection': connection}),
                        'msg': (
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
-                       'debug': (self.debug_engine, {}),
-                       'whoami': (self.whoami_engine, {'connection': connection, 'clear_data': req_dict.clear_data}),
-                       'userlist': (self.userlist_engine, {'connection': connection, 'clear_data': req_dict.clear_data})
+                       'whoami': (self.send_info,
+                                  {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
+                       'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
+                                                     'clear_data': req_dict.clear_data})
                        }
         else:
             methods = {'login': (self.login_engine, {'connection': connection, 'username': param}),
-                       'empty': (self.error_first_login, {'connection': connection})}
+                       'empty': (self.send_error, {'connection': connection, 'error_mode': 'first_login'})}
         return methods
+
+    def prepare_message(self, mode, connection=None, username=None, message=None, info_mode=None, clear_data=None):
+        if mode == 'login':
+            print(self.pack_message.server_message('login', username=username))
+            message = self.pack_message.system_message('login', username=username)
+        elif mode == 'logout':
+            print(self.pack_message.server_message('logout', username=username))
+            message = self.pack_message.system_message('logout', username=username)
+        elif mode == 'send_message':
+            sender = self.sender.get_name_by_connection(connection)
+            if self.sender.get_connection_by_name(username) is not None:
+                message = self.pack_message.chat_message(username=sender, message=message,
+                                                         private=True, target=username)
+            else:
+                return -1
+        elif mode == 'send_message_all':
+            sender = self.sender.get_name_by_connection(connection)
+            message = self.pack_message.chat_message(username=sender, message=message)
+        elif mode == 'info':
+            info_set = {'whoami': self.sender.get_name_by_connection(connection),
+                        'userlist': self.sender.get_username_list()}
+            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        return message
+
+    def validate_request(self, request, connection, addr):
+        if self.sender.add_connection(connection, self.version) == 0:
+            print(self.pack_message.server_message('new', addr=addr))
+        req_dict = DataParser(request)
+        if req_dict.status == 0:
+            return req_dict
+        else:
+            return req_dict.STATUS_DICT[req_dict.status]
+
+    def send_error(self, connection, error_mode, mess=None, username=None):
+        message = self.pack_message.system_error(error_mode, message=mess, username=username)
+        self.sender.send(connection, message)
+
+    def send_info(self, connection, info_mode, clear_data):
+        message = self.prepare_message(mode='info', connection=connection, info_mode=info_mode, clear_data=clear_data)
+        self.sender.send(connection, message)
+
+    def engine(self, request, writer, addr):
+        if not request:
+            self.logout_engine(writer)
+            return -1
+        else:
+            req_dict = self.validate_request(request, writer, addr)
+            if type(req_dict) == DataParser:
+                return self.run_command(req_dict, writer)
+            else:
+                self.send_error(writer, 'bad_request', mess=req_dict)
+            return 0
 
     def run_command(self, req_dict, connection):
         methods = self.prepare_run(req_dict, connection)
         protocol = ChatProtocol(**methods)
-        return protocol.engine(req_dict.cmd)
-
-    def login_messaging(self, username):
-        print(self.pack_message.server_message('login', username=username))
-        message = self.pack_message.system_message('login', username=username)
-        return message
-
-    def logout_messaging(self, username):
-        message = self.pack_message.system_message('logout', username=username)
-        print(self.pack_message.server_message('logout', username=username))
-        return message
-
-    def send_message_messaging(self, connection, username, message):
-        sender = self.get_name_by_connection(connection)
-        if self.get_connection_by_name(username) is not None:
-            message = self.pack_message.chat_message(username=sender, message=message, private=True)
-            return message
-        return -12
-
-    def send_all_messaging(self, connection, message):
-        sender = self.get_name_by_connection(connection)
-        message = self.pack_message.chat_message(username=sender, message=message)
-        return message
-
-    def logout_engine(self, connection):
-        username = self.get_name_by_connection(connection)
-        if username != 0:
-            message = self.logout_messaging(username)
-            self.logout(connection)
-            self.send_all(message)
-            return -1
+        state = protocol.engine(req_dict.cmd)
+        return state
 
     def login_engine(self, connection, username):
-        if self.login(connection, username) == 0:
-            message = self.login_messaging(username)
-            self.send_all(message)
+        if self.sender.login(connection, username) == 0:
+            message = self.prepare_message(mode='login', username=username)
+            self.sender.send_all(message)
         else:
-            message = self.pack_message.system_error('user_exist')
-            self.send_message(connection, message)
+            self.send_error(connection, 'user_exist')
 
-    def error_alredy_login(self, connection):
-        message = self.pack_message.system_error('already_login')
-        self.send_message(connection, message)
-
-    def error_first_login(self, connection):
-        message = self.pack_message.system_error('first_login')
-        self.send_message(connection, message)
+    def logout_engine(self, connection):
+        username = self.sender.get_name_by_connection(connection)
+        if username != 0:
+            message = self.prepare_message(mode='logout', username=username)
+            self.sender.send_all(message)
+            self.sender.logout(connection)
 
     def send_message_engine(self, connection, username, message):
-        message = self.send_message_messaging(connection, username, message)
+        message = self.prepare_message(mode='send_message', connection=connection, username=username, message=message)
         if message != -1:
-            user = self.get_connection_by_name(username)
-            try:
-                self.send_message(user, message)
-            except:
-                pass
-            self.send_message(connection, message)
+            user = self.sender.get_connection_by_name(username)
+            self.sender.send(user, message)
+            self.sender.send(connection, message)
         else:
-            message = self.pack_message.system_error('not_found', username=username)
-            self.send_message(connection, message)
+            self.send_error(connection, 'not_found', username=username)
 
     def send_all_engine(self, connection, message):
-        message = self.send_all_messaging(connection, message)
-        self.send_all(message)
-
-    def debug_engine(self):
-        connections = self.get_connections()
-        userlist = self.get_users()
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
-
-    def whoami_engine(self, connection, clear_data):
-        username = self.get_name_by_connection(connection)
-        message = self.pack_message.system_info(username, clear_data)
-        self.send_message(connection, message)
-
-    def userlist_engine(self, connection, clear_data):
-        userlist = ', '.join(self.get_username_list())
-        message = self.pack_message.system_info(userlist, clear_data)
-        if 'WS' in self.version and clear_data:
-            message = message.split(sep=', ')
-        self.send_message(connection, message)
+        message = self.prepare_message(mode='send_message_all', connection=connection, message=message)
+        self.sender.send_all(message)

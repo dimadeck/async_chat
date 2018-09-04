@@ -2,14 +2,15 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 
-from chats import VERSION_TOR as VERSION, get_setup_dict
+from chats import TorServer
 from kernel.chat_kernel import ChatKernel
+from kernel.sender import Sender
 
 
 class EchoServer(TCPServer):
-    def __init__(self, connections, port):
-        setup_dict = get_setup_dict(connections, VERSION, port)
-        self.chat = ChatKernel(setup_dict)
+    def __init__(self, chat):
+        self.chat = chat
+        self.chat.add_server(TorServer)
         super(EchoServer, self).__init__()
 
     @gen.coroutine
@@ -20,12 +21,14 @@ class EchoServer(TCPServer):
             except:
                 self.chat.logout_engine(stream)
                 break
-            if self.chat.engine(data, stream, address) == -1:
+            request = data.decode('utf-8').strip('\r\n')
+            if self.chat.engine(request, stream, address) == -1:
                 break
 
 
-def main(port=8000, connections=None):
-    server = EchoServer(connections=connections, port=port)
+def main(port=8000):
+    chat = ChatKernel(TorServer, port, sender=Sender())
+    server = EchoServer(chat)
     server.listen(port)
     try:
         IOLoop.current().start()
