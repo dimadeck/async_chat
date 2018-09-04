@@ -1,11 +1,14 @@
 import json
 
+from kernel.color_module import Color
+
 
 class AsServer:
     VERSION = 'AsyncIO_Chat'
 
     @staticmethod
     async def send_message(connection, message):
+        message = add_color(message, 'tcp')
         await connection.write(bytes(f'{message}\n', 'utf-8'))
 
     @staticmethod
@@ -31,6 +34,7 @@ class TwServer:
 
     @staticmethod
     def send_message(connection, message):
+        message = add_color(message, 'tcp')
         connection.sendLine(bytes(f'{message}', 'utf-8'))
 
     @staticmethod
@@ -56,6 +60,7 @@ class TorServer:
 
     @staticmethod
     def send_message(connect, message):
+        message = add_color(message, 'tcp')
         connect.write(bytes(f'{message}\n', 'utf-8'))
 
     @staticmethod
@@ -76,9 +81,14 @@ class TorWsServer:
         connection.close()
 
 
+def add_color(message, mode):
+    mess = Color.color_engine(message, mode)
+    return mess
+
+
 def prepare_ws_message(message):
     if type(message) == list:
         mes = {'action': 'list', 'message': message}
     else:
-        mes = {'action': 'response', 'message': message}
+        mes = {'action': 'response', 'message': add_color(message, 'ws')}
     return mes
