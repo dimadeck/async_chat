@@ -1,188 +1,193 @@
 <!DOCTYPE html>
 <meta charset="utf-8"/>
 <html>
+
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
     </script>
     <script language="javascript" type="text/javascript">
-    $(function() {
-      var conn = null;
-      var login_status = false;
-      var send_mode = null;
-      update_ui();
-      $('#field_name').val('').focus();
-      function log(msg) {
-        var control = $('#log');
-        control.html(control.html() + msg + '<br/>');
-        control.scrollTop(control.scrollTop() + 1000);
-      }
-      function set_send_mode() {
-        var list = document.getElementById("user_list");
-        index = list.options.selectedIndex;
-        if (index == -1){
-          index = 0;
-        }
-        if (index >= 0)
-        {
-          option = list.options[index];
-          send_mode = option.value;
-          $('#target').text(option.text);
-          $('#text').focus();
-        }
-      }
-      function connect() {
-        disconnect();
-        var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host+'/ws';
-        conn = new WebSocket(wsUri);
-        var name = $('#field_name').val();
-        login_status = false;
-        conn.onopen = function() {
-                  conn.send('login '+name);
-                  update_ui();
-                };
-        conn.onmessage = function(e) {
-          var data = JSON.parse(e.data);
-          switch (data.action)
-          {
-            case 'response':
-            log(data.message);
-            if (login_status == false){
-              if (data.message.indexOf('login to chat')>0){
-                login_status = true;
-              }
-            }
-            if (login_status == true){
-            conn.send('/userlist');
+        $(function() {
+            var conn = null;
+            var login_status = false;
+            var send_mode = null;
             update_ui();
-            }
-            break;
-            case 'list':
-            $('#user_list').empty();
-            $('#user_list').append($('<option>',
-            {
-              value: 'msgall ',
-              text: 'All'
-            }));
-            $('#user_list').append($('<option>',
-            {
-              value: '',
-              text: 'Clear data'
-            }));
-            for (i in data.message)
-            {
-              $('#user_list').append($('<option>',
-              {
-                value: 'msg '+data.message[i]+' ',
-                text: data.message[i]
-              }));
-            }
-            if (send_mode == null){
-              set_send_mode();
-            }
-            break;
-          }
-        };
-        conn.onclose = function() {
-          log('Disconnected.');
-          conn = null;
-          login_status = false;
-          update_ui();
-        };
-      }
-      function disconnect() {
-        if (login_status == true) {
-          conn.send('logout');
-          update_ui();
-        }
-      }
-      function update_ui() {
-        if (login_status == false) {
-          $('#chat_viewport').prop("hidden", true);
-          document.getElementById('log').innerHTML = '';
-          $('#status').prop("src", 'http://3d-zambia.chordsrt.com/assets/button_red_50-0e9cba6bd7edd35e3a03f351748610225ed9c3d6208b6a705973d314014fe8da.png');
-          $('#connect').prop("src", 'http://mebeldes.nashko.ru/sites/default/files/images/disign/possible/all-on_0.png');
-          $('#send').prop("disabled", true);
-          $('#name').prop("hidden", true);
-          $('#field_name').prop("hidden", false);
-          $('#field_name').val(name).focus();
-        } else {
-          $('#chat_viewport').prop("hidden", false);
-          $('#status').prop("src", 'http://www.clker.com/cliparts/4/t/n/Q/b/d/green-glossy-icon-th.png');
-          $('#connect').prop("src", 'https://kusnendiblog.files.wordpress.com/2010/11/shutdown-48.png');
-          $('#send').prop("disabled", false);
-          $('#name').prop("hidden", false);
-          $('#field_name').prop("hidden", true);
-          $('#text').val('').focus();
-        }
-        $('#name').text(name);
-      };
-      $('#connect').on('click', function() {
-        if (conn == null) {
-          connect();
-        } else {
-          disconnect();
-        }
-        if (login_status == false){
-          name = $('#field_name').val();
-          conn.send('login '+name);
-        }
-        update_ui();
-        return false;
-      });
-      $('#field_name').on('keyup', function(e) {
-        if (e.keyCode === 13) {
-          $('#connect').click();
-          return false;
-        }
-      });
-      // Login end
-      // Send start
-      $('#send').on('click', function() {
-        var text = $('#text').val();
-        conn.send(send_mode+text);
-        $('#text').val('').focus();
-        return false;
-      });
-      $('#text').on('keydown', function( e ) {
-  if( e.keyCode === 13 ) {
-    e.preventDefault();
-    whenEnterPressed();
-  }
-});
-      $('#text').on('keyup', function(e) {
-        if (e.keyCode === 13) {
-          $('#send').click();
-          return false;
-        }
-      });
-     // Send end
-      $('#user_list').on('dblclick', function() {
-          set_send_mode();
-        return false;
-      });
-    });
-   </script>
-    <style>
- body, .navbar {
-    background: url(http://arenda-uds114.ru/wp-content/uploads/2018/05/os-x-apple-canvas-trxture.jpg);
-    background-size: 100%;}
-.log {
-        background: url(https://img.as-creation.com/app/items/s/873422.jpg);}
-.text {
-    color: white;
-}
+            $('#field_name').val('').focus();
 
+            function log(msg) {
+                var control = $('#log');
+                control.html(control.html() + msg + '<br/>');
+                control.scrollTop(control.scrollTop() + 1000);
+            }
+
+            function set_send_mode() {
+                var list = document.getElementById("user_list");
+                index = list.options.selectedIndex;
+                if (index == -1) {
+                    index = 0;
+                }
+                if (index >= 0) {
+                    option = list.options[index];
+                    send_mode = option.value;
+                    $('#target').text(option.text);
+                    $('#text').focus();
+                }
+            }
+
+            function connect() {
+                disconnect();
+                var wsUri = (window.location.protocol == 'https:' && 'wss://' || 'ws://') + window.location.host + '/ws';
+                conn = new WebSocket(wsUri);
+                var name = $('#field_name').val();
+                login_status = false;
+                conn.onopen = function() {
+                    conn.send('login ' + name);
+                    update_ui();
+                };
+                conn.onmessage = function(e) {
+                    var data = JSON.parse(e.data);
+                    switch (data.action) {
+                        case 'response':
+                            log(data.message);
+                            if (login_status == false) {
+                                if (data.message.indexOf('login to chat') > 0) {
+                                    login_status = true;
+                                }
+                            }
+                            if (login_status == true) {
+                                conn.send('/userlist');
+                                update_ui();
+                            }
+                            break;
+                        case 'list':
+                            $('#user_list').empty();
+                            $('#user_list').append($('<option>', {
+                                value: 'msgall ',
+                                text: 'All'
+                            }));
+                            $('#user_list').append($('<option>', {
+                                value: '',
+                                text: 'Clear data'
+                            }));
+                            for (i in data.message) {
+                                $('#user_list').append($('<option>', {
+                                    value: 'msg ' + data.message[i] + ' ',
+                                    text: data.message[i]
+                                }));
+                            }
+                            if (send_mode == null) {
+                                set_send_mode();
+                            }
+                            break;
+                    }
+                };
+                conn.onclose = function() {
+                    log('Disconnected.');
+                    conn = null;
+                    login_status = false;
+                    update_ui();
+                };
+            }
+
+            function disconnect() {
+                if (login_status == true) {
+                    conn.send('logout');
+                    update_ui();
+                }
+            }
+
+            function update_ui() {
+                if (login_status == false) {
+                    $('#chat_viewport').prop("hidden", true);
+                    document.getElementById('log').innerHTML = '';
+                    $('#status').prop("src", 'http://3d-zambia.chordsrt.com/assets/button_red_50-0e9cba6bd7edd35e3a03f351748610225ed9c3d6208b6a705973d314014fe8da.png');
+                    $('#connect').prop("src", 'http://mebeldes.nashko.ru/sites/default/files/images/disign/possible/all-on_0.png');
+                    $('#send').prop("disabled", true);
+                    $('#name').prop("hidden", true);
+                    $('#field_name').prop("hidden", false);
+                    $('#field_name').val(name).focus();
+                } else {
+                    $('#chat_viewport').prop("hidden", false);
+                    $('#status').prop("src", 'http://www.clker.com/cliparts/4/t/n/Q/b/d/green-glossy-icon-th.png');
+                    $('#connect').prop("src", 'https://kusnendiblog.files.wordpress.com/2010/11/shutdown-48.png');
+                    $('#send').prop("disabled", false);
+                    $('#name').prop("hidden", false);
+                    $('#field_name').prop("hidden", true);
+                    $('#text').val('').focus();
+                }
+                $('#name').text(name);
+            };
+            $('#connect').on('click', function() {
+                if (conn == null) {
+                    connect();
+                } else {
+                    disconnect();
+                }
+                if (login_status == false) {
+                    name = $('#field_name').val();
+                    conn.send('login ' + name);
+                }
+                update_ui();
+                return false;
+            });
+            $('#field_name').on('keyup', function(e) {
+                if (e.keyCode === 13) {
+                    $('#connect').click();
+                    return false;
+                }
+            });
+            // Login end
+            // Send start
+            $('#send').on('click', function() {
+                var text = $('#text').val();
+                conn.send(send_mode + text);
+                $('#text').val('').focus();
+                return false;
+            });
+            $('#text').on('keydown', function(e) {
+                if (e.keyCode === 13) {
+                    e.preventDefault();
+                    whenEnterPressed();
+                }
+            });
+            $('#text').on('keyup', function(e) {
+                if (e.keyCode === 13) {
+                    $('#send').click();
+                    return false;
+                }
+            });
+            // Send end
+            $('#user_list').on('dblclick', function() {
+                set_send_mode();
+                return false;
+            });
+        });
+
+    </script>
+    <style>
+        body,
+        .navbar {
+            background: url(http://arenda-uds114.ru/wp-content/uploads/2018/05/os-x-apple-canvas-trxture.jpg);
+            background-size: 100%;
+        }
+
+        .log {
+            background: url(https://img.as-creation.com/app/items/s/873422.jpg);
+        }
+
+        .text {
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container stroke container-fluid">
         <div class="navbar-brand">
-            <img src="https://webradiorc.com/gallery_gen/72e4031558cae39c5d4d63f3f50ab4ed_160x160.png"
-                 width="40" height="40" alt="logo">
+            <img src="https://webradiorc.com/gallery_gen/72e4031558cae39c5d4d63f3f50ab4ed_160x160.png" width="40"
+                 height="40" alt="logo">
             <span id="chat_version">{{version}} <img id="status" width=15 height=15></span>
         </div>
         <form class="navbar-brand" id="loginform" onsubmit="return false;">
@@ -198,20 +203,20 @@
     <div class="row">
         <div class="col col-md-3 col-sm-3">
             <div class="text">Userlist:</div>
-            <select class="container" size=15 style="min-width:7em;height:50vh" id="user_list"></select>
-    </div>
-    <br>
-        <div class="col col-md-9 col-sm-9">
-        <div class="container">
-            <div class="text">Chat:</div>
-            <div class="container log" id="log"
-                 style="min-width:20em;height:50vh;overflow:auto;border:3px double gray"></div>
-            <div class="text">Send to: <span id='target'></span></div>
-            <textarea class="container" style="min-height:4em" id="text"></textarea>
-            <input hidden=true id="send" type="button" value="Send" disabled/>
+            <select class="container" size=5 style="min-width:7em;height:80%" id="user_list"></select>
         </div>
-    </div>
+        <div class="col col-md-9 col-sm-9">
+            <div class="container">
+                <div class="text">Chat:</div>
+                <div class="container log" id="log"
+                     style="min-width:20em;height:50vh;overflow:auto;border:3px double gray"></div>
+                <div class="text">Send to: <span id='target'></span></div>
+                <textarea class="container" style="min-height:4em" id="text"></textarea>
+                <input hidden=true id="send" type="button" value="Send" disabled/>
+            </div>
+        </div>
     </div>
 </div>
 </body>
+
 </html>
