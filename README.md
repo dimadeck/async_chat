@@ -9,9 +9,20 @@
         source env/bin/activate
         pip install -r requirements.txt
 
-## UPDATE [03.09.18]: ##
-    Обновлен внешний вид страницы WS-чата
+## UPDATE [04.09.18]: ##
+    Некоторые незначительные изменения: 
+        -index.html(reformat, 80% высоты для списка пользователей),
+        -Упрощение и исправления для функций [INFO]
     
+    ### Release v.0.4: ###
+        https://github.com/dimadeck/async_chat/tree/stable_version_0.4
+        
+    ### Note: ###
+        Ветка v_0_5 переписывается целыми модулями, поэтому код в ней может быть нестабильным и недоработанным.
+    
+
+## UPDATE [03.09.18]: ##
+    Обновлен внешний вид страницы WS-чата    
 ![alt text](readme_img/template_0309.png)
 
 ## UPDATE [31.08.18]: ##
