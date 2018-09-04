@@ -1,15 +1,12 @@
 import sys
 
+from chats import chat_asyncio as as_chat, chat_ws_asyncio as as_ws_chat, AsyncIO as as_chats
 from chats import chat_tornado as tor_chat, chat_ws_tornado as tor_ws_chat, Tornado as tor_chats
+from chats import chat_twisted as tw_chat, chat_ws_twisted as tw_ws_chat, Twisted as tw_chats
 
-# from chats import chat_asyncio as as_chat, chat_twisted as tw_chat, chat_tornado as tor_chat,
-#  Tornado as tor_chats, Twisted as tw_chats
-#
-# LAUNCH = {'as_chat': as_chat.main, 'tw_chat': tw_chat.main, 'tor_chat': tor_chat.main,
-#           'as_ws_chat': as_ws_chat.main, 'tw_ws_chat': tw_ws_chat.main, 'tor_ws_chat': tor_ws_chat.main,
-#           'as_chats': as_chats.main, 'tor_chats': tor_chats.main, 'tw_chats': tw_chats.main}
-
-LAUNCH = {'tor_chat': tor_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'tor_chats': tor_chats.main}
+LAUNCH = {'tor_chat': tor_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'tor_chats': tor_chats.main,
+          'as_chat': as_chat.main, 'as_ws_chat': as_ws_chat.main, 'tw_chats': tw_chats.main,
+          'tw_chat': tw_chat.main, 'tw_ws_chat': tw_ws_chat.main, 'as_chats': as_chats.main}
 
 LAUNCH_KEYS = list(LAUNCH.keys())
 
