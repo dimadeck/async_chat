@@ -1,7 +1,9 @@
 import time
 
 from kernel import *
-from kernel.color_module import Color
+
+
+# from kernel.color_module import Color
 
 
 class PackMessage:
@@ -21,7 +23,7 @@ class PackMessage:
         elif server_mode == 'logout':
             message = self.logout(username)
         mess = self.add_suffix(SERVER_SUFFIX, message)
-        mess = Color.color_engine(mess)
+        # mess = Color.color_engine(mess)
         mess = f'[{self.version}] - {mess}'
         return mess
 
@@ -31,21 +33,21 @@ class PackMessage:
         elif system_mode == 'logout':
             message = self.logout(username)
         mess = self.add_suffix(SYSTEM_SUFFIX, message)
-        mess = Color.color_engine(mess, self.color_mode)
+        # mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def chat_message(self, username, message, private=False, target=None):
         private_sym = '[->]' if private else ''
         target = f'[{target}]' if target is not None else ''
         mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{target}{DELIMETER_CHAT}{message}'
-        mess = Color.color_engine(mess, self.color_mode)
+        # mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def system_info(self, message=None, clear_data=False):
         if clear_data:
             return message
         mess = self.add_suffix(INFO_SUFFIX, message)
-        mess = Color.color_engine(mess, self.color_mode)
+        # mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     def system_error(self, error_mode, message=None, username=None):
@@ -56,7 +58,7 @@ class PackMessage:
                            'not_found': f'[{username}] {MESSAGE_NOT_FOUND}'}
 
         mess = self.add_suffix(ERROR_SUFFIX, error_messaging[error_mode])
-        mess = Color.color_engine(mess, self.color_mode)
+        # mess = Color.color_engine(mess, self.color_mode)
         return mess
 
     @staticmethod

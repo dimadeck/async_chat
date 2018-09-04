@@ -16,5 +16,5 @@ MESSAGE_USER_EXIST = 'Username already taken!'
 MESSAGE_NOT_FOUND = 'not found!'
 
 BASE_METHODS = ['login', 'msg', 'msgall', 'logout']
-SPECIAL_METHODS = ['whoami', 'userlist', 'debug']
+SPECIAL_METHODS = ['whoami', 'userlist']
 AVAILABLE_METHODS = BASE_METHODS + SPECIAL_METHODS
