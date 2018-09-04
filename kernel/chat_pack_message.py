@@ -2,63 +2,74 @@ import time
 
 from kernel import *
 
-
-# from kernel.color_module import Color
+from kernel.color_module import Color
 
 
 class PackMessage:
-    def __init__(self, version):
-        self.version = version
-        self.color = True
-        if self.version is not None:
-            self.color_mode = 'ws' if 'WS' in self.version else 'tcp'
+    @staticmethod
+    def prepare_message(mode, username=None, message=None, error_mode=None, info_mode=None, clear_data=None,
+                        sender=None, userlist=None, version=None):
+        if mode == ('login' or 'logout'):
+            print(PackMessage.server_message(mode, username=username, version=version))
+            message = PackMessage.system_message(mode, username=username)
+        elif mode == 'send_message':
+            message = PackMessage.chat_message(username=sender, message=message, private=True, target=username)
+        elif mode == 'send_message_all':
+            message = PackMessage.chat_message(username=username, message=message)
+        elif mode == 'info':
+            info_set = {'whoami': username, 'userlist': userlist}
+            message = PackMessage.system_info(info_set[info_mode], clear_data)
+        elif mode == 'error':
+            message = PackMessage.system_error(error_mode, message=message, username=username)
+        return message
 
-    def server_message(self, server_mode, port=None, addr=None, username=None, message=None):
+    @staticmethod
+    def server_message(server_mode, port=None, addr=None, username=None, message=None, version=None):
         if server_mode == 'start':
-            message = self.server_start(self.version, port)
+            message = PackMessage.server_start(version, port)
         elif server_mode == 'new':
-            message = self.server_new_connection(addr)
+            message = PackMessage.server_new_connection(addr)
         elif server_mode == 'login':
-            message = self.login(username)
+            message = PackMessage.login(username)
         elif server_mode == 'logout':
-            message = self.logout(username)
-        mess = self.add_suffix(SERVER_SUFFIX, message)
-        # mess = Color.color_engine(mess)
-        mess = f'[{self.version}] - {mess}'
+            message = PackMessage.logout(username)
+        mess = PackMessage.add_suffix(SERVER_SUFFIX, message)
+        mess = Color.color_engine(mess)
+        mess = f'[{version}] - {mess}'
         return mess
 
-    def system_message(self, system_mode, username=None, message=None):
+    @staticmethod
+    def system_message(system_mode, username=None, message=None):
         if system_mode == 'login':
-            message = self.login(username)
+            message = PackMessage.login(username)
         elif system_mode == 'logout':
-            message = self.logout(username)
-        mess = self.add_suffix(SYSTEM_SUFFIX, message)
-        # mess = Color.color_engine(mess, self.color_mode)
+            message = PackMessage.logout(username)
+        mess = PackMessage.add_suffix(SYSTEM_SUFFIX, message)
         return mess
 
-    def chat_message(self, username, message, private=False, target=None):
+    @staticmethod
+    def chat_message(username, message, private=False, target=None):
         private_sym = '[->]' if private else ''
         target = f'[{target}]' if target is not None else ''
         mess = f'[{time.strftime("%H:%M:%S")}][{username}]{private_sym}{target}{DELIMETER_CHAT}{message}'
-        # mess = Color.color_engine(mess, self.color_mode)
         return mess
 
-    def system_info(self, message=None, clear_data=False):
+    @staticmethod
+    def system_info(message=None, clear_data=False):
         if clear_data:
             return message
-        mess = self.add_suffix(INFO_SUFFIX, message)
-        # mess = Color.color_engine(mess, self.color_mode)
+        mess = PackMessage.add_suffix(INFO_SUFFIX, message)
         return mess
 
-    def system_error(self, error_mode, message=None, username=None):
+    @staticmethod
+    def system_error(error_mode, message=None, username=None):
         error_messaging = {'bad_request': message,
                            'first_login': MESSAGE_FIRST_LOGIN,
                            'already_login': MESSAGE_ALREADY_LOGIN,
                            'user_exist': MESSAGE_USER_EXIST,
                            'not_found': f'[{username}] {MESSAGE_NOT_FOUND}'}
 
-        mess = self.add_suffix(ERROR_SUFFIX, error_messaging[error_mode])
-        # mess = Color.color_engine(mess, self.color_mode)
+        mess = PackMessage.add_suffix(ERROR_SUFFIX, error_messaging[error_mode])
         return mess
 
     @staticmethod
@@ -89,19 +100,3 @@ class PackMessage:
     @staticmethod
     def message(message):
         return message
-
-    def test(self):
-        phrases = [
-            self.server_message('start', port='test_port'),
-            self.server_message('new', addr='test_addr'),
-            self.server_message('login', username='test_user'),
-            self.server_message('logout', username='test_user'),
-            self.system_message('login', username='test_user'),
-            self.system_message('logout', username='test_user'),
-            self.system_error('bad_request', message='test_error_message'),
-            self.system_error('not_found', username='test_user'), self.system_error('first_login'),
-            self.system_error('already_login'), self.system_error('user_exist'),
-            self.chat_message(username='test_user', message='test_message'),
-            self.chat_message(username='test_user', message='test_private_message', private=True),
-        ]
-        return phrases
