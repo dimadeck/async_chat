@@ -48,6 +48,9 @@ class ChatKernel:
     def login(self, connection, username):
         return self.connections.register_user(connection, username)
 
+    def drop_connection(self, connection):
+        self.connections.drop_connection(connection, self.version)
+
     def set_outside_request(self, func):
         self.outside_request = func
 
@@ -156,7 +159,7 @@ class ChatKernel:
 
     def logout(self, connection):
         self.close_connection(connection)
-        self.connections.drop_connection(connection, self.version)
+        self.drop_connection(connection)
 
     def from_outside(self, req_dict, connection):
         methods = self.prepare_outside(req_dict, connection)
