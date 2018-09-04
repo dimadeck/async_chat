@@ -35,41 +35,35 @@ class ChatKernel:
                        'empty': (self.send_error, {'connection': connection, 'error_mode': 'first_login'})}
         return methods
 
-    def login_messaging(self, username):
-        print(self.pack_message.server_message('login', username=username))
-        message = self.pack_message.system_message('login', username=username)
+    def prepare_message(self, mode, connection=None, username=None, message=None, info_mode=None, clear_data=None):
+        if mode == 'login':
+            print(self.pack_message.server_message('login', username=username))
+            message = self.pack_message.system_message('login', username=username)
+        elif mode == 'logout':
+            print(self.pack_message.server_message('logout', username=username))
+            message = self.pack_message.system_message('logout', username=username)
+        elif mode == 'send_message':
+            sender = self.sender.get_name_by_connection(connection)
+            if self.sender.get_connection_by_name(username) is not None:
+                message = self.pack_message.chat_message(username=sender, message=message,
+                                                         private=True, target=username)
+            else:
+                return -1
+        elif mode == 'send_message_all':
+            sender = self.sender.get_name_by_connection(connection)
+            message = self.pack_message.chat_message(username=sender, message=message)
+        elif mode == 'info':
+            info_set = {'whoami': self.sender.get_name_by_connection(connection),
+                        'userlist': self.sender.get_username_list()}
+            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        elif mode == 'debug':
+            connections = self.sender.get_connections()
+            userlist = self.sender.get_users(self.version)
+            print(self.pack_message.message(connections))
+            print(self.pack_message.message(userlist))
+            return 0
+
         return message
-
-    def logout_messaging(self, username):
-        message = self.pack_message.system_message('logout', username=username)
-        print(self.pack_message.server_message('logout', username=username))
-        return message
-
-    def send_message_messaging(self, connection, username, message):
-        sender = self.sender.get_name_by_connection(connection)
-        if self.sender.get_connection_by_name(username) is not None:
-            message = self.pack_message.chat_message(username=sender, message=message, private=True, target=username)
-            return message
-        else:
-            return -1
-
-    def send_all_messaging(self, connection, message):
-        sender = self.sender.get_name_by_connection(connection)
-        message = self.pack_message.chat_message(username=sender, message=message)
-        return message
-
-    def prepare_info(self, connection, info_mode, clear_data):
-        info_set = {'whoami': self.sender.get_name_by_connection(connection),
-                    'userlist': self.sender.get_username_list()}
-        message = self.pack_message.system_info(info_set[info_mode], clear_data)
-        return message
-
-    def prepare_debug(self):
-        connections = self.sender.get_connections()
-        userlist = self.sender.get_users(self.version)
-
-        print(self.pack_message.message(connections))
-        print(self.pack_message.message(userlist))
 
     def validate_request(self, request, connection, addr):
         if self.sender.add_connection(connection, self.version) == 0:
@@ -85,7 +79,7 @@ class ChatKernel:
         self.sender.send(connection, message)
 
     def send_info(self, connection, info_mode, clear_data):
-        message = self.prepare_info(connection, info_mode, clear_data)
+        message = self.prepare_message(mode='info', connection=connection, info_mode=info_mode, clear_data=clear_data)
         self.sender.send(connection, message)
 
     def engine(self, request, writer, addr):
@@ -106,38 +100,32 @@ class ChatKernel:
         state = protocol.engine(req_dict.cmd)
         return state
 
+    def login_engine(self, connection, username):
+        if self.sender.login(connection, username) == 0:
+            message = self.prepare_message(mode='login', username=username)
+            self.sender.send_all(message)
+        else:
+            self.send_error(connection, 'user_exist')
+
     def logout_engine(self, connection):
         username = self.sender.get_name_by_connection(connection)
         if username != 0:
-            message = self.logout_messaging(username)
+            message = self.prepare_message(mode='logout', username=username)
             self.sender.send_all(message)
             self.sender.logout(connection)
-            return -1
-
-    def login_engine(self, connection, username):
-        if self.sender.login(connection, username) == 0:
-            message = self.login_messaging(username)
-            self.sender.send_all(message)
-            return 0
-        else:
-            self.send_error(connection, 'user_exist')
-            return -10
 
     def send_message_engine(self, connection, username, message):
-        message = self.send_message_messaging(connection, username, message)
+        message = self.prepare_message(mode='send_message', connection=connection, username=username, message=message)
         if message != -1:
             user = self.sender.get_connection_by_name(username)
             self.sender.send(user, message)
             self.sender.send(connection, message)
-            return 0
         else:
             self.send_error(connection, 'not_found', username=username)
-            return -10
 
     def send_all_engine(self, connection, message):
-        message = self.send_all_messaging(connection, message)
+        message = self.prepare_message(mode='send_message_all', connection=connection, message=message)
         self.sender.send_all(message)
-        return 0
 
     def debug_engine(self):
-        self.prepare_debug()
+        self.prepare_message(mode='debug')
