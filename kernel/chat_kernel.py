@@ -115,14 +115,9 @@ class ChatKernel:
         return message
 
     def prepare_info(self, connection, info_mode, clear_data):
-        if clear_data and 'WS' in self.version:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': self.get_username_list()}
-            message = self.pack_message.system_info(info_set[info_mode], clear_data)
-        else:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': ', '.join(self.get_username_list())}
-            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        info_set = {'whoami': self.get_name_by_connection(connection),
+                    'userlist': self.get_username_list()}
+        message = self.pack_message.system_info(info_set[info_mode], clear_data)
         return message
 
     def prepare_debug(self):
