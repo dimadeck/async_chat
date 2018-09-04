@@ -13,7 +13,7 @@ def main(port1=8000, port2=8080):
     server1 = EchoServer(chat1)
     server1.listen(port1)
 
-    chat2 = ChatKernel(TorWsServer, port2, chat1.sender)
+    chat2 = ChatKernel(TorWsServer, port2, sender)
     server2 = Application(chat2)
     server2.listen(port2)
 
