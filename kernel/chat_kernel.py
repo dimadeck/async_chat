@@ -24,7 +24,7 @@ class ChatKernel:
                        'msg': (
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
-                       'debug': (self.prepare_message(mode='debug'), {}),
+                       'debug': (self.prepare_message, {'mode': 'debug'}),
                        'whoami': (self.send_info,
                                   {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
                        'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
