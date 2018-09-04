@@ -2,13 +2,14 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from chats import VERSION_TOR_WS as VERSION, get_setup_dict
+from chats import TorWsServer
 from kernel.chat_kernel import ChatKernel
+from kernel.sender import Sender
 
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('templates/index.html', version=VERSION)
+        self.render('templates/index.html', version=TorWsServer.VERSION)
 
 
 class WebSocket(tornado.websocket.WebSocketHandler):
@@ -22,9 +23,9 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
 
 class Application(tornado.web.Application):
-    def __init__(self, connections, port):
-        setup_dict = get_setup_dict(connections, VERSION, port)
-        self.chat = ChatKernel(setup_dict)
+    def __init__(self, chat):
+        self.chat = chat
+        self.chat.add_server(TorWsServer)
         handlers = (
             (r'/', MainHandler),
             (r'/ws', WebSocket))
@@ -32,8 +33,9 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers)
 
 
-def main(port=8888, connections=None):
-    application = Application(connections, port)
+def main(port=8080):
+    chat = ChatKernel(TorWsServer, port, sender=Sender())
+    application = Application(chat)
     application.listen(port)
     try:
         tornado.ioloop.IOLoop.instance().start()
