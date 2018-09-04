@@ -100,7 +100,7 @@ class Color:
         return suffix, body
 
     @staticmethod
-    def get_delimeter(phrase):
+    def get_delimiter(phrase):
         if DELIMETER_MESSAGE in phrase:
             return DELIMETER_MESSAGE
         elif DELIMETER_CHAT in phrase:
@@ -115,30 +115,11 @@ class Color:
 
     @staticmethod
     def color_engine(phrase, mode='tcp'):
-        delimeter = Color.get_delimeter(phrase)
-        if delimeter == -1:
+        delimiter = Color.get_delimiter(phrase)
+        if delimiter == -1:
             return phrase
         else:
             make_color = {DELIMETER_MESSAGE: Color.color_message, DELIMETER_CHAT: Color.color_chat}
-            suffix, body = Color.get_suffix_body(phrase, delimeter)
-            color_suffix, color_body = make_color[delimeter](suffix, body, mode)
-            return f"{color_suffix}{delimeter}{color_body}"
-
-
-def test():
-    from kernel.chat_pack_message import PackMessage
-    print('#####################[START TCP]#####################')
-    phrases = PackMessage(version='testVersion').test()
-    for phrase in phrases:
-        print(phrase)
-    print('#####################[END TCP]#####################')
-
-    print('#####################[START WS]#####################<br>')
-    phrases = PackMessage(version='testVersionWS').test()
-    for phrase in phrases:
-        print(f'{phrase}<br>')
-    print('#####################[END WS]#####################')
-
-
-if __name__ == '__main__':
-    test()
+            suffix, body = Color.get_suffix_body(phrase, delimiter)
+            color_suffix, color_body = make_color[delimiter](suffix, body, mode)
+            return f"{color_suffix}{delimiter}{color_body}"
