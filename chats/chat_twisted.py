@@ -1,8 +1,9 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
-from chats import VERSION_TW as VERSION, get_setup_dict
+from chats import TwServer
 from kernel.chat_kernel import ChatKernel
+from kernel.sender import Sender
 
 
 class Chat(LineReceiver):
@@ -20,17 +21,20 @@ class Chat(LineReceiver):
 
 
 class Factory(protocol.ServerFactory):
-    def __init__(self, connections, port):
-        setup_dict = get_setup_dict(connections, VERSION, port)
-        self.chat = ChatKernel(setup_dict)
+    def __init__(self, chat):
+        self.chat = chat
+        self.chat.add_server(TwServer)
+
         super(Factory, self).__init__()
 
     def buildProtocol(self, addr):
         return Chat(self.chat, addr)
 
 
-def main(port=1234, connections=None):
-    reactor.listenTCP(port, Factory(connections=connections, port=port))
+def main(port=8000):
+    chat = ChatKernel(TwServer, port, sender=Sender())
+
+    reactor.listenTCP(port, Factory(chat))
     reactor.run()
 
 
