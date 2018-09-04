@@ -24,7 +24,6 @@ class ChatKernel:
                        'msg': (
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
-                       'debug': (self.prepare_message, {'mode': 'debug'}),
                        'whoami': (self.send_info,
                                   {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
                        'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
@@ -56,11 +55,6 @@ class ChatKernel:
             info_set = {'whoami': self.sender.get_name_by_connection(connection),
                         'userlist': self.sender.get_username_list()}
             message = self.pack_message.system_info(info_set[info_mode], clear_data)
-        elif mode == 'debug':
-            connections = self.sender.get_connections()
-            userlist = self.sender.get_users(self.version)
-            print(self.pack_message.message(connections))
-            print(self.pack_message.message(userlist))
         return message
 
     def validate_request(self, request, connection, addr):
