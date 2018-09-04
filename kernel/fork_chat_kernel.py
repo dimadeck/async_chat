@@ -1,15 +1,17 @@
 from kernel.chat_kernel import ChatKernel as CK
+from kernel.chat_pack_message import PackMessage
 from kernel.chat_protocol import ChatProtocol
 from kernel.data_parser import DataParser
 
 
 class ChatKernel(CK):
     async def send_error(self, connection, error_mode, mess=None, username=None):
-        message = self.pack_message.system_error(error_mode, message=mess, username=username)
+        message = PackMessage.prepare_message(mode='error', error_mode=error_mode, message=mess, username=username)
         await self.sender.send(connection, message)
 
-    async def send_info(self, connection, info_mode, clear_data):
-        message = self.prepare_message(mode='info', connection=connection, info_mode=info_mode, clear_data=clear_data)
+    async def send_info(self, connection, info_mode, clear_data, userlist=None, username=None):
+        message = PackMessage.prepare_message('info', info_mode=info_mode, clear_data=clear_data,
+                                              userlist=userlist, username=username)
         await self.sender.send(connection, message)
 
     async def engine(self, request, writer, addr):
@@ -32,7 +34,7 @@ class ChatKernel(CK):
 
     async def login_engine(self, connection, username):
         if self.sender.login(connection, username) == 0:
-            message = self.prepare_message(mode='login', username=username)
+            message = PackMessage.prepare_message(mode='login', username=username, version=self.version)
             await self.sender.send_all(message)
         else:
             await self.send_error(connection, 'user_exist')
@@ -40,19 +42,21 @@ class ChatKernel(CK):
     async def logout_engine(self, connection):
         username = self.sender.get_name_by_connection(connection)
         if username != 0:
-            message = self.prepare_message(mode='logout', username=username)
+            message = PackMessage.prepare_message(mode='logout', username=username, version=self.version)
             await self.sender.send_all(message)
             await self.sender.logout(connection)
 
     async def send_message_engine(self, connection, username, message):
-        message = self.prepare_message(mode='send_message', connection=connection, username=username, message=message)
-        if message != -1:
-            user = self.sender.get_connection_by_name(username)
+        user = self.sender.get_connection_by_name(username)
+        if user is not None:
+            message = PackMessage.prepare_message(mode='send_message', username=username, message=message,
+                                                  sender=self.sender.get_name_by_connection(connection))
             await self.sender.send(user, message)
             await self.sender.send(connection, message)
         else:
             await self.send_error(connection, 'not_found', username=username)
 
     async def send_all_engine(self, connection, message):
-        message = self.prepare_message(mode='send_message_all', connection=connection, message=message)
+        username = self.sender.get_name_by_connection(connection)
+        message = PackMessage.prepare_message(mode='send_message_all', username=username, message=message)
         await self.sender.send_all(message)
