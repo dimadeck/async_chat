@@ -24,7 +24,7 @@ class ChatKernel:
                        'msg': (
                            self.send_message_engine, {'connection': connection, 'username': param, 'message': message}),
                        'msgall': (self.send_all_engine, {'connection': connection, 'message': message}),
-                       'debug': (self.debug_engine, {}),
+                       'debug': (self.prepare_message(mode='debug'), {}),
                        'whoami': (self.send_info,
                                   {'connection': connection, 'info_mode': 'whoami', 'clear_data': req_dict.clear_data}),
                        'userlist': (self.send_info, {'connection': connection, 'info_mode': 'userlist',
@@ -61,8 +61,6 @@ class ChatKernel:
             userlist = self.sender.get_users(self.version)
             print(self.pack_message.message(connections))
             print(self.pack_message.message(userlist))
-            return 0
-
         return message
 
     def validate_request(self, request, connection, addr):
@@ -126,6 +124,3 @@ class ChatKernel:
     def send_all_engine(self, connection, message):
         message = self.prepare_message(mode='send_message_all', connection=connection, message=message)
         self.sender.send_all(message)
-
-    def debug_engine(self):
-        self.prepare_message(mode='debug')
