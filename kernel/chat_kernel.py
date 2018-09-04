@@ -48,6 +48,9 @@ class ChatKernel:
     def login(self, connection, username):
         return self.connections.register_user(connection, username)
 
+    def drop_connection(self, connection):
+        self.connections.drop_connection(connection, self.version)
+
     def set_outside_request(self, func):
         self.outside_request = func
 
@@ -115,14 +118,9 @@ class ChatKernel:
         return message
 
     def prepare_info(self, connection, info_mode, clear_data):
-        if clear_data and 'WS' in self.version:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': self.get_username_list()}
-            message = self.pack_message.system_info(info_set[info_mode], clear_data)
-        else:
-            info_set = {'whoami': self.get_name_by_connection(connection),
-                        'userlist': ', '.join(self.get_username_list())}
-            message = self.pack_message.system_info(info_set[info_mode], clear_data)
+        info_set = {'whoami': self.get_name_by_connection(connection),
+                    'userlist': self.get_username_list()}
+        message = self.pack_message.system_info(info_set[info_mode], clear_data)
         return message
 
     def prepare_debug(self):
@@ -161,7 +159,7 @@ class ChatKernel:
 
     def logout(self, connection):
         self.close_connection(connection)
-        self.connections.drop_connection(connection, self.version)
+        self.drop_connection(connection)
 
     def from_outside(self, req_dict, connection):
         methods = self.prepare_outside(req_dict, connection)
