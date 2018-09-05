@@ -7,11 +7,16 @@ class Connected:
     def add_version_header(self, version):
         if version not in self.connections:
             self.connections[version] = []
+            return 0
+        return -1
 
     def add_connection(self, connection, version):
         if not self.is_exist_connection(connection):
             self.connections_list.append(connection)
-            self.connections[version].append(connection)
+            try:
+                self.connections[version].append(connection)
+            except KeyError:
+                return -2
             return 0
         else:
             return -1
@@ -20,10 +25,13 @@ class Connected:
         return self.connections[version]
 
     def get_version_by_connection(self, connection):
-        for version in self.connections:
-            if connection in self.connections[version]:
-                return version
-        return -1
+        if connection in self.connections_list:
+            for version in self.connections:
+                if connection in self.connections[version]:
+                    return version
+            return -1
+        else:
+            return -2
 
     def is_exist_connection(self, connection):
         return connection in self.connections_list
