@@ -12,10 +12,14 @@ class AsyncioChat:
 
     async def handle_client(self, reader, writer):
         while True:
-            request = (await reader.read(1024))
-            addr = writer.get_extra_info('peername')
-            request = request.decode('utf-8').strip('\r\n')
-            if await self.chat.engine(request, writer, addr) == -1:
+            try:
+                request = (await reader.read(1024))
+                addr = writer.get_extra_info('peername')
+                request = request.decode('utf-8').strip('\r\n')
+                if await self.chat.engine(request, writer, addr) == -1:
+                    break
+            except:
+                await self.chat.logout_engine(writer)
                 break
 
 
