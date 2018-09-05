@@ -4,15 +4,6 @@ from kernel.data_parser import DataParser
 
 
 class ParserTest(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.expected_line1 = 1
-
-    def test_parser_template(self):
-        line2 = 1
-        self.assertEqual(self.expected_line1, line2)
-
     def test_parser_status_ok_1(self):
         expected_status = 0
         status = DataParser('login dima').status
