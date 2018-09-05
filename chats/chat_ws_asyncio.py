@@ -26,16 +26,19 @@ class AioChat:
         ws_current = web.WebSocketResponse()
         await ws_current.prepare(request)
         while True:
-            msg = await ws_current.receive()
-            if msg.type == WSMsgType.CLOSE:
-                await self.chat.logout_engine(ws_current)
-                break
-            else:
-                msg = bytes(msg.data, encoding='utf-8')
-                addr = request.transport.get_extra_info('peername')
-                req = msg.decode('utf-8').strip('')
-                if await self.chat.engine(req, ws_current, addr) == -1:
+            try:
+                msg = await ws_current.receive()
+                if msg.type == WSMsgType.CLOSE:
+                    await self.chat.logout_engine(ws_current)
                     break
+                else:
+                    msg = bytes(msg.data, encoding='utf-8')
+                    addr = request.transport.get_extra_info('peername')
+                    req = msg.decode('utf-8').strip('')
+                    if await self.chat.engine(req, ws_current, addr) == -1:
+                        break
+            except:
+                break
         return ws_current
 
 
