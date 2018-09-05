@@ -1,7 +1,6 @@
 import time
 
 from kernel import *
-
 from kernel.color_module import Color
 
 
@@ -9,7 +8,7 @@ class PackMessage:
     @staticmethod
     def prepare_message(mode, username=None, message=None, error_mode=None, info_mode=None, clear_data=None,
                         sender=None, userlist=None, version=None):
-        if mode == ('login' or 'logout'):
+        if mode == 'login' or mode == 'logout':
             print(PackMessage.server_message(mode, username=username, version=version))
             message = PackMessage.system_message(mode, username=username)
         elif mode == 'send_message':
