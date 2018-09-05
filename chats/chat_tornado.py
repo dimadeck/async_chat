@@ -10,7 +10,6 @@ from kernel.sender import Sender
 class EchoServer(TCPServer):
     def __init__(self, chat):
         self.chat = chat
-        self.chat.add_server(TorServer)
         super(EchoServer, self).__init__()
 
     @gen.coroutine

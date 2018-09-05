@@ -23,8 +23,6 @@ class Chat(LineReceiver):
 class Factory(protocol.ServerFactory):
     def __init__(self, chat):
         self.chat = chat
-        self.chat.add_server(TwServer)
-
         super(Factory, self).__init__()
 
     def buildProtocol(self, addr):

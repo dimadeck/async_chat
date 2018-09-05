@@ -8,7 +8,6 @@ from kernel.fork_sender import Sender
 class AsyncioChat:
     def __init__(self, chat):
         self.chat = chat
-        self.chat.add_server(AsServer)
 
     async def handle_client(self, reader, writer):
         while True:

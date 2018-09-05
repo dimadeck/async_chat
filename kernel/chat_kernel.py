@@ -7,10 +7,8 @@ class ChatKernel:
     def __init__(self, server, port, sender):
         self.version = server.VERSION
         self.sender = sender
-        print(PackMessage.server_message(server_mode='start', port=port, version=self.version))
-
-    def add_server(self, server):
         self.sender.add_server(server)
+        print(PackMessage.server_message(server_mode='start', port=port, version=self.version))
 
     def prepare_run(self, req_dict, connection):
         param = req_dict.parameter
