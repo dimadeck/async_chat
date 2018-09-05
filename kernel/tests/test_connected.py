@@ -163,6 +163,7 @@ class ConnectedTest(unittest.TestCase):
         self.connections.add_version_header('test_version')
         self.connections.add_connection('test_connection_1', 'test_version')
         self.connections.register_user('test_connection_1', 'Dima')
+        self.connections.drop_connection('test_connection_1')
         state = self.connections.is_exist_connection('test_connection_1')
         self.assertEqual(expected_state, state)
 
