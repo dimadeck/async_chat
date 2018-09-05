@@ -6,7 +6,7 @@ from kernel.data_parser import DataParser
 
 class ChatKernel(CK):
     async def send_error(self, connection, error_mode, mess=None, username=None):
-        message = PackMessage.prepare_message(mode='error', error_mode=error_mode, message=mess, username=username)
+        message = PackMessage.prepare_message('error', error_mode=error_mode, message=mess, username=username)
         await self.sender.send(connection, message)
 
     async def send_info(self, connection, info_mode, clear_data, userlist=None, username=None):
