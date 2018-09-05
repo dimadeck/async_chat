@@ -44,8 +44,11 @@ class Connected:
 
     def register_user(self, connection, username):
         if self.is_valid_name(username) == 0:
-            self.users[connection] = username
-            return 0
+            if connection in self.connections_list:
+                self.users[connection] = username
+                return 0
+            else:
+                return -2
         return -1
 
     def is_register(self, connection):
@@ -67,9 +70,9 @@ class Connected:
         if self.is_register(connection):
             self.users.pop(connection)
         if connection in self.connections_list:
-            self.connections_list.remove(connection)
             version = self.get_version_by_connection(connection)
             self.connections[version].remove(connection)
+            self.connections_list.remove(connection)
 
     def get_username_list(self):
         user_list = []
