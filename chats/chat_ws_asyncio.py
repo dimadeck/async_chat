@@ -10,7 +10,6 @@ from kernel.fork_sender import Sender
 class AioChat:
     def __init__(self, chat):
         self.chat = chat
-        self.chat.add_server(AsWsServer)
         self.app = web.Application()
 
     def init_app(self):
@@ -23,6 +22,7 @@ class AioChat:
         return aiohttp_jinja2.render_template('index.html', request, {'version': AsWsServer.VERSION})
 
     async def ws(self, request):
+
         ws_current = web.WebSocketResponse()
         await ws_current.prepare(request)
         while True:

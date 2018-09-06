@@ -25,7 +25,6 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 class Application(tornado.web.Application):
     def __init__(self, chat):
         self.chat = chat
-        self.chat.add_server(TorWsServer)
         handlers = (
             (r'/', MainHandler),
             (r'/ws', WebSocket))

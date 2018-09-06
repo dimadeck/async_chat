@@ -42,7 +42,6 @@ class FactoryWS:
         self.factory.protocol = TwistedWsProtocol
 
         self.factory.protocol.chat = chat
-        self.factory.protocol.chat.add_server(TwWsServer)
         ws_resource = WebSocketResource(self.factory)
 
         root = Resource()
