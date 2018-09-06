@@ -92,6 +92,13 @@ class KernelTest(unittest.TestCase):
         line = TestServer.TEST_MESSAGE_STATE
         self.assertEqual(expected_line, line)
 
+    def test_kernel_login_username_already_taken(self):
+        mess = PackMessage.prepare_message('error', error_mode='user_exist', username='Dima')
+        expected_line = f"test_connection_2: {mess}"
+        self.chat.engine('login Dima', 'test_connection_2', '-')
+        line = TestServer.TEST_MESSAGE_STATE
+        self.assertEqual(expected_line, line)
+
     def test_kernel_send_message_ok(self):
         mess = PackMessage.prepare_message('send_message', sender='Dima', message='hello!', username='Dima')
         expected_line = f"test_connection_1: {mess}"
@@ -142,7 +149,7 @@ class KernelTest(unittest.TestCase):
     def test_kernel_first_login(self):
         mess = PackMessage.prepare_message('error', error_mode='first_login')
         expected_line = f"test_connection_1: {mess}"
-        self.chat.engine('', 'test_connection_1', '-')
+        self.chat.engine('logout', 'test_connection_1', '-')
         self.chat.engine('msgall hello!', 'test_connection_1', '-')
         line = TestServer.TEST_MESSAGE_STATE
         self.assertEqual(expected_line, line)
