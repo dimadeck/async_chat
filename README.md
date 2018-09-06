@@ -10,6 +10,20 @@
         source env/bin/activate
         pip install -r requirements.txt
 
+
+## UPDATE [06.09.18]: ##
+    
+    Разделение файла index.html на html, js, css, static/images,
+    Адаптация серверов под новую архитектуру html.
+
+## UPDATE [05.09.18]: ##
+    
+    Выделена сущность sender для работы с подключениями (connection manager) и работы 
+    с серверами (send, close methods).
+    Написаны тесты для kernel модулей.
+    Добавлен рукурсивный поисковик тестов и запуск из run.py test.
+    
+
 ## UPDATE [04.09.18]: ##
     Некоторые незначительные изменения: 
         -index.html(reformat, 80% высоты для списка пользователей),
