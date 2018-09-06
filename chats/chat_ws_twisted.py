@@ -4,6 +4,7 @@ from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerFactory
 from autobahn.twisted.websocket import WebSocketServerProtocol
 from twisted.internet import reactor
+from twisted.web import static
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 
@@ -11,16 +12,8 @@ from chats import TwWsServer
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__name__))
-TEMPLATES_DIR = os.path.join(CURRENT_DIR, 'chats', 'templates')
-index = os.path.join(TEMPLATES_DIR, 'index.html')
-
-
-class HttpResource(Resource):
-    def render_GET(self, request):
-        html = open(index, "r").read()
-        html = html.replace('{{version}}', TwWsServer.VERSION)
-        return bytes(html, encoding='utf-8')
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')
 
 
 class TwistedWsProtocol(WebSocketServerProtocol):
@@ -43,11 +36,10 @@ class FactoryWS:
 
         self.factory.protocol.chat = chat
         ws_resource = WebSocketResource(self.factory)
-
         root = Resource()
-        root.putChild(b"", HttpResource())
         root.putChild(b"ws", ws_resource)
-
+        root.putChild(b"static", static.File(STATIC_DIR))
+        root.putChild(b"", static.File(os.path.join(TEMPLATES_DIR, 'index.html')))
         self.site = Site(root)
 
 
