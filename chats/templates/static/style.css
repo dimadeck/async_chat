@@ -1,0 +1,28 @@
+  body,.navbar {
+        background: url(/static/images/background.jpg);
+        background-size: 100%;
+    }
+
+    .log {
+        background: url(/static/images/chat_field.jpg);
+    }
+
+    .text {
+        color: white;
+    }
+    .field_name {
+      max-width:40vw;
+    }
+    .user_list {
+      min-width:7em;
+      height:80%;
+    }
+    .log {
+      min-width:20em;
+      height:50vh;
+      overflow:auto;
+      border:3px double gray;
+    }
+    .text_field {
+      min-height:4em;
+    }
