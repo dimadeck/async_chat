@@ -1,10 +1,13 @@
-import aiohttp_jinja2
-import jinja2
+import os
+
 from aiohttp import web, WSMsgType
 
 from chats import AsWsServer
 from kernel.fork_chat_kernel import ChatKernel
 from kernel.fork_sender import Sender
+
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')
 
 
 class AioChat:
@@ -13,13 +16,14 @@ class AioChat:
         self.app = web.Application()
 
     def init_app(self):
-        aiohttp_jinja2.setup(self.app, loader=jinja2.PackageLoader('chats', 'templates'))
         self.app.router.add_get('/', self.index)
+        self.app.router.add_static('/static', path=STATIC_DIR)
         self.app.router.add_get('/ws', self.ws)
         return self.app
 
-    def index(self, request):
-        return aiohttp_jinja2.render_template('index.html', request, {})
+    @staticmethod
+    def index(request):
+        return web.FileResponse(path=os.path.join(TEMPLATES_DIR, 'index.html'))
 
     async def ws(self, request):
 
