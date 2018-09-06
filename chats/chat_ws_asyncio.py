@@ -19,7 +19,7 @@ class AioChat:
         return self.app
 
     def index(self, request):
-        return aiohttp_jinja2.render_template('index.html', request, {'version': AsWsServer.VERSION})
+        return aiohttp_jinja2.render_template('index.html', request, {})
 
     async def ws(self, request):
 
