@@ -5,9 +5,7 @@ from aiohttp import web, WSMsgType
 from kernel.fork_chat_kernel import ChatKernel
 from kernel.fork_sender import Sender
 from servers import AsWsServer
-
-TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')
+from servers import TEMPLATES_DIR, STATIC_DIR
 
 
 class AioChat:

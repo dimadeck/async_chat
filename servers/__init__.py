@@ -1,6 +1,10 @@
 import json
+import os
 
 from kernel.color_module import Color
+
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')
 
 
 class AsServer:

@@ -10,10 +10,7 @@ from twisted.web.server import Site
 
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
-from servers import TwWsServer
-
-TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')
+from servers import TEMPLATES_DIR, STATIC_DIR, TwWsServer
 
 
 class TwistedWsProtocol(WebSocketServerProtocol):
