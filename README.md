@@ -109,30 +109,30 @@
 
 ## [Демонстрация работы] ##
 
-  TCP (на примере tornado):
-    Запуск сервера: 
-      python run.py tor_chat
-    Подключение:
-      telnet 127.0.0.1 8000
+    TCP (на примере tornado):
+        Запуск сервера: 
+            python run.py tor_chat
+        Подключение:
+            telnet 127.0.0.1 8000
     
 ![alt text](readme_img/tcp_tornado_clients.png)
 ![alt text](readme_img/tcp_tornado_server.png)
 
-  WebSocket (на примере twisted_ws):
-    Запуск сервера:
-      python run.py tw_ws_chat
-    Подключение:
-      Перейти в браузере на 127.0.0.1:8080
+    WebSocket (на примере twisted_ws):
+        Запуск сервера:
+            python run.py tw_ws_chat
+        Подключение:
+            Перейти в браузере на 127.0.0.1:8080
 
 ![alt text](readme_img/ws_twisted_clients.png)
 ![alt text](readme_img/ws_twisted_server.png)
 
-  TCP + WebSocket (на примере asyncIO_pair)
-    Запуск сервера:
-      python run.py as_chats
-    Подключение:
-      telnet 127.0.0.1 8000 - для TCP
-      Перейти в браузере на 127.0.0.1:8080 - для WebSocket
+    TCP + WebSocket (на примере asyncIO_pair)
+        Запуск сервера:
+            python run.py as_chats
+        Подключение:
+            telnet 127.0.0.1 8000 - для TCP
+            Перейти в браузере на 127.0.0.1:8080 - для WebSocket
 
 ![alt text](readme_img/pair_as_clients.png)
 ![alt text](readme_img/pair_as_server.png)
