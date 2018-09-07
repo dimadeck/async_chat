@@ -19,13 +19,16 @@ def main(port1=8000, port2=8080):
     server2 = AioChat(chat2)
     app = server2.init_app()
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(asyncio.start_server(server1.handle_client, '127.0.0.1', port1))
-    loop.create_task(web.run_app(app, port=port2, host='127.0.0.1'))
     try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        loop.close()
+        loop = asyncio.get_event_loop()
+        loop.create_task(asyncio.start_server(server1.handle_client, '127.0.0.1', port1))
+        loop.create_task(web.run_app(app, port=port2, host='127.0.0.1'))
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            loop.close()
+    except RuntimeError:
+        pass
 
 
 if __name__ == '__main__':
