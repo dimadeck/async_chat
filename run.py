@@ -1,8 +1,8 @@
 import sys
 
 from servers import asyncIO as as_chat, asyncIO_ws as as_ws_chat, asyncIO_pair as as_chats
-from servers import tornado as tor_chat, tornado_ws as tor_ws_chat, Tornado_pair as tor_chats
-from servers import twisted as tw_chat, twisted_ws as tw_ws_chat, Twisted_pair as tw_chats
+from servers import tornado as tor_chat, tornado_ws as tor_ws_chat, tornado_pair as tor_chats
+from servers import twisted as tw_chat, twisted_ws as tw_ws_chat, twisted_pair as tw_chats
 from testing import test_all
 
 LAUNCH = {'tor_chat': tor_chat.main, 'tor_ws_chat': tor_ws_chat.main, 'tor_chats': tor_chats.main,
