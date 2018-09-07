@@ -32,7 +32,7 @@ def main(port=8000):
     try:
         IOLoop.current().start()
     except KeyboardInterrupt:
-        IOLoop.current().close()
+        IOLoop.current().stop()
 
 
 if __name__ == "__main__":
