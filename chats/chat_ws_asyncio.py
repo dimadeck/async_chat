@@ -16,17 +16,12 @@ class AioChat:
         self.app = web.Application()
 
     def init_app(self):
-        self.app.router.add_get('/', self.index)
+        self.app.router.add_get('/', lambda index: web.FileResponse(path=os.path.join(TEMPLATES_DIR, 'index.html')))
         self.app.router.add_static('/static', path=STATIC_DIR)
         self.app.router.add_get('/ws', self.ws)
         return self.app
 
-    @staticmethod
-    def index(request):
-        return web.FileResponse(path=os.path.join(TEMPLATES_DIR, 'index.html'))
-
     async def ws(self, request):
-
         ws_current = web.WebSocketResponse()
         await ws_current.prepare(request)
         while True:
