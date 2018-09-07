@@ -1,10 +1,10 @@
 from twisted.internet import reactor
 
-from chats import TwServer, TwWsServer
-from chats.chat_twisted import Factory
-from chats.chat_ws_twisted import FactoryWS
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TwServer, TwWsServer
+from servers.twisted import Factory
+from servers.twisted_ws import FactoryWS
 
 
 def main(port1=8000, port2=8080):

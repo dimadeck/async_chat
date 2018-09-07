@@ -8,9 +8,9 @@ from twisted.web import static
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 
-from chats import TwWsServer
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TwWsServer
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 STATIC_DIR = os.path.join(TEMPLATES_DIR, 'static')

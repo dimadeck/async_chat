@@ -2,11 +2,11 @@ import asyncio
 
 from aiohttp import web
 
-from chats import AsServer, AsWsServer
-from chats.chat_asyncio import AsyncioChat
-from chats.chat_ws_asyncio import AioChat
 from kernel.fork_chat_kernel import ChatKernel
 from kernel.fork_sender import Sender
+from servers import AsServer, AsWsServer
+from servers.asyncIO import AsyncioChat
+from servers.asyncIO_ws import AioChat
 
 
 def main(port1=8000, port2=8080):

@@ -2,9 +2,9 @@ from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.tcpserver import TCPServer
 
-from chats import TorServer
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TorServer
 
 
 class EchoServer(TCPServer):

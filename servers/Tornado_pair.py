@@ -1,10 +1,10 @@
 import tornado
 
-from chats import TorServer, TorWsServer
-from chats.chat_tornado import EchoServer
-from chats.chat_ws_tornado import Application
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TorServer, TorWsServer
+from servers.tornado import EchoServer
+from servers.tornado_ws import Application
 
 
 def main(port1=8000, port2=8080):

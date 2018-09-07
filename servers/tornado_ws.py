@@ -2,9 +2,9 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from chats import TorWsServer
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TorWsServer
 
 
 class WebSocket(tornado.websocket.WebSocketHandler):

@@ -1,8 +1,8 @@
 import asyncio
 
-from chats import AsServer
 from kernel.fork_chat_kernel import ChatKernel
 from kernel.fork_sender import Sender
+from servers import AsServer
 
 
 class AsyncioChat:

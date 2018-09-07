@@ -1,9 +1,9 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
-from chats import TwServer
 from kernel.chat_kernel import ChatKernel
 from kernel.sender import Sender
+from servers import TwServer
 
 
 class Chat(LineReceiver):
